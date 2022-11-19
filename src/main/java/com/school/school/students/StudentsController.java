@@ -12,15 +12,24 @@ public class StudentsController {
 
     @GetMapping
     public List<Student> getAll(){
-        return StudentsStorage.data;
+        return StudentsStorage.getAll();
     }
 
     @PostMapping
-    public Student create (@RequestBody Student student) {
-        if (student.getId() == null) {
-            student.generateId();
-        }
-        StudentsStorage.data.add(student);
-        return student;
+    public void create (@RequestBody Student student) {
+        StudentsStorage.create(student);
+    }
+    @GetMapping("/{id}")
+    public Student getById (@PathVariable UUID id) {
+        return StudentsStorage.getById(id);
+    }
+    @PutMapping("/{id}")
+    public void updateById (@PathVariable UUID id, @RequestBody Student newStudent) {
+        StudentsStorage.update(id, newStudent);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById (@PathVariable UUID id) {
+        StudentsStorage.delete(id);
     }
 }
