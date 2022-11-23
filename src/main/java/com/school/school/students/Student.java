@@ -1,7 +1,5 @@
 package com.school.school.students;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.UUID;
 
 

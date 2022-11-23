@@ -1,6 +1,5 @@
 package com.school.school.students;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
