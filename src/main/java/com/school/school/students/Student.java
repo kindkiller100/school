@@ -2,6 +2,7 @@ package com.school.school.students;
 
 import java.util.UUID;
 
+
 public class Student {
     private UUID id;
     private String name;
@@ -35,9 +36,5 @@ public class Student {
 
     public Byte getAge() {
         return age;
-    }
-
-    public void setAge(Byte age) {
-        this.age = age;
     }
 }

@@ -38,7 +38,7 @@ CREATE TABLE lessons
     duration smallint CHECK (duration > 0),
     subject_id int NOT NULL REFERENCES subjects(id),
     teacher_id int NOT NULL REFERENCES teachers(id),
-    description VARCHAR (40) ,
+    description VARCHAR (40),
     deleted boolean DEFAULT FALSE
 );
 
