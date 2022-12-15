@@ -1,5 +1,7 @@
 package subjects;
 
+import java.util.Objects;
+
 public class Subject {
     private long id;
     private String title;
@@ -31,5 +33,27 @@ public class Subject {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Subject{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Subject)) return false;
+        Subject subject = (Subject) o;
+        return getId() == subject.getId() && getTitle().equals(subject.getTitle()) && getDescription().equals(subject.getDescription());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getTitle(), getDescription());
     }
 }
