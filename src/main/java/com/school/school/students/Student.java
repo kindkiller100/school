@@ -1,28 +1,33 @@
 package com.school.school.students;
 
-import java.util.UUID;
-
+import java.time.LocalDate;
 
 public class Student {
-    private UUID id;
+    private long id;
     private String name;
-    private Byte age;
+    private String secondName;
+    private String lastname;
+    private LocalDate dateOfBirth;
+    private String gender;
+    private String telephoneNumber;
+    private String info;
+    private boolean deleted;
 
     public void generateId(){
-        long countOfId;
-        UUID newId;
-        do {
-            newId = UUID.randomUUID();
-            UUID finalNewId = newId;
-            countOfId = StudentsStorage.data
-                    .stream()
-                    .filter(student -> student.getId().equals(finalNewId))
-                    .count();
-        } while (countOfId > 0);
-        this.id = newId;
+//        long countOfId;
+//        UUID newId;
+//        do {
+//            newId = UUID.randomUUID();
+//            UUID finalNewId = newId;
+//            countOfId = StudentsStorage.data
+//                    .stream()
+//                    .filter(student -> student.getId().equals(finalNewId))
+//                    .count();
+//        } while (countOfId > 0);
+//        this.id = newId;
     }
 
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 
@@ -30,11 +35,31 @@ public class Student {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getSecondName() {
+        return secondName;
     }
 
-    public Byte getAge() {
-        return age;
+    public String getLastname() {
+        return lastname;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public String getTelephoneNumber() {
+        return telephoneNumber;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 }
