@@ -28,6 +28,7 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- swagger -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>

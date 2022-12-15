@@ -16,11 +16,15 @@ public class StudentsStorage {
     public static List<Student> getAll(){
         return data;
     }
-    public static Student getById (UUID id){
-        return data.stream()
-                .filter((s) -> s.getId().equals(id))
-                .findFirst()
-                .orElseThrow();
+    public static Student getById(UUID id) {
+        if (id == null) {
+            throw new NullPointerException("Student's id is empty.");
+        }
+
+        return StudentsStorage.data.stream()
+                .filter(student -> student.getId().equals(id))
+                .findAny()
+                .orElseThrow(() -> new NullPointerException("Student by id '" + id + "' not found."));
     }
     public static void update (UUID id, Student student){
         if (!id.equals(student.getId())){
