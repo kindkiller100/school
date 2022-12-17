@@ -31,15 +31,15 @@ CREATE TABLE subjects
     description varchar(140)
 );
 
-CREATE TABLE lessons
-(
-    id serial PRIMARY KEY,
-    startDateTime timestamp NOT NULL,
-    duration smallint CHECK (duration > 0),
-    subject_id int NOT NULL REFERENCES subjects(id),
-    teacher_id int NOT NULL REFERENCES teachers(id),
-    description VARCHAR (40),
-    deleted boolean DEFAULT FALSE
+CREATE TABLE lessons  
+(  
+id serial PRIMARY KEY,  
+startDateTime timestamp NOT NULL, 
+duration smallint CHECK (duration > 0),  
+subject_id int NOT NULL REFERENCES subjects(id),  
+teacher_id int NOT NULL REFERENCES teachers(id), 
+description VARCHAR (40) ,
+deleted boolean DEFAULT FALSE
 );
 
 CREATE TABLE student_lesson

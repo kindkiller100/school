@@ -1,12 +1,18 @@
 package com.school.school.students;
 
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.UUID;
 
 public class Student {
     private UUID id;
     private String name;
     private Byte age;
+
+    public UUID getId() {
+        return id;
+    }
 
     public void generateId(){
         long countOfId;
@@ -22,19 +28,20 @@ public class Student {
         this.id = newId;
     }
 
-    public UUID getId() {
-        return id;
-    }
 
     public String getName() {
         return name;
+    }
+
+    public Byte getAge() {
+        return age;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public Byte getAge() {
-        return age;
+    public void setAge(Byte age) {
+        this.age = age;
     }
 }

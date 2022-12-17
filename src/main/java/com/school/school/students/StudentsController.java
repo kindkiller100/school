@@ -6,68 +6,69 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/students")
 public class StudentsController {
-
     @GetMapping
     public List<Student> getAll(){
-        return StudentsStorage.getAll();
+        return StudentsStorage.data;
     }
 
     @PostMapping
-    public void create (@RequestBody Student student) {
-        StudentsStorage.create(student);
+    public Student create(@RequestBody Student student){
+        if (student.getId() == null) {
+            student.generateId();
+        }
+        StudentsStorage.data.add(student);
+        return student;
     }
+
     @GetMapping("/{id}")
-    public Student getById (@PathVariable UUID id) {
-        return StudentsStorage.getById(id);
+    public Student getById(@PathVariable UUID id){
+        return getStudentById(id);
     }
+
     @PutMapping("/{id}")
-    public void updateById (@PathVariable UUID id, @RequestBody Student newStudent) {
-        StudentsStorage.update(id, newStudent);
+    public Student put(@PathVariable UUID id,
+                       @RequestBody Student newStudent){
+        Student student = getStudentById(id);
+        if (newStudent.getName() != null) {
+            student.setName(newStudent.getName());
+        }
+        if (newStudent.getAge() != null) {
+            student.setAge(newStudent.getAge());
+        }
+        return student;
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById (@PathVariable UUID id) {
-        StudentsStorage.delete(id);
-    }
+    public void deleteById(@PathVariable UUID id){
 
-//    @PostMapping
-//    public Student create(@RequestBody Student student) {
-//        if (student.getId() == null) {
-//            student.generateId();
-//        }
-//
-//        StudentsStorage.data.add(student);
-//
-//        return student;
-//    }
-//
-//    @GetMapping("/{id}")
-//    public Student getById(@PathVariable UUID id) {
-//        return StudentsStorage.getById(id);
-//    }
-//
-//    @PutMapping("/{id}")
-//    public void editById(@PathVariable UUID id, @RequestBody Student newStudent) {
-//        Student student = StudentsStorage.getById(id);
-//
-//        if (newStudent.getName() != null && !student.getName().equals(newStudent.getName())) {
-//            student.setName(newStudent.getName());
-//        }
-//
-//        if (newStudent.getAge() != null && !student.getAge().equals(newStudent.getAge())) {
-//            student.setAge(newStudent.getAge());
-//        }
-//    }
+        StudentsStorage.data.removeIf(student -> student.getId().equals(id));
+    }
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorMessage> handleException(NullPointerException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessage(exception.getMessage()));
+    }
+
+    private Student getStudentById(UUID id){
+        if (id != null){
+            Optional<Student> optionalStudent = StudentsStorage.data
+                    .stream()
+                    .filter(s -> s.getId().equals(id))
+                    .findFirst();
+            if (optionalStudent.isPresent()) {
+                return optionalStudent.get();
+            } else {
+                throw new NullPointerException("Don`t found a student by id.");
+            }
+        } else
+            throw new NullPointerException("Student`s id is empty.");
     }
 }
