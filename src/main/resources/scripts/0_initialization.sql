@@ -54,6 +54,6 @@ CREATE TABLE payments
     date_time timestamp NOT NULL,
     summ money NOT NULL,
     student_id int REFERENCES students(id),
-    auto_identified boolean  DEFAULT NULL,
+    auto_identified boolean DEFAULT NULL,
     info varchar(200)
 );
