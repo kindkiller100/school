@@ -41,6 +41,4 @@ public class StudentsStorage {
                 .findFirst()
                 .orElseThrow();
     }
-
-
 }
