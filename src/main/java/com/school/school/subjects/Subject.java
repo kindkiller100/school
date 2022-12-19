@@ -1,4 +1,4 @@
-package subjects;
+package com.school.school.subjects;
 
 import java.util.Objects;
 
