@@ -51,9 +51,9 @@ CREATE TABLE student_lesson
 CREATE TABLE payments
 (
     id serial PRIMARY KEY,
-    date timestamp NOT NULL,
+    dateTime timestamp NOT NULL,
     summ money NOT NULL,
     student_id int REFERENCES students(id),
-    auto_identification boolean  DEFAULT NULL,
+    auto_identified boolean  DEFAULT NULL,
     info varchar(200)
 );
