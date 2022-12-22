@@ -2,15 +2,16 @@ package com.school.school.students;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class StudentsStorage {
     public static List<Student> data = new ArrayList<>();
     public static void create (Student student) {
-        if (student.getId() == null) {
-            student.generateId();
-        }
+//        if (student.getId() == null) {
+//            student.generateId();
+//        }
         data.add(student);
     }
     public static List<Student> getAll(){
@@ -22,7 +23,7 @@ public class StudentsStorage {
         }
 
         return StudentsStorage.data.stream()
-                .filter(student -> student.getId().equals(id))
+                .filter(student -> Objects.equals( student.getId(), id ) )
                 .findAny()
                 .orElseThrow(() -> new NullPointerException("Student by id '" + id + "' not found."));
     }
