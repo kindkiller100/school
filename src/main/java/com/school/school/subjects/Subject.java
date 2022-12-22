@@ -22,7 +22,7 @@ public class Subject {
     public Subject() {
     }
 
-    public Subject(String title, String description, Boolean deleted) {
+    public Subject(String title, String description, boolean deleted) {
         this.title = title;
         this.description = description;
         this.deleted = deleted;
