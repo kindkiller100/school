@@ -9,16 +9,6 @@ import com.school.school.subjects.SubjectRepository;
 @RestController
 public class SchoolController {
 
-    final
-    SubjectRepository subjectRepository;
-
-
-    public SchoolController( SubjectRepository subjectRepository )
-    {
-        this.subjectRepository = subjectRepository;
-    }
-
-
     @GetMapping("/{name}/{age}/{strength}")
     public String home(
             @PathVariable String name,
