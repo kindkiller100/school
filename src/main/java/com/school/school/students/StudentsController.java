@@ -20,19 +20,19 @@ public class StudentsController {
     public void create (@RequestBody Student student) {
         StudentsStorage.create(student);
     }
-    @GetMapping("/{id}")
-    public Student getById (@PathVariable Long id) {
-        return StudentsStorage.getById(id);
-    }
-    @PutMapping("/{id}")
-    public void updateById (@PathVariable Long id, @RequestBody Student newStudent) {
-        StudentsStorage.update(id, newStudent);
-    }
+//    @GetMapping("/{id}")
+//    public Student getById (@PathVariable Long id) {
+//        return StudentsStorage.getById(id);
+//    }
+//    @PutMapping("/{id}")
+//    public void updateById (@PathVariable Long id, @RequestBody Student newStudent) {
+//        StudentsStorage.update(id, newStudent);
+//    }
 
-    @DeleteMapping("/{id}")
-    public void deleteById (@PathVariable Long id) {
-        StudentsStorage.delete(id);
-    }
+//    @DeleteMapping("/{id}")
+//    public void deleteById (@PathVariable Long id) {
+//        StudentsStorage.delete(id);
+//    }
 
 //    @PostMapping
 //    public Student create(@RequestBody Student student) {
