@@ -17,20 +17,15 @@ public class Subject {
 
     private String title;
     private String description;
+    private boolean deleted;
 
     public Subject() {
     }
 
-    public Subject(String title, String description) {
+    public Subject(String title, String description, Boolean deleted) {
         this.title = title;
         this.description = description;
-    }
-
-    public Subject( long id, String title, String description )
-    {
-        this.id = id;
-        this.title = title;
-        this.description = description;
+        this.deleted = deleted;
     }
 
 
@@ -44,6 +39,10 @@ public class Subject {
 
     public String getDescription() {
         return description;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 
 
@@ -60,6 +59,12 @@ public class Subject {
         this.description = description;
     }
 
+    public void setDeleted( boolean deleted )
+    {
+        this.deleted = deleted;
+    }
+
+
     @Override
     public String toString() {
         return "Subject{" +
@@ -74,7 +79,10 @@ public class Subject {
         if (this == o) return true;
         if (!(o instanceof Subject)) return false;
         Subject subject = (Subject) o;
-        return getId() == subject.getId() && getTitle().equals(subject.getTitle()) && getDescription().equals(subject.getDescription());
+        return getId() == subject.getId()
+            && getTitle().equals(subject.getTitle())
+            && getDescription().equals(subject.getDescription())
+            && Objects.equals(isDeleted(), subject.isDeleted());
     }
 
     @Override

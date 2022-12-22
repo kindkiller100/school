@@ -11,17 +11,15 @@ public class Lesson {
     private long subjectId;
     private long teacherId;
     private String description;
-    private boolean deleted;
 
     public Lesson(){}
 
-    public Lesson(LocalDateTime startDateTime, short duration, long subjectId, long teacherId, String description, boolean deleted) {
+    public Lesson(LocalDateTime startDateTime, short duration, long subjectId, long teacherId, String description) {
         this.startDateTime = startDateTime;
         this.duration = duration;
         this.subjectId = subjectId;
         this.teacherId = teacherId;
         this.description = description;
-        this.deleted = deleted;
     }
 
     public long getId() {
@@ -46,10 +44,6 @@ public class Lesson {
 
     public String getDescription() {
         return description;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
     }
 
     @Override
