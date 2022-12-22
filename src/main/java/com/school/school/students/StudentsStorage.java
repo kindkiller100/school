@@ -8,9 +8,9 @@ import java.util.stream.IntStream;
 public class StudentsStorage {
     private static List<Student> data = new ArrayList<>();
     public static void create (Student student) {
-        if (student.getId() == null) {
-            student.generateId();
-        }
+//        if (student.getId() == null) {
+//            student.generateId();
+//        }
         data.add(student);
     }
     public static List<Student> getAll(){

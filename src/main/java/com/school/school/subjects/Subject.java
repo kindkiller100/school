@@ -1,9 +1,20 @@
-package subjects;
+package com.school.school.subjects;
 
 import java.util.Objects;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "subjects")
 public class Subject {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String title;
     private String description;
 
@@ -14,6 +25,14 @@ public class Subject {
         this.title = title;
         this.description = description;
     }
+
+    public Subject( long id, String title, String description )
+    {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
+
 
     public long getId() {
         return id;
@@ -27,7 +46,13 @@ public class Subject {
         return description;
     }
 
-    public void setTitle(String title) {
+
+    public void setId( long id )
+    {
+        this.id = id;
+    }
+
+    public void setTitle( String title) {
         this.title = title;
     }
 

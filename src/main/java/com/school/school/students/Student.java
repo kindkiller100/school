@@ -8,19 +8,19 @@ public class Student {
     private String name;
     private Byte age;
 
-    public void generateId(){
-        long countOfId;
-        UUID newId;
-        do {
-            newId = UUID.randomUUID();
-            UUID finalNewId = newId;
-            countOfId = StudentsStorage.data
-                    .stream()
-                    .filter(student -> student.getId().equals(finalNewId))
-                    .count();
-        } while (countOfId > 0);
-        this.id = newId;
-    }
+//    public void generateId(){
+//        long countOfId;
+//        UUID newId;
+//        do {
+//            newId = UUID.randomUUID();
+//            UUID finalNewId = newId;
+//            countOfId = StudentsStorage.data
+//                    .stream()
+//                    .filter(student -> student.getId().equals(finalNewId))
+//                    .count();
+//        } while (countOfId > 0);
+//        this.id = newId;
+//    }
 
     public UUID getId() {
         return id;
