@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class StudentsStorage {
-    private static List<Student> data = new ArrayList<>();
+    public static List<Student> data = new ArrayList<>();
     public static void create (Student student) {
 //        if (student.getId() == null) {
 //            student.generateId();
@@ -41,6 +41,4 @@ public class StudentsStorage {
                 .findFirst()
                 .orElseThrow();
     }
-
-
 }

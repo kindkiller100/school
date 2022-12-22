@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/students")
@@ -22,16 +21,16 @@ public class StudentsController {
         StudentsStorage.create(student);
     }
     @GetMapping("/{id}")
-    public Student getById (@PathVariable UUID id) {
+    public Student getById (@PathVariable Long id) {
         return StudentsStorage.getById(id);
     }
     @PutMapping("/{id}")
-    public void updateById (@PathVariable UUID id, @RequestBody Student newStudent) {
+    public void updateById (@PathVariable Long id, @RequestBody Student newStudent) {
         StudentsStorage.update(id, newStudent);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById (@PathVariable UUID id) {
+    public void deleteById (@PathVariable Long id) {
         StudentsStorage.delete(id);
     }
 
