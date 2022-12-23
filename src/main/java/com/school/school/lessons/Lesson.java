@@ -1,14 +1,22 @@
 package com.school.school.lessons;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+@Entity
+@Table(name = "lessons")
 public class Lesson {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(name = "startdatetime")
     private LocalDateTime startDateTime;
     private short duration;
+    @Column(name = "subject_id")
     private long subjectId;
+    @Column(name = "teacher_id")
     private long teacherId;
     private String description;
 
