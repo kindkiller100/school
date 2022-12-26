@@ -19,10 +19,10 @@ public class Subject {
     private String description;
     private boolean deleted;
 
-    public Subject() {
+    private Subject() {
     }
 
-    public Subject(String title, String description, boolean deleted) {
+    private Subject(String title, String description, boolean deleted) {
         this.title = title;
         this.description = description;
         this.deleted = deleted;
@@ -64,7 +64,6 @@ public class Subject {
         this.deleted = deleted;
     }
 
-
     @Override
     public String toString() {
         return "Subject{" +
@@ -88,5 +87,30 @@ public class Subject {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getTitle(), getDescription());
+    }
+
+    static public class Builder {
+        private String title;
+        private String description;
+        private boolean deleted;
+
+        public Builder setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
+
+        public Subject build(){
+            return new Subject(title, description, deleted);
+        }
     }
 }
