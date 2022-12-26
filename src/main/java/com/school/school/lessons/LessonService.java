@@ -2,9 +2,9 @@ package com.school.school.lessons;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class LessonService {
@@ -20,20 +20,21 @@ public class LessonService {
     }
 
     public void delete(long id){
+        //TODO: add validations
         if (lessonRepository.existsById(id)) {
             lessonRepository.deleteById(id);
+        } else {
+            throw new NotFoundException("Lesson with id «" + id + "» not found.");
         }
     }
 
-    public void editById(long id, Lesson editLesson){
-        if (id != editLesson.getId())
-            throw new NullPointerException("Id dont equals.");
-        if (lessonRepository.existsById(id)){
-            //need validates for id, subjectId and teacherId
+    public void editById(Lesson editLesson){
+        if (lessonRepository.existsById(editLesson.getId())){
+            //TODO: add validations for id, subjectId and teacherId
             lessonRepository.save(editLesson);
         } else {
-            //need custom exception
-            throw new NullPointerException("Don`t found a lesson by id «" + id + "».");
+            //TODO: add custom exception
+            throw new NotFoundException("Lesson with id «" + editLesson.getId() + "» not found.");
         }
     }
 }

@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @Entity
-@Table(name = "lessons")
+@Table(name = "lessons") //, schema="school_db"
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,8 +1,11 @@
 package com.school.school.lessons;
 
-import com.school.school.subjects.Subject;
+import org.springdoc.api.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -10,7 +13,7 @@ import java.util.List;
 @RequestMapping("/lessons")
 public class LessonsController {
     @Autowired
-    LessonService lessonService;
+    private LessonService lessonService;
 
     @GetMapping
     public List<Lesson> list()
@@ -29,8 +32,15 @@ public class LessonsController {
         lessonService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public void editById(@PathVariable long id, @RequestBody Lesson editLesson){
-        lessonService.editById(id, editLesson);
+    @PutMapping
+    public void editById( @RequestBody Lesson editLesson){
+        lessonService.editById(editLesson);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorMessage> handleException(NotFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessage(exception.getMessage()));
     }
 }
