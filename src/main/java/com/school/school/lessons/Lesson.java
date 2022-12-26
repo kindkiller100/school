@@ -1,5 +1,7 @@
 package com.school.school.lessons;
 
+import com.school.school.students.Student;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -12,9 +14,15 @@ public class Lesson {
     private long teacherId;
     private String description;
 
-    public Lesson(){}
+    private Lesson() {
+    }
 
-    public Lesson(LocalDateTime startDateTime, short duration, long subjectId, long teacherId, String description) {
+    private Lesson(long id,
+                   LocalDateTime startDateTime,
+                   short duration,
+                   long subjectId,
+                   long teacherId,
+                   String description) {
         this.startDateTime = startDateTime;
         this.duration = duration;
         this.subjectId = subjectId;
@@ -71,5 +79,63 @@ public class Lesson {
                 " (duration " + duration + " min.)" +
                 ", description: '" + description + '\'' +
                 '}';
+    }
+
+    public Builder clone() {
+        return new Lesson.Builder()
+                .setId(this.id)
+                .setStartDateTime(this.startDateTime)
+                .setDuration(this.duration)
+                .setSubjectId(this.subjectId)
+                .setTeacherId(this.teacherId)
+                .setDescription(this.description);
+    }
+
+    static public class Builder {
+        private long id;
+        private LocalDateTime startDateTime;
+        private short duration;
+        private long subjectId;
+        private long teacherId;
+        private String description;
+
+        public Builder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder setStartDateTime(LocalDateTime startDateTime) {
+            this.startDateTime = startDateTime;
+            return this;
+        }
+
+        public Builder setDuration(short duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public Builder setSubjectId(long subjectId) {
+            this.subjectId = subjectId;
+            return this;
+        }
+
+        public Builder setTeacherId(long teacherId) {
+            this.teacherId = teacherId;
+            return this;
+        }
+
+        public Builder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Lesson build() { //возвращает объект внешнего класса с заданными параметрами
+            return new Lesson(id,
+                    startDateTime,
+                    duration,
+                    subjectId,
+                    teacherId,
+                    description);
+        }
     }
 }
