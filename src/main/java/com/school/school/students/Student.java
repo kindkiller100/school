@@ -118,52 +118,52 @@ public class Student {
         private String info;
         private boolean deleted;
 
-        public Student.Builder setId(long id) {
+        public Builder setId(long id) {
             this.id = id;
             return this;
         }
 
-        public Student.Builder setName(String name) {
+        public Builder setName(String name) {
             this.name = name;
             return this;
         }
 
-        public Student.Builder setSecondName(String secondName) {
+        public Builder setSecondName(String secondName) {
             this.secondName = secondName;
             return this;
         }
 
-        public Student.Builder setLastName(String lastName) {
+        public Builder setLastName(String lastName) {
             this.lastName = lastName;
             return this;
         }
 
-        public Student.Builder setDateOfBirth(LocalDate dateOfBirth) {
+        public Builder setDateOfBirth(LocalDate dateOfBirth) {
             this.dateOfBirth = dateOfBirth;
             return this;
         }
 
-        public Student.Builder setGender(String gender) {
+        public Builder setGender(String gender) {
             this.gender = gender;
             return this;
         }
 
-        public Student.Builder setTelephoneNumber(String telephoneNumber) {
+        public Builder setTelephoneNumber(String telephoneNumber) {
             this.telephoneNumber = telephoneNumber;
             return this;
         }
 
-        public Student.Builder setInfo(String info) {
+        public Builder setInfo(String info) {
             this.info = info;
             return this;
         }
 
-        public Student.Builder setDeleted(boolean deleted) {
+        public Builder setDeleted(boolean deleted) {
             this.deleted = deleted;
             return this;
         }
 
-        public Student build() {
+        public Student build() {//возвращает объект внешнего класса с заданными параметрами
             return new Student(id,
                     name,
                     secondName,

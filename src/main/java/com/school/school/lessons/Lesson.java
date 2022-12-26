@@ -1,5 +1,7 @@
 package com.school.school.lessons;
 
+import com.school.school.students.Student;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -15,7 +17,8 @@ public class Lesson {
     private Lesson() {
     }
 
-    private Lesson(LocalDateTime startDateTime,
+    private Lesson(long id,
+                   LocalDateTime startDateTime,
                    short duration,
                    long subjectId,
                    long teacherId,
@@ -78,40 +81,57 @@ public class Lesson {
                 '}';
     }
 
+    public Builder clone() {
+        return new Lesson.Builder()
+                .setId(this.id)
+                .setStartDateTime(this.startDateTime)
+                .setDuration(this.duration)
+                .setSubjectId(this.subjectId)
+                .setTeacherId(this.teacherId)
+                .setDescription(this.description);
+    }
+
     static public class Builder {
+        private long id;
         private LocalDateTime startDateTime;
         private short duration;
         private long subjectId;
         private long teacherId;
         private String description;
 
-        public Lesson.Builder setStartDateTime(LocalDateTime startDateTime) {
+        public Builder setId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder setStartDateTime(LocalDateTime startDateTime) {
             this.startDateTime = startDateTime;
             return this;
         }
 
-        public Lesson.Builder setDuration(short duration) {
+        public Builder setDuration(short duration) {
             this.duration = duration;
             return this;
         }
 
-        public Lesson.Builder setSubjectId(long subjectId) {
+        public Builder setSubjectId(long subjectId) {
             this.subjectId = subjectId;
             return this;
         }
 
-        public Lesson.Builder setTeacherId(long teacherId) {
+        public Builder setTeacherId(long teacherId) {
             this.teacherId = teacherId;
             return this;
         }
 
-        public Lesson.Builder setDescription(String description) {
+        public Builder setDescription(String description) {
             this.description = description;
             return this;
         }
 
-        public Lesson build() {
-            return new Lesson(startDateTime,
+        public Lesson build() { //возвращает объект внешнего класса с заданными параметрами
+            return new Lesson(id,
+                    startDateTime,
                     duration,
                     subjectId,
                     teacherId,
