@@ -14,19 +14,17 @@ public class Teacher {
     private String info;
     private boolean deleted;
 
-    public Teacher() {
+    private Teacher() {
     }
 
-    public Teacher(long id,
-                   String name,
-                   String secondName,
-                   String lastName,
-                   LocalDate dateOfBirth,
-                   String gender,
-                   String telephoneNumber,
-                   String info,
-                   boolean deleted) {
-        this.id = id;
+    private Teacher(String name,
+                    String secondName,
+                    String lastName,
+                    LocalDate dateOfBirth,
+                    String gender,
+                    String telephoneNumber,
+                    String info,
+                    boolean deleted) {
         this.name = name;
         this.secondName = secondName;
         this.lastName = lastName;
@@ -115,5 +113,67 @@ public class Teacher {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    static public class Builder {
+        private String name;
+        private String secondName;
+        private String lastName;
+        private LocalDate dateOfBirth;
+        private String gender;
+        private String telephoneNumber;
+        private String info;
+        private boolean deleted;
+
+        public Teacher.Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Teacher.Builder setSecondName(String secondName) {
+            this.secondName = secondName;
+            return this;
+        }
+
+        public Teacher.Builder setLastName(String lastName) {
+            this.lastName = lastName;
+            return this;
+        }
+
+        public Teacher.Builder setDateOfBirth(LocalDate dateOfBirth) {
+            this.dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        public Teacher.Builder setGender(String gender) {
+            this.gender = gender;
+            return this;
+        }
+
+        public Teacher.Builder setTelephoneNumber(String telephoneNumber) {
+            this.telephoneNumber = telephoneNumber;
+            return this;
+        }
+
+        public Teacher.Builder setInfo(String info) {
+            this.info = info;
+            return this;
+        }
+
+        public Teacher.Builder setDeleted(boolean deleted) {
+            this.deleted = deleted;
+            return this;
+        }
+
+        public Teacher build() {
+            return new Teacher(name,
+                    secondName,
+                    lastName,
+                    dateOfBirth,
+                    gender,
+                    telephoneNumber,
+                    info,
+                    deleted);
+        }
     }
 }

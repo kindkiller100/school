@@ -12,9 +12,14 @@ public class Lesson {
     private long teacherId;
     private String description;
 
-    public Lesson(){}
+    private Lesson() {
+    }
 
-    public Lesson(LocalDateTime startDateTime, short duration, long subjectId, long teacherId, String description) {
+    private Lesson(LocalDateTime startDateTime,
+                   short duration,
+                   long subjectId,
+                   long teacherId,
+                   String description) {
         this.startDateTime = startDateTime;
         this.duration = duration;
         this.subjectId = subjectId;
@@ -71,5 +76,46 @@ public class Lesson {
                 " (duration " + duration + " min.)" +
                 ", description: '" + description + '\'' +
                 '}';
+    }
+
+    static public class Builder {
+        private LocalDateTime startDateTime;
+        private short duration;
+        private long subjectId;
+        private long teacherId;
+        private String description;
+
+        public Lesson.Builder setStartDateTime(LocalDateTime startDateTime) {
+            this.startDateTime = startDateTime;
+            return this;
+        }
+
+        public Lesson.Builder setDuration(short duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public Lesson.Builder setSubjectId(long subjectId) {
+            this.subjectId = subjectId;
+            return this;
+        }
+
+        public Lesson.Builder setTeacherId(long teacherId) {
+            this.teacherId = teacherId;
+            return this;
+        }
+
+        public Lesson.Builder setDescription(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Lesson build() {
+            return new Lesson(startDateTime,
+                    duration,
+                    subjectId,
+                    teacherId,
+                    description);
+        }
     }
 }
