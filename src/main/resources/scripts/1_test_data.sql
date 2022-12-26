@@ -1,18 +1,19 @@
-insert into subjects (id, title, description)
+-- заполнение таблиц
+insert into school_db.subjects (id, title, description)
 VALUES ('1', 'Рисование', 'Рисование'),
        ('2', 'Изобр. искусство', 'Изобразительное искусство'),
        ('3', 'Лепка', 'Лепка руками'),
        ('4', 'Композиция', 'Композиция'),
        ('5', 'История искусства', 'История изобразительного искусства');
 
-insert into teachers (id, name, secondName, lastName, dateOfBirth, gender, telephoneNumber)
+insert into school_db.teachers (id, name, secondName, lastName, dateOfBirth, gender, telephoneNumber)
 VALUES ('1', 'Иван', 'Петрович', 'Дудкин','1999-01-08', 'М', '+375291526258'),
        ('2', 'Кристина', 'Александровна', 'Жук','1994-08-03', 'Ж', '+375297522222'),
        ('3', 'Сергей', 'Евгеньевич', 'Иванов','1991-05-20', 'М', '+375297286594'),
        ('4', 'Анна', 'Евгеньевна', 'Иванова','1997-10-28', 'Ж', '+375297286587'),
        ('5', 'Константин', 'Владимирович', 'Яндовский','1999-06-02', 'М', '+375295599594');
 
-insert into students (id, name, lastName, dateOfBirth, gender, telephoneNumber)
+insert into school_db.students (id, name, lastName, dateOfBirth, gender, telephoneNumber)
 VALUES ('1', 'Сергей', 'Куликов','2005-10-08', 'М', '+375291116258'),
        ('2', 'Виктория', 'Калинина','2006-11-03', 'Ж', '+375297772222'),
        ('3', 'Александр', 'Малышко','2005-12-20', 'М', '+375297236584'),
@@ -24,7 +25,7 @@ VALUES ('1', 'Сергей', 'Куликов','2005-10-08', 'М', '+375291116258
        ('9', 'Ирина', 'Бондаренко','2005-03-18', 'Ж', '+375296586587'),
        ('10', 'Егор', 'Мурин','2006-04-01', 'М', '+375296525784');
 
-insert into lessons (id, startDateTime, duration, subject_id, teacher_id)
+insert into school_db.lessons (id, startDateTime, duration, subject_id, teacher_id)
 VALUES ('1', '2023-01-05 10:00:00', '90','1', '1'),
        ('2', '2023-01-06 12:00:00', '45','2', '2'),
        ('3', '2023-01-07 09:00:00', '135','3', '3'),
@@ -37,7 +38,7 @@ VALUES ('1', '2023-01-05 10:00:00', '90','1', '1'),
        ('9', '2023-01-15 14:00:00', '60','4', '4'),
        ('10', '2023-01-16 18:00:00', '30','5', '5');
 
-insert into student_lesson (id, student_id, lesson_id)
+insert into school_db.student_lesson (id, student_id, lesson_id)
 VALUES ('1', '1', '1'),
        ('2', '2', '2'),
        ('3', '3', '3'),
@@ -59,4 +60,3 @@ VALUES ('1', '1', '1'),
        ('18', '8', '5'),
        ('19', '9', '1'),
        ('20', '10', '2');
-
