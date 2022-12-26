@@ -1,31 +1,26 @@
 package com.school.school.students;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "students")
 public class Student {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
+    @Column(name = "secondname")
     private String secondName;
-    private String lastname;
+    @Column(name = "lastname")
+    private String lastName;
+    @Column(name = "dateofbirth")
     private LocalDate dateOfBirth;
     private String gender;
+    @Column(name = "telephonenumber")
     private String telephoneNumber;
     private String info;
     private boolean deleted;
-
-    public void generateId(){
-//        long countOfId;
-//        UUID newId;
-//        do {
-//            newId = UUID.randomUUID();
-//            UUID finalNewId = newId;
-//            countOfId = StudentsStorage.data
-//                    .stream()
-//                    .filter(student -> student.getId().equals(finalNewId))
-//                    .count();
-//        } while (countOfId > 0);
-//        this.id = newId;
-    }
 
     public long getId() {
         return id;
@@ -40,7 +35,7 @@ public class Student {
     }
 
     public String getLastname() {
-        return lastname;
+        return lastName;
     }
 
     public LocalDate getDateOfBirth() {
@@ -58,6 +53,7 @@ public class Student {
     public String getInfo() {
         return info;
     }
+
 
     public boolean isDeleted() {
         return deleted;
