@@ -1,7 +1,5 @@
 package com.school.school.lessons;
 
-import com.school.school.subjects.Subject;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -14,13 +12,14 @@ public class Lesson {
     private long teacherId;
     private String description;
 
-    public Lesson(){}
+    private Lesson() {
+    }
 
     private Lesson(LocalDateTime startDateTime,
-                  short duration,
-                  long subjectId,
-                  long teacherId,
-                  String description) {
+                   short duration,
+                   long subjectId,
+                   long teacherId,
+                   String description) {
         this.startDateTime = startDateTime;
         this.duration = duration;
         this.subjectId = subjectId;
@@ -111,7 +110,7 @@ public class Lesson {
             return this;
         }
 
-        public Lesson build(){
+        public Lesson build() {
             return new Lesson(startDateTime,
                     duration,
                     subjectId,

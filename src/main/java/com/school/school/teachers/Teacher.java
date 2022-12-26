@@ -1,7 +1,5 @@
 package com.school.school.teachers;
 
-import com.school.school.subjects.Subject;
-
 import java.time.LocalDate;
 import java.util.Objects;
 

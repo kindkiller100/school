@@ -1,7 +1,5 @@
 package com.school.school.students;
 
-import com.school.school.teachers.Teacher;
-
 import java.time.LocalDate;
 
 public class Student {
@@ -14,6 +12,9 @@ public class Student {
     private String telephoneNumber;
     private String info;
     private boolean deleted;
+
+    private Student() {
+    }
 
     private Student(String name,
                     String secondName,
@@ -32,7 +33,8 @@ public class Student {
         this.info = info;
         this.deleted = deleted;
     }
-    public void generateId(){
+
+    public void generateId() {
 //        long countOfId;
 //        UUID newId;
 //        do {
