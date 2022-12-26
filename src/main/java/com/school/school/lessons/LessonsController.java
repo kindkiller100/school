@@ -33,10 +33,11 @@ public class LessonsController {
     }
 
     @PutMapping
-    public void editById( @RequestBody Lesson editLesson){
+    public void editById(@RequestBody Lesson editLesson){
         lessonService.editById(editLesson);
     }
 
+    //метод, который отправляем на UI сообщение об ошибке
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorMessage> handleException(NotFoundException exception) {
         return ResponseEntity

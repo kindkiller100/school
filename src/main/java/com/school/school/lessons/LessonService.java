@@ -21,18 +21,18 @@ public class LessonService {
     }
 
     public void delete(long id){
-        if (lessonRepository.existsById(id)) {
-            lessonRepository.deleteById(id);
-        } else {
+        if (lessonRepository.existsById(id)) {      //проверяем, есть ли запись с таким id в базе данных
+            lessonRepository.deleteById(id);        //удаляем запись по id
+        } else {                                    //если записи нет - выбрасываем ошибку
             throw new NotFoundException("Lesson with id «" + id + "» not found.");
         }
     }
 
     public void editById(Lesson editLesson){
-        if (lessonRepository.existsById(editLesson.getId())){
+        if (lessonRepository.existsById(editLesson.getId())){   //проверяем, есть ли запись с таким id в базе данных
             //TODO: add validations for id, subjectId and teacherId
-            lessonRepository.save(editLesson);
-        } else {
+            lessonRepository.save(editLesson);                  //сохраняем запись с измененными данными в БД
+        } else {                                                //иначе выбрасываем ошибку
             //TODO: add custom exception
             throw new NotFoundException("Lesson with id «" + editLesson.getId() + "» not found.");
         }
