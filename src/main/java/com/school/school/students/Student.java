@@ -25,7 +25,8 @@ public class Student {
     private Student() {
     }
 
-    private Student(String name,
+    private Student(long id,
+                    String name,
                     String secondName,
                     String lastName,
                     LocalDate dateOfBirth,
@@ -93,7 +94,21 @@ public class Student {
         return deleted;
     }
 
+    public Builder clone() {
+        return new Student.Builder()
+                .setId(this.id)
+                .setName(this.name)
+                .setSecondName(this.secondName)
+                .setLastName(this.lastName)
+                .setDateOfBirth(this.dateOfBirth)
+                .setGender(this.gender)
+                .setTelephoneNumber(this.telephoneNumber)
+                .setInfo(this.info)
+                .setDeleted(this.deleted);
+    }
+
     static public class Builder {
+        private long id;
         private String name;
         private String secondName;
         private String lastName;
@@ -102,6 +117,11 @@ public class Student {
         private String telephoneNumber;
         private String info;
         private boolean deleted;
+
+        public Student.Builder setId(long id) {
+            this.id = id;
+            return this;
+        }
 
         public Student.Builder setName(String name) {
             this.name = name;
@@ -144,7 +164,8 @@ public class Student {
         }
 
         public Student build() {
-            return new Student(name,
+            return new Student(id,
+                    name,
                     secondName,
                     lastName,
                     dateOfBirth,

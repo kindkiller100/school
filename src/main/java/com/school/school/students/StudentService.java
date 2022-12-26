@@ -21,14 +21,17 @@ public class StudentService {
 
     public void delete(long id) {
         if (studentRepository.existsById(id)) {
-           
+            Student st = studentRepository
+                    .findById(id)
+                    .orElse(null)
+                    .clone()
+                    .setDeleted(true)
+                    .build();
+           editById(id,st);
         }
     }
 
     public void editById(long id, Student editStudent) {
-
-        if (id != editStudent.getId())
-            throw new NullPointerException("Id dont equals.");
         if (studentRepository.existsById(id)){
             studentRepository.save(editStudent);
         } else {
