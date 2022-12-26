@@ -16,11 +16,11 @@ public class LessonService {
     }
 
     public void create(Lesson lesson){
+        //TODO: add validations
         lessonRepository.save(lesson);
     }
 
     public void delete(long id){
-        //TODO: add validations
         if (lessonRepository.existsById(id)) {
             lessonRepository.deleteById(id);
         } else {
