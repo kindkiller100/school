@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "subjects")
+@Table(name = "subjects",schema="school_db")
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
