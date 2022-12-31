@@ -82,7 +82,7 @@ public class Payment {
                 '}';
     }
 
-    public Builder copy() {
+    public Builder clone() {
         return new Builder()
                 .setId(this.id)
                 .setDateTime(this.dateTime)
