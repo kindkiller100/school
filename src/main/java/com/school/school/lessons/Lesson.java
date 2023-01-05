@@ -1,22 +1,30 @@
 package com.school.school.lessons;
 
-import com.school.school.students.Student;
-
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+@Entity
+@Table(name = "lessons", schema="school_db")
 public class Lesson {
-    private long id;
-    private LocalDateTime startDateTime;
-    private short duration;
-    private long subjectId;
-    private long teacherId;
-    private String description;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;                    //id занятия
+    @Column(name = "startdatetime")
+    private LocalDateTime startDateTime;//дата и время начала занятия
+    private short duration;             //продолжительность занятия в минутах
+    @Column(name = "subject_id")
+    private long subjectId;             //id предмета
+    @Column(name = "teacher_id")
+    private long teacherId;             //id преподавателя
+    private String description;         //расшифровка (подробное описание) занятия
 
+    //конструктор без параметров
     private Lesson() {
     }
 
+    //конструктор со всеми параметрами кроме id
     private Lesson(long id,
                    LocalDateTime startDateTime,
                    short duration,
@@ -54,6 +62,7 @@ public class Lesson {
         return description;
     }
 
+    //переопределение метода equals(). Объекты одинаковы, если у них одинаковый id
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,20 +71,22 @@ public class Lesson {
         return id == lesson.id;
     }
 
+    //переопределение метода hashCode()
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
+    //переопределение метода toString()
     @Override
     public String toString() {
-        // subjektId, teacherId
+        //TODO: subjektId, teacherId -> name of subjekt & teacher
         return "Lesson{" +
                 "subject: «" + subjectId +
                 "», teacher: " + teacherId +
-                ", date of lesson: " + startDateTime.toLocalDate() +
-                ", start at: " + startDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) +
-                ", end at: " + startDateTime.toLocalTime().plusMinutes(duration).format(DateTimeFormatter.ofPattern("HH:mm")) +
+                ", date of lesson: " + startDateTime.toLocalDate() +        //получаем дату занятия
+                ", start at: " + startDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) +     //получаем время занятия в формате ЧЧ.ММ
+                ", end at: " + startDateTime.toLocalTime().plusMinutes(duration).format(DateTimeFormatter.ofPattern("HH:mm")) + //получаем время занятия, добавляем продолжительность занятия и форматируем результат
                 " (duration " + duration + " min.)" +
                 ", description: '" + description + '\'' +
                 '}';
