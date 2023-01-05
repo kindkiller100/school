@@ -8,13 +8,9 @@ import java.util.Objects;
 @Entity
 @Table(name = "lessons", schema="school_db")
 public class Lesson {
-    private long id;
-    private LocalDateTime startDateTime;
-    private short duration;
-    private long subjectId;
-    private long teacherId;
-    private String description;
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;                    //id занятия
     @Column(name = "startdatetime")
     private LocalDateTime startDateTime;//дата и время начала занятия
     private short duration;             //продолжительность занятия в минутах
