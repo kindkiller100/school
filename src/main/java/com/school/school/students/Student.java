@@ -34,6 +34,7 @@ public class Student {
                     String telephoneNumber,
                     String info,
                     boolean deleted) {
+        this.id = id;
         this.name = name;
         this.secondName = secondName;
         this.lastName = lastName;
