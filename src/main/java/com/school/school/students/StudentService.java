@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -31,9 +32,21 @@ public class StudentService {
         return studentRepository.findAllByDeletedIsFalse();
     }
 
+    public List<Student> getAllByFilter(String like){
+        return studentRepository.findAllByFilter(like);
+    }
+
+    public List<Student> getAllByAge(Byte fromAge, Byte uptoAge){
+        LocalDate fromDate = LocalDate.now().minusYears(uptoAge);
+        LocalDate uptoDate = LocalDate.now().minusYears(fromAge);
+        return studentRepository.findAllByAge(fromDate, uptoDate);
+    }
+
+
     public void create(Student student) {
         studentRepository.save(student);
     }
+
 
     public void delete(long id) {
         if (studentRepository.existsById(id)) {
@@ -46,6 +59,7 @@ public class StudentService {
             studentRepository.save(st);
         }
     }
+
 
     public void restoreDeleted(long id) {
         if (studentRepository.existsById(id)) {

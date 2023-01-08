@@ -35,8 +35,18 @@ public class StudentController {
     public List<Student> getAllNotDeleted(){
         return studentService.getAllNotDeleted();
     }
+    @GetMapping("/filter/{like}")
+    //поиск по частичному совпадению строки like в колонках name, secondname, lastname, telephonenumber
+    public List<Student> getAllByFilter(@PathVariable String like){
+        return studentService.getAllByFilter(like);
+    }
+    @GetMapping("/filterByAge/{from}/{upto}")//нет валидации на отрицательные числа
+    //поиск по возрасту "от" и "до", в годах
+    public List<Student> getAllByAge(@PathVariable Byte from, @PathVariable Byte upto){
+        return studentService.getAllByAge(from, upto);
+    }
 
-    @PostMapping
+    @PostMapping //можно создавать сразу удаленных
     public void create(@Valid @RequestBody Student student) {
         studentService.create(student);
     }
@@ -48,7 +58,7 @@ public class StudentController {
 
     @PutMapping("/{id}/restore")// или DeleteMapping?
     public void restoreDeleted(@PathVariable long id) {
-        studentService.restoreDeleted(id);//нет валидации нa null
+        studentService.restoreDeleted(id);
     }
     @PutMapping("/{id}/edit")
     public void editById(@Valid @RequestBody Student editStudent){
