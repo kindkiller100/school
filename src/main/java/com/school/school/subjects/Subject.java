@@ -1,7 +1,5 @@
 package com.school.school.subjects;
 
-import com.school.school.students.Student;
-
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -11,24 +9,24 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "subjects",schema="school_db")
+@Table(name = "subjects", schema="school_db")
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-    private String title;
-    private String description;
-    private boolean deleted;
+    private long id; //id предмета
+    private String title; //заголовок предмета
+    private String description; //описание предмета
+    private boolean deleted; //флаг "удаления" предмета
 
-    private Subject() {
+    protected Subject() {
     }
 
-    private Subject(String title, String description, boolean deleted) {
+    private Subject(long id, String title, String description, boolean deleted) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.deleted = deleted;
     }
-
 
     public long getId() {
         return id;
@@ -44,32 +42,6 @@ public class Subject {
 
     public boolean isDeleted() {
         return deleted;
-    }
-
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    @Override
-    public String toString() {
-        return "Subject{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                '}';
     }
 
     @Override
@@ -88,12 +60,26 @@ public class Subject {
         return Objects.hash(getId(), getTitle(), getDescription());
     }
 
+    @Override
+    public String toString() {
+        return "Subject{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", deleted=" + deleted +
+                '}';
+    }
+
     public Builder clone() {
         return new Subject.Builder()
                 .setId(this.id)
                 .setTitle(this.title)
                 .setDescription(this.description)
                 .setDeleted(this.deleted);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     static public class Builder {
@@ -123,7 +109,7 @@ public class Subject {
         }
 
         public Subject build() {//возвращает объект внешнего класса с заданными параметрами
-            return new Subject(title, description, deleted);
+            return new Subject(id, title, description, deleted);
         }
     }
 }
