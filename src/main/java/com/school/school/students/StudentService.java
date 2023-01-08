@@ -39,11 +39,11 @@ public class StudentService {
         if (studentRepository.existsById(id)) {
             Student st = studentRepository
                     .findById(id)
-                    .orElse(null)
+                    .orElseThrow(() -> new NotFoundException("Student with id «" + id + "» not found"))
                     .clone()
                     .setDeleted(true)
                     .build();
-            editById(id, st);
+            studentRepository.save(st);
         }
     }
 
@@ -51,21 +51,24 @@ public class StudentService {
         if (studentRepository.existsById(id)) {
             Student st = studentRepository
                     .findById(id)
-                    .orElse(null)
+                    .orElseThrow(() -> new NotFoundException("Student with id «" + id + "» not found"))
                     .clone()
                     .setDeleted(false)
                     .build();
-            editById(id, st);
+            studentRepository.save(st);
         }
     }
 
-
-    public void editById(long id, Student editStudent) {//переделать an not change id and deleted
-        if (studentRepository.existsById(id)) {
-            studentRepository.save(editStudent);
-        } else {
-            throw new NotFoundException("Student with id «" + id + "» not found");
-        }
+    public void editById(Student editStudent) {
+        long id = editStudent.getId();
+        Student updatedStudent = editStudent
+                .clone()
+                .setDeleted(studentRepository
+                        .findById(id)
+                        .orElseThrow(() -> new NotFoundException("Student with id «" + id + "» not found"))
+                        .isDeleted())
+                .build();
+        studentRepository.save(updatedStudent);
     }
 
 }

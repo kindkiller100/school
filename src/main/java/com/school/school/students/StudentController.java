@@ -4,11 +4,14 @@ import org.springdoc.api.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/students")
@@ -16,7 +19,7 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
-    @GetMapping//добавить пагинацию?
+    @GetMapping
     public List<Student> list() {
         return studentService.list();
     }
@@ -25,11 +28,11 @@ public class StudentController {
         return studentService.getById(id);
     }
     @GetMapping("/deleted")
-    public List<Student> getAllDeleted(){//нет валидации нa null(походу и не нужна)
+    public List<Student> getAllDeleted(){
         return studentService.getAllDeleted();
     }
     @GetMapping("/notDeleted")// перименовать в active ?
-    public List<Student> getAllNotDeleted(){//нет валидации нa null(походу и не нужна)
+    public List<Student> getAllNotDeleted(){
         return studentService.getAllNotDeleted();
     }
 
@@ -48,19 +51,27 @@ public class StudentController {
         studentService.restoreDeleted(id);//нет валидации нa null
     }
     @PutMapping("/{id}/edit")
-    public void editById(@Valid @PathVariable long id, @RequestBody Student editStudent){
-        studentService.editById(id,editStudent);
+    public void editById(@Valid @RequestBody Student editStudent){
+        studentService.editById(editStudent);
     }
 
-    @ExceptionHandler({NullPointerException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({NullPointerException.class})
     public ResponseEntity<ErrorMessage> handleException(NullPointerException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessage(exception.getMessage()));
     }
-    public ResponseEntity<ErrorMessage> handleException(MethodArgumentNotValidException exception) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorMessage(exception.getMessage()));
+    //обработка исключений валидации
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public Map<String, String> handleException(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }
