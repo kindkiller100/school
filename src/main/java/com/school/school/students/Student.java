@@ -27,8 +27,8 @@ public class Student {
     @Column(name = "gender")
     private String gender;
     @NotBlank(message = "Не должно быть пустым")
-    @Size(min = 3, max = 20, message = "Длина telephonenumber должна быть от 3 до 20 символов")
-    @Pattern(regexp = "^[+][0-9]{5,19}$", message = "Номера начинаются со знака '+' и должны иметь от 5 до 19 цифр")
+    @Pattern(regexp = "^[+0-9]{1}[0-9]{5,19}$",
+            message = "Номера начинаются со знака '+' или цифры, должны иметь от 6 до 20 символов")
     @Column(name = "telephonenumber")
     private String telephoneNumber;
     @Column(name = "info")

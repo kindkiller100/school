@@ -20,8 +20,8 @@ public class StudentController {
     private StudentService studentService;
 
     @GetMapping
-    public List<Student> list() {
-        return studentService.list();
+    public List<Student> getAll(){
+        return studentService.getAll();
     }
     @GetMapping("/{id}")
     public Student getById(@PathVariable long id){
@@ -31,22 +31,18 @@ public class StudentController {
     public List<Student> getAllDeleted(){
         return studentService.getAllDeleted();
     }
-    @GetMapping("/notDeleted")// перименовать в active ?
-    public List<Student> getAllNotDeleted(){
-        return studentService.getAllNotDeleted();
-    }
     @GetMapping("/filter/{like}")
     //поиск по частичному совпадению строки like в колонках name, secondname, lastname, telephonenumber
     public List<Student> getAllByFilter(@PathVariable String like){
         return studentService.getAllByFilter(like);
     }
-    @GetMapping("/filterByAge/{from}/{upto}")//нет валидации на отрицательные числа
+    @GetMapping("/filter/age/{from}/{upto}")
     //поиск по возрасту "от" и "до", в годах
     public List<Student> getAllByAge(@PathVariable Byte from, @PathVariable Byte upto){
         return studentService.getAllByAge(from, upto);
     }
 
-    @PostMapping //можно создавать сразу удаленных
+    @PostMapping
     public void create(@Valid @RequestBody Student student) {
         studentService.create(student);
     }
@@ -56,16 +52,16 @@ public class StudentController {
         studentService.delete(id);
     }
 
-    @PutMapping("/{id}/restore")// или DeleteMapping?
+    @PutMapping("/{id}/restore")
     public void restoreDeleted(@PathVariable long id) {
         studentService.restoreDeleted(id);
     }
-    @PutMapping("/{id}/edit")
+    @PutMapping("/edit")
     public void editById(@Valid @RequestBody Student editStudent){
         studentService.editById(editStudent);
     }
 
-    @ExceptionHandler({NullPointerException.class})
+    @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorMessage> handleException(NullPointerException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -73,7 +69,7 @@ public class StudentController {
     }
     //обработка исключений валидации
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleException(
             MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
