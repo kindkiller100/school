@@ -27,11 +27,11 @@ public class TeacherService
         }
     }
 
-    public void editById(long id, Teacher editTeacher) {
+    public void editById(Teacher editTeacher) {
         if (teacherRepository.existsById(editTeacher.getId())) {
             teacherRepository.save(editTeacher);
         } else {
-            throw new NotFoundException("Teacher with id " + id + " not found");
+            throw new NotFoundException("Teacher with id " + editTeacher.getId() + " not found");
         }
     }
 }

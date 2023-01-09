@@ -23,8 +23,7 @@ public class TeachersController
             teacherService.delete(id);
         }
         @PutMapping
-        public void editById(@PathVariable long id, @RequestBody Teacher editTeacher) {
-                teacherService.editById(id, editTeacher);
+        public void editById(@RequestBody Teacher editTeacher) {
+                teacherService.editById(editTeacher);
         }
-
 }
