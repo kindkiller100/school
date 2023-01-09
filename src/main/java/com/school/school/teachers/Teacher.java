@@ -2,16 +2,26 @@ package com.school.school.teachers;
 
 import com.school.school.students.Student;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Teacher {
+@Entity
+@Table(name = "teachers", schema = "school_db")
+public class Teacher
+{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
+    @Column (name = "secondname")
     private String secondName;
+    @Column (name = "lastname")
     private String lastName;
+    @Column (name = "dateofbirth")
     private LocalDate dateOfBirth;
     private String gender;
+    @Column (name = "telephonenumber")
     private String telephoneNumber;
     private String info;
     private boolean deleted;
@@ -200,3 +210,4 @@ public class Teacher {
         }
     }
 }
+
