@@ -7,16 +7,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "subjects", schema="school_db")
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id; //id предмета
-    private String title; //заголовок предмета
-    private String description; //описание предмета
-    private boolean deleted; //флаг "удаления" предмета
+    private long id; //id subject
+    @NotBlank
+    @Size(min = 3, max = 20)
+    private String title; //заголовок subject
+    private String description; //описание subject
+    private boolean deleted; //флаг "удаления" subject
 
     protected Subject() {
     }
@@ -108,7 +112,8 @@ public class Subject {
             return this;
         }
 
-        public Subject build() {//возвращает объект внешнего класса с заданными параметрами
+        //возвращает объект внешнего класса с заданными параметрами
+        public Subject build() {
             return new Subject(id, title, description, deleted);
         }
     }

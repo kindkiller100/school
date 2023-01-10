@@ -1,7 +1,6 @@
 package com.school.school.subjects;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,15 +12,14 @@ public class SubjectService
     @Autowired
     private SubjectRepository subjectRepository;
 
-    public List<Subject> list() {
-        return subjectRepository.findAll();
+    //возвращает список всех subject с deleted == false
+    public List<Subject> getAll() {
+        return subjectRepository.findAllByDeletedIsFalse();
     }
 
-    //возвращает список всех subject с установленным/снятым флагом deleted
-    public List<Subject> getAll(boolean deleted) {
-        return list().stream()
-                .filter(subject -> subject.isDeleted() == deleted)
-                .collect(Collectors.toList());
+    //возвращает список всех subject с deleted == true
+    public List<Subject> getAllDeleted() {
+        return subjectRepository.findAllByDeletedIsTrue();
     }
 
     //создает subject
@@ -32,12 +30,8 @@ public class SubjectService
         //TODO: change exceptions
         if (subjectRepository.existsById(id)) {
             throw new NotFoundException("Subject with id «" + id + "» already exists.");
-        } else if (title.isEmpty()) {
-            throw new NotFoundException("Title is empty.");
-        } else if (existsByTitle(title)) {
+        } else if (subjectRepository.existsByTitle(title)) {
             throw new NotFoundException("Subject with title «" + title + "» already exists.");
-        } else if (subject.isDeleted()) {
-            throw new NotFoundException("Checkbox «Deleted» cannot be true.");
         }
 
         subjectRepository.save(subject);
@@ -49,9 +43,7 @@ public class SubjectService
         String title = subject.getTitle();
 
         //TODO: change exceptions
-        if (title.isEmpty()) {
-            throw new NotFoundException("Title is empty.");
-        } else if (existsByTitle(title, id)) {
+        if (subjectRepository.existsByTitleAndIdNotLike(title, id)) {
             throw new NotFoundException("Subject with title «" + title + "» already exists.");
         }
 
@@ -65,8 +57,18 @@ public class SubjectService
         subjectRepository.save(subjectClone);
     }
 
+    //устанавливает флаг deleted по id
+    public void delete(long id) {
+        setDeletedById(id, true);
+    }
+
+    //снимает флаг deleted по id
+    public void restoreDeleted(long id) {
+        setDeletedById(id, false);
+    }
+
     //устанавливает/снимает флаг deleted по id
-    public void setDeleted(long id, boolean deleted) {
+    private void setDeletedById(long id, boolean deleted) {
         //TODO: change exceptions
         Subject subjectClone = subjectRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Subject with id «" + id + "» not found."))
@@ -75,18 +77,5 @@ public class SubjectService
                 .build();
 
         subjectRepository.save(subjectClone);
-    }
-
-    //возвращает subject по title
-    private boolean existsByTitle(String title) {
-        return list().stream()
-                .anyMatch(subject -> subject.getTitle().equals(title));
-    }
-
-    //возвращает subject по title за исключением переданного id
-    private boolean existsByTitle(String title, long excludedId) {
-        return list().stream()
-                .filter(subject -> subject.getId() != excludedId)
-                .anyMatch(subject -> subject.getTitle().equals(title));
     }
 }

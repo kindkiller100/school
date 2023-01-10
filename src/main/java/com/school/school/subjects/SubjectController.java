@@ -25,13 +25,13 @@ public class SubjectController {
     SubjectService subjectService;
 
     @GetMapping
-    public List<Subject> list() {
-        return subjectService.list();
+    public List<Subject> getAll() {
+        return subjectService.getAll();
     }
 
-    @GetMapping("/{deleted}")
-    public List<Subject> getAll(@PathVariable boolean deleted) {
-        return subjectService.getAll(deleted);
+    @GetMapping("/deleted")
+    public List<Subject> getAllDeleted() {
+        return subjectService.getAllDeleted();
     }
 
     @PostMapping
@@ -44,9 +44,14 @@ public class SubjectController {
         subjectService.edit(subject);
     }
 
-    @DeleteMapping("/{id}/{deleted}")
-    public void delete(@PathVariable long id, @PathVariable boolean deleted) {
-        subjectService.setDeleted(id, deleted);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable long id) {
+        subjectService.delete(id);
+    }
+
+    @PutMapping("/{id}/restore")
+    public void restoreDeleted(@PathVariable long id) {
+        subjectService.restoreDeleted(id);
     }
 
     //метод, который отправляет на UI сообщение об ошибке
