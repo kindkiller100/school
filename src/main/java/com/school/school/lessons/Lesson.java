@@ -1,6 +1,11 @@
 package com.school.school.lessons;
 
+import com.school.school.utils.CorrectDateTime;
+
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -11,20 +16,28 @@ public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;                    //id занятия
+    @CorrectDateTime(message = "Start date and time are not correct. Lesson must start no later than one day ago.")
     @Column(name = "startdatetime")
     private LocalDateTime startDateTime;//дата и время начала занятия
+    @Min(value = 30, message = "Duration of the lesson should be in the range from 30 to 210")
+    @Max(value = 210, message = "Duration of the lesson should be in the range from 30 to 210")
     private short duration;             //продолжительность занятия в минутах
+    //TODO: проверка, что предмет существует
+    @Min(value = 1, message = "Must be greater than 1")
     @Column(name = "subject_id")
     private long subjectId;             //id предмета
+    //TODO: проверка, что преподаватель существует
+    @Min(value = 1, message = "Must be greater than 1")
     @Column(name = "teacher_id")
     private long teacherId;             //id преподавателя
+    @Size(max = 40, message = "Size of description must be less than 40 characters.")
     private String description;         //расшифровка (подробное описание) занятия
 
     //конструктор без параметров
-    private Lesson() {
+    protected Lesson() {
     }
 
-    //конструктор со всеми параметрами кроме id
+    //конструктор со всеми параметрами
     private Lesson(long id,
                    LocalDateTime startDateTime,
                    short duration,
