@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "students")
+@Table(name = "students", schema="school_db")
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
