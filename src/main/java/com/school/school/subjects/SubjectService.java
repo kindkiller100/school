@@ -43,7 +43,7 @@ public class SubjectService
         String title = subject.getTitle();
 
         //TODO: change exceptions
-        if (subjectRepository.existsByTitleAndIdNotLike(title, id)) {
+        if (subjectRepository.existsByTitleAndIdNot(title, id)) {
             throw new NotFoundException("Subject with title «" + title + "» already exists.");
         }
 

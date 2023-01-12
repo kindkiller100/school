@@ -10,5 +10,5 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     List<Subject> findAllByDeletedIsTrue();
     List<Subject> findAllByDeletedIsFalse();
     boolean existsByTitle(String title);
-    boolean existsByTitleAndIdNotLike(String title, long id);
+    boolean existsByTitleAndIdNot(String title, long id);
 }
