@@ -25,7 +25,7 @@ public class StudentController {
     }
     @GetMapping("/{id}")
     public Student getById(@PathVariable long id){
-        return studentService.getById(id);
+        return studentService.getIfExists(id);
     }
     @GetMapping("/deleted")
     public List<Student> getAllDeleted(){
@@ -58,7 +58,7 @@ public class StudentController {
     }
     @PutMapping("/edit")
     public void editById(@Valid @RequestBody Student editStudent){
-        studentService.editById(editStudent);
+        studentService.edit(editStudent);
     }
 
     @ExceptionHandler(NullPointerException.class)

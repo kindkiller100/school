@@ -16,7 +16,7 @@ public class StudentService {
         return studentRepository.findAllByDeletedIsFalse();
     }
 
-    public Student getById(long id) {
+    public Student getIfExists(long id) {
         return studentRepository
                 .findById(id)
                 .orElseThrow(
@@ -35,11 +35,11 @@ public class StudentService {
 
     public List<Student> getAllByAge(Byte fromAge, Byte uptoAge) {
         if (fromAge < 0 || uptoAge < 0 || fromAge > uptoAge) {
-            throw new NumberFormatException("Wrong age period, from: " + fromAge +  ", upto: " + uptoAge);
+            throw new NumberFormatException("Wrong age period, from: " + fromAge + ", upto: " + uptoAge);
         }
         LocalDate fromDate = LocalDate.now().minusYears(uptoAge);
         LocalDate uptoDate = LocalDate.now().minusYears(fromAge);
-        return studentRepository.findAllByAge(fromDate, uptoDate);
+        return studentRepository.findAllByDateOfBirthRange(fromDate, uptoDate);
     }
 
 
@@ -48,36 +48,25 @@ public class StudentService {
     }
 
     public void delete(long id) {
-        Student st = studentRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Student with id «" + id + "» not found"))
-                .clone()
-                .setDeleted(true)
-                .build();
-        studentRepository.save(st);
+        Student student = getIfExists(id);
+        Student studentUpdated = student.clone().setDeleted(true).build();
+        studentRepository.save(studentUpdated);
     }
 
     public void restoreDeleted(long id) {
-        Student st = studentRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Student with id «" + id + "» not found"))
-                .clone()
-                .setDeleted(false)
-                .build();
-        studentRepository.save(st);
+        Student student = getIfExists(id);
+        Student studentUpdated = student.clone().setDeleted(false).build();
+        studentRepository.save(studentUpdated);
     }
 
-    public void editById(Student editStudent) {
+    public void edit(Student editStudent) {
         long id = editStudent.getId();
         //записываем значение deleted оригинального объекта из бд
-        boolean isDeleted = studentRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Student with id «" + id + "» not found"))
-                .isDeleted();
-        Student updatedStudent = editStudent
+        boolean isDeleted = getIfExists(id).isDeleted();
+        Student studentUpdated = editStudent
                 .clone()
                 .setDeleted(isDeleted)//перезаписываем значенеие deleted у обновленного объекта
                 .build();
-        studentRepository.save(updatedStudent);
+        studentRepository.save(studentUpdated);
     }
 }

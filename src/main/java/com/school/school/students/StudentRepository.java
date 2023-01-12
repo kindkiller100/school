@@ -22,5 +22,5 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findAllByFilter(String like);
 
     @Query(value ="SELECT * FROM students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
-    List<Student> findAllByAge(LocalDate fromDate, LocalDate uptoDate);
+    List<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate);
 }
