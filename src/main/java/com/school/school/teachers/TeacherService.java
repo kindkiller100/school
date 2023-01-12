@@ -34,20 +34,16 @@ public class TeacherService {
     }
 
     public void delete(long id) {
-        Teacher st = teacherRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Student with id «" + id + "» not found"))
+        Teacher teacher = getIfExists(id)
                 .clone()
                 .setDeleted(true)
                 .build();
-        teacherRepository.save(st);
+        teacherRepository.save(teacher);
     }
 
     //восстанавливает удаленного
     public void restoreDeleted(long id) {
-        Teacher teacher = teacherRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Teacher with id «" + id + "» not found"))
+        Teacher teacher = getIfExists(id)
                 .clone()
                 .setDeleted(false)
                 .build();
@@ -57,15 +53,13 @@ public class TeacherService {
     public void edit(Teacher editTeacher) {
         long id = editTeacher.getId();
         //записываем значение deleted оригинального объекта из бд
-        boolean isDeleted = teacherRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Teacher with id «" + id + "» not found"))
+        boolean isDeleted = getIfExists(id)
                 .isDeleted();
-        Teacher updatedStudent = editTeacher
+        Teacher updatedTeacher = editTeacher
                 .clone()
                 .setDeleted(isDeleted)//перезаписываем значение deleted у обновленного объекта
                 .build();
-        teacherRepository.save(updatedStudent);
+        teacherRepository.save(updatedTeacher);
     }
 }
 
