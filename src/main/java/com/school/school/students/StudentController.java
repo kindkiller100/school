@@ -4,9 +4,14 @@ import org.springdoc.api.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/students")
@@ -15,12 +20,30 @@ public class StudentController {
     private StudentService studentService;
 
     @GetMapping
-    public List<Student> list() {
-        return studentService.list();
+    public List<Student> getAll(){
+        return studentService.getAll();
+    }
+    @GetMapping("/{id}")
+    public Student getById(@PathVariable long id){
+        return studentService.getIfExists(id);
+    }
+    @GetMapping("/deleted")
+    public List<Student> getAllDeleted(){
+        return studentService.getAllDeleted();
+    }
+    @GetMapping("/filter/{like}")
+    //поиск по частичному совпадению строки like в колонках name, secondname, lastname, telephonenumber
+    public List<Student> getAllByFilter(@PathVariable String like){
+        return studentService.getAllByFilter(like);
+    }
+    @GetMapping("/filter/age/{from}/{upto}")
+    //поиск по возрасту "от" и "до", в годах
+    public List<Student> getAllByAge(@PathVariable Byte from, @PathVariable Byte upto){
+        return studentService.getAllByAge(from, upto);
     }
 
     @PostMapping
-    public void create(@RequestBody Student student) {
+    public void create(@Valid @RequestBody Student student) {
         studentService.create(student);
     }
 
@@ -29,9 +52,13 @@ public class StudentController {
         studentService.delete(id);
     }
 
-    @PutMapping("/{id}")
-    public void editById(@PathVariable long id, @RequestBody Student editStudent){
-        studentService.editById(id,editStudent);
+    @PutMapping("/{id}/restore")
+    public void restoreDeleted(@PathVariable long id) {
+        studentService.restoreDeleted(id);
+    }
+    @PutMapping("/edit")
+    public void editById(@Valid @RequestBody Student editStudent){
+        studentService.edit(editStudent);
     }
 
     @ExceptionHandler(NullPointerException.class)
@@ -39,5 +66,18 @@ public class StudentController {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessage(exception.getMessage()));
+    }
+    //обработка исключений валидации
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleException(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }
