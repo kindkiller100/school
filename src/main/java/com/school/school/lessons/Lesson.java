@@ -2,13 +2,14 @@ package com.school.school.lessons;
 
 import com.school.school.subjects.Subject;
 import com.school.school.teachers.Teacher;
-import com.school.school.utils.CorrectDateTime;
+import org.webjars.NotFoundException;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -27,8 +28,7 @@ public class Lesson {
     private short duration;             //продолжительность занятия в минутах
     @ManyToOne(fetch = FetchType.EAGER)
     private Subject subject;            //предмет
-    //TODO: проверка, что преподаватель существует
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Teacher teacher;            //преподаватель
     @Size(max = 40, message = "Size of description must be less than 40 characters.")
     private String description;         //расшифровка (подробное описание) занятия
@@ -94,16 +94,25 @@ public class Lesson {
     //переопределение метода toString()
     @Override
     public String toString() {
-        //TODO: subjektId, teacherId -> name of subjekt & teacher
         return "Lesson{" +
                 "subject: «" + subject.getTitle() +
-                "», teacher: " + teacher.getLastName() + " " + teacher.getName() + " " + teacher.getSecondName() +
+                "», teacher: " + teacher.getLastName() + " " + teacher.getName() + " " + teacher.getSecondName() +  //тут нвыерное в классе Teacher можно было бы и метод какой-нибудь забабахать, но это не точно
                 ", date of lesson: " + startDateTime.toLocalDate() +        //получаем дату занятия
                 ", start at: " + startDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) +     //получаем время занятия в формате ЧЧ.ММ
                 ", end at: " + startDateTime.toLocalTime().plusMinutes(duration).format(DateTimeFormatter.ofPattern("HH:mm")) + //получаем время занятия, добавляем продолжительность занятия и форматируем результат
                 " (duration " + duration + " min.)" +
                 ", description: '" + description + '\'' +
                 '}';
+    }
+
+    //валидация даты начала занятия. Дата начала занятия не должна быть позже, чем день назад.
+    public void startDateValidation() {
+        if (startDateTime == null) {
+            throw new NotFoundException("In lesson with id «" + id + "» date of start is null.");
+        }
+        if (startDateTime.toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
+            throw new NotFoundException("Lesson must start no later than one day ago.");
+        }
     }
 
     public Builder clone() {

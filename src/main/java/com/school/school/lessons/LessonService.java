@@ -78,7 +78,7 @@ public class LessonService {
 
     //создание занятия
     public void create(Lesson lesson){
-        //TODO: add validations
+        lesson.startDateValidation();   //проверка даты начала занятия
         lessonRepository.save(lesson);
     }
 
@@ -94,7 +94,7 @@ public class LessonService {
     //редактирование занятия
     public void edit(Lesson editLesson){
         if (lessonRepository.existsById(editLesson.getId())){   //проверяем, есть ли запись с таким id в базе данных
-            //TODO: add validations for id, subjectId and teacherId
+            editLesson.startDateValidation();                   //проверка даты начала занятия
             lessonRepository.save(editLesson);                  //сохраняем запись с измененными данными в БД
         } else {                                                //иначе выбрасываем ошибку
             //TODO: add custom exception
