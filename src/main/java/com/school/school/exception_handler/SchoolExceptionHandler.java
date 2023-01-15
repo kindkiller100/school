@@ -20,7 +20,7 @@ public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
 
     //обработка ошибок со статусом 400 и 404
     @ExceptionHandler(IllegalArgumentException.class)
-    protected ResponseEntity<Object> handleIllegalArgument(RuntimeException exception) {
+    protected ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException exception) {
         HttpStatus status = exception instanceof NotFoundException ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
         return ResponseEntity
                 .status(status)
@@ -28,7 +28,7 @@ public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
     }
     //обработка ошибок со статусом 500
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<Object> handleException(RuntimeException exception) {
+    protected ResponseEntity<Object> handleException(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
