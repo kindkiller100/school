@@ -2,16 +2,36 @@ package com.school.school.teachers;
 
 import com.school.school.students.Student;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Entity
+@Table(name = "teachers", schema = "school_db")
 public class Teacher {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @NotBlank(message = "Не должно быть пустым")
+    @Size(min = 3, max = 20, message = "Длина name должна быть от 3 до 20 символов")
     private String name;
+    @Size(min = 3, max = 20, message = "Длина name должна быть от 3 до 20 символов")
+    @Column(name = "secondname")
     private String secondName;
+    @NotBlank(message = "Не должно быть пустым")
+    @Size(min = 3, max = 20, message = "Длина name должна быть от 3 до 20 символов")
+    @Column(name = "lastname")
     private String lastName;
+    @Column(name = "dateofbirth")
     private LocalDate dateOfBirth;
     private String gender;
+    @NotBlank(message = "Не должно быть пустым")
+    @Pattern(regexp = "^[+0-9]{1}[0-9]{5,19}$",
+            message = "Номера начинаются со знака '+' или цифры, должны иметь от 6 до 20 символов")
+    @Column(name = "telephonenumber")
     private String telephoneNumber;
     private String info;
     private boolean deleted;
@@ -28,6 +48,7 @@ public class Teacher {
                     String telephoneNumber,
                     String info,
                     boolean deleted) {
+        this.id = id;
         this.name = name;
         this.secondName = secondName;
         this.lastName = lastName;
@@ -200,3 +221,4 @@ public class Teacher {
         }
     }
 }
+
