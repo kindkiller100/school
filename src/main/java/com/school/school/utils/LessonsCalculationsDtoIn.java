@@ -6,7 +6,7 @@ import javax.validation.constraints.Min;
 public class LessonsCalculationsDtoIn {
     @Min(value = 1, message = "Must be greater than 1")
     private long id;    //id (студента/преподавателя)
-    //@CorrectDateTimeRange(message = "One or both dates are empty.")
+    @CorrectDateTimeRange(message = "One or both dates are empty.")
     private DateTimeRange dateTimeRange;    //диапазона дат
 
     public LessonsCalculationsDtoIn(long id, DateTimeRange dateTimeRange) {
