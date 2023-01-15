@@ -16,7 +16,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank
-    @Size(max = 20)
+    @Size(min = 1, max = 20)
     private String title;
 
     protected Group() {
