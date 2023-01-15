@@ -2,11 +2,11 @@ package com.school.school.utils;
 
 import javax.validation.constraints.Min;
 
-//класс для получения параметров id (студента/преподавателя) и диапазона дат
+//класс для получения параметров id (студента/преподавателя) и диапазона
 public class LessonsCalculationsDtoIn {
     @Min(value = 1, message = "Must be greater than 1")
     private long id;    //id (студента/преподавателя)
-    @CorrectDateTimeRange(message = "One or both dates are empty.")
+    //@CorrectDateTimeRange(message = "One or both dates are empty.")
     private DateTimeRange dateTimeRange;    //диапазона дат
 
     public LessonsCalculationsDtoIn(long id, DateTimeRange dateTimeRange) {
@@ -22,11 +22,11 @@ public class LessonsCalculationsDtoIn {
         this.id = id;
     }
 
-    public DateTimeRange getDataTimeRange() {
+    public DateTimeRange getDateTimeRange() {
         return dateTimeRange;
     }
 
-    public void setDataTimeRange(DateTimeRange dateTimeRange) {
+    public void setDateTimeRange(DateTimeRange dateTimeRange) {
         this.dateTimeRange = dateTimeRange;
     }
 }

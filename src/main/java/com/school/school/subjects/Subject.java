@@ -20,7 +20,7 @@ public class Subject {
     private String description;
     private boolean deleted;
 
-    private Subject() {
+    protected Subject() {
     }
 
     private Subject(String title, String description, boolean deleted) {

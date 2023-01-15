@@ -31,11 +31,11 @@ public class LessonsController {
     @GetMapping("/{id}")
     public Lesson getById(@PathVariable long id)
     {
-        return lessonService.getById(id);
+        return lessonService.getIfExists(id);
     }
 
-    @PostMapping("/date_range") //? GetMapping
-    public List<Lesson> getAllInDateRange(@RequestBody @Valid DateTimeRange dateRange)
+    @PostMapping("/date_range")
+    public List<Lesson> getAllInDateRange(@Valid @RequestBody DateTimeRange dateRange)
     {
         return lessonService.getAllInDateRange(dateRange);
     }
@@ -46,10 +46,10 @@ public class LessonsController {
         return lessonService.getAllByTeacherId(id);
     }
 
-    @PostMapping("/by_teacher/")    //? GetMapping
-    public double countHoursOfLessonByTeacherInRange(@RequestBody @Valid LessonsCalculationsDtoIn lessonsCalc)
+    @PostMapping("/by_teacher")
+    public double countHoursOfLessonByTeacherInRange(@Valid @RequestBody LessonsCalculationsDtoIn lessonsCalc)
     {
-        return lessonService.countHoursOfLessonsByTeacherInRange(lessonsCalc);
+        return lessonService.countHoursOfLessonsByTeacherInRange(lessonsCalc.getId(), lessonsCalc.getDateTimeRange());
     }
 
     @GetMapping("/by_student/{id}")
@@ -58,14 +58,14 @@ public class LessonsController {
         return lessonService.getAllByStudentId(id);
     }
 
-    @PostMapping("/by_student") //? GetMapping
-    public double countHoursOfLessonsByStudentInRange(@RequestBody @Valid LessonsCalculationsDtoIn lessonsCalc)
+    @PostMapping("/by_student")
+    public double countHoursOfLessonsByStudentInRange(@Valid @RequestBody LessonsCalculationsDtoIn lessonsCalc)
     {
-        return lessonService.countHoursOfLessonsByStudentInRange(lessonsCalc);
+        return lessonService.countHoursOfLessonsByStudentInRange(lessonsCalc.getId(), lessonsCalc.getDateTimeRange());
     }
 
     @PostMapping
-    public void create(@RequestBody @Valid Lesson lesson)
+    public void create(@Valid @RequestBody Lesson lesson)
     {
         lessonService.create(lesson);
     }
@@ -76,8 +76,8 @@ public class LessonsController {
     }
 
     @PutMapping
-    public void editById(@RequestBody @Valid Lesson editLesson){
-        lessonService.editById(editLesson);
+    public void edit(@Valid @RequestBody Lesson editLesson){
+        lessonService.edit(editLesson);
     }
 
     //метод, который отправляем на UI сообщение об ошибке

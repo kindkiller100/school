@@ -2,7 +2,6 @@ package com.school.school.lessons;
 
 import com.school.school.students.StudentRepository;
 import com.school.school.utils.DateTimeRange;
-import com.school.school.utils.LessonsCalculationsDtoIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -26,15 +25,14 @@ public class LessonService {
     }
 
     //получить занятие по id
-    public Lesson getById(long id){
+    public Lesson getIfExists(long id){
         return lessonRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Lesson with id «" + id + "» not found."));
     }
 
     //получить все занятия из диапазона дат
     public List<Lesson> getAllInDateRange(DateTimeRange dateRange){
-        stringError.setLength(0);
-        dateRange.rangeValidation(stringError);
+        dateRange.rangeValidation();
         return lessonRepository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo());
     }
 
@@ -49,27 +47,33 @@ public class LessonService {
     }
 
     //количество часов занятий, проведенных преподавателем за период
-    public double countHoursOfLessonsByTeacherInRange(LessonsCalculationsDtoIn lessonsCalc) {
+    public double countHoursOfLessonsByTeacherInRange(long id, DateTimeRange dateTimeRange) {
         stringError.setLength(0);
         //проверяем, что записть с таким Id существует
-        if (!lessonRepository.existsById(lessonsCalc.getId())) {
-            stringError.append("Lesson with id «" + lessonsCalc.getId() + "» not found.");
+        if (!lessonRepository.existsById(id)) {
+            stringError.append("Lesson with id «" + id + "» not found.");
         }
         // проверка диапазона дат
-        lessonsCalc.getDataTimeRange().rangeValidation(stringError);
-        return lessonRepository.countHoursOfLessonsByTeacherInRange(lessonsCalc.getId(), lessonsCalc.getDataTimeRange().getFrom(), lessonsCalc.getDataTimeRange().getTo())/60d;
+        if (!dateTimeRange.validation()) {
+            stringError.append(DateTimeRange.errString);
+        }
+        //получаем количество минут занятий, проведенных преподавателем за период, и переводим в часы
+        return lessonRepository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
     }
 
     //количество часов занятий, посещенных студентом за период
-    public double countHoursOfLessonsByStudentInRange(LessonsCalculationsDtoIn lessonsCalc) {
+    public double countHoursOfLessonsByStudentInRange(long id, DateTimeRange dateTimeRange) {
         stringError.setLength(0);
         //проверяем, что записть с таким Id существует
-        if (!studentRepository.existsById(lessonsCalc.getId())) {
-            stringError.append("Student with id «" + lessonsCalc.getId() + "» not found.");
+        if (!studentRepository.existsById(id)) {
+            stringError.append("Student with id «" + id + "» not found.");
         }
         // проверка диапазона дат
-        lessonsCalc.getDataTimeRange().rangeValidation(stringError);
-        return lessonRepository.findDurationByStudentIdInRange(lessonsCalc.getId(), lessonsCalc.getDataTimeRange().getFrom(), lessonsCalc.getDataTimeRange().getTo())/ 60d;
+        if (!dateTimeRange.validation()) {
+            stringError.append(DateTimeRange.errString);
+        }
+        //получаем количество минут занятий, посещенных студеном за период, и переводим в часы
+        return lessonRepository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;
     }
 
     //создание занятия
@@ -88,7 +92,7 @@ public class LessonService {
     }
 
     //редактирование занятия
-    public void editById(Lesson editLesson){
+    public void edit(Lesson editLesson){
         if (lessonRepository.existsById(editLesson.getId())){   //проверяем, есть ли запись с таким id в базе данных
             //TODO: add validations for id, subjectId and teacherId
             lessonRepository.save(editLesson);                  //сохраняем запись с измененными данными в БД

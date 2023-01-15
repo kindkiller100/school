@@ -1,10 +1,13 @@
 package com.school.school.lessons;
 
+import com.school.school.subjects.Subject;
+import com.school.school.teachers.Teacher;
 import com.school.school.utils.CorrectDateTime;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,20 +19,17 @@ public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;                    //id занятия
-    @CorrectDateTime(message = "Start date and time are not correct. Lesson must start no later than one day ago.")
+    @NotNull(message = "Start of lesson must not be empty")
     @Column(name = "startdatetime")
     private LocalDateTime startDateTime;//дата и время начала занятия
     @Min(value = 30, message = "Duration of the lesson should be in the range from 30 to 210")
     @Max(value = 210, message = "Duration of the lesson should be in the range from 30 to 210")
     private short duration;             //продолжительность занятия в минутах
-    //TODO: проверка, что предмет существует
-    @Min(value = 1, message = "Must be greater than 1")
-    @Column(name = "subject_id")
-    private long subjectId;             //id предмета
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Subject subject;            //предмет
     //TODO: проверка, что преподаватель существует
-    @Min(value = 1, message = "Must be greater than 1")
-    @Column(name = "teacher_id")
-    private long teacherId;             //id преподавателя
+    @ManyToOne
+    private Teacher teacher;            //преподаватель
     @Size(max = 40, message = "Size of description must be less than 40 characters.")
     private String description;         //расшифровка (подробное описание) занятия
 
@@ -41,13 +41,14 @@ public class Lesson {
     private Lesson(long id,
                    LocalDateTime startDateTime,
                    short duration,
-                   long subjectId,
-                   long teacherId,
+                   Subject subject,
+                   Teacher teacher,
                    String description) {
+        this.id = id;
         this.startDateTime = startDateTime;
         this.duration = duration;
-        this.subjectId = subjectId;
-        this.teacherId = teacherId;
+        this.subject = subject;
+        this.teacher = teacher;
         this.description = description;
     }
 
@@ -63,12 +64,12 @@ public class Lesson {
         return duration;
     }
 
-    public long getSubjectId() {
-        return subjectId;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public long getTeacherId() {
-        return teacherId;
+    public Teacher getTeacher() {
+        return teacher;
     }
 
     public String getDescription() {
@@ -95,8 +96,8 @@ public class Lesson {
     public String toString() {
         //TODO: subjektId, teacherId -> name of subjekt & teacher
         return "Lesson{" +
-                "subject: «" + subjectId +
-                "», teacher: " + teacherId +
+                "subject: «" + subject.getTitle() +
+                "», teacher: " + teacher.getLastName() + " " + teacher.getName() + " " + teacher.getSecondName() +
                 ", date of lesson: " + startDateTime.toLocalDate() +        //получаем дату занятия
                 ", start at: " + startDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) +     //получаем время занятия в формате ЧЧ.ММ
                 ", end at: " + startDateTime.toLocalTime().plusMinutes(duration).format(DateTimeFormatter.ofPattern("HH:mm")) + //получаем время занятия, добавляем продолжительность занятия и форматируем результат
@@ -110,8 +111,8 @@ public class Lesson {
                 .setId(this.id)
                 .setStartDateTime(this.startDateTime)
                 .setDuration(this.duration)
-                .setSubjectId(this.subjectId)
-                .setTeacherId(this.teacherId)
+                .setSubject(this.subject)
+                .setTeacher(this.teacher)
                 .setDescription(this.description);
     }
 
@@ -119,8 +120,8 @@ public class Lesson {
         private long id;
         private LocalDateTime startDateTime;
         private short duration;
-        private long subjectId;
-        private long teacherId;
+        private Subject subject;
+        private Teacher teacher;
         private String description;
 
         public Builder setId(long id) {
@@ -138,13 +139,13 @@ public class Lesson {
             return this;
         }
 
-        public Builder setSubjectId(long subjectId) {
-            this.subjectId = subjectId;
+        public Builder setSubject(Subject subject) {
+            this.subject = subject;
             return this;
         }
 
-        public Builder setTeacherId(long teacherId) {
-            this.teacherId = teacherId;
+        public Builder setTeacher(Teacher teacher) {
+            this.teacher = teacher;
             return this;
         }
 
@@ -157,8 +158,8 @@ public class Lesson {
             return new Lesson(id,
                     startDateTime,
                     duration,
-                    subjectId,
-                    teacherId,
+                    subject,
+                    teacher,
                     description);
         }
     }
