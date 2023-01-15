@@ -11,7 +11,7 @@ public interface TeacherRepository extends JpaRepository<Teacher,Long>
 {
     List<Teacher> findAllByDeletedIsTrue();
     List<Teacher> findAllByDeletedIsFalse();
-    @Query(value = "SELECT * FROM teachers " +
+    @Query(value = "SELECT * FROM school_db.teachers " +
             "WHERE name ILIKE %?1% " +
             "OR secondname ILIKE %?1% " +
             "OR lastname ILIKE %?1% " +
