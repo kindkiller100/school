@@ -1,5 +1,7 @@
+-- удаляем старую и создаем новую схему
 drop schema if exists school_db cascade;
 create schema school_db;
+
 -- создание таблиц
 CREATE TABLE school_db.students
 (
@@ -43,7 +45,7 @@ CREATE TABLE school_db.lessons
     subject_id int NOT NULL REFERENCES subjects(id),
     teacher_id int NOT NULL REFERENCES teachers(id),
     description VARCHAR (40)
-    );
+);
 
 CREATE TABLE school_db.student_lesson
 (
@@ -51,6 +53,7 @@ CREATE TABLE school_db.student_lesson
     student_id int NOT NULL REFERENCES students(id),
     lesson_id int NOT NULL REFERENCES lessons(id)
 );
+
 CREATE TABLE school_db.payments
 (
     id serial PRIMARY KEY,
