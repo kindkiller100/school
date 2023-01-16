@@ -10,7 +10,7 @@ import java.time.LocalTime;
 
 public class DateTimeRange {
     //сообщение об ошибке диапазона дат
-    public static final String errString = "Invalid date range specified. The end date of the range is greater than the start date of the range.";
+    public static final String ERR_STRING = "Invalid date range specified. The end date of the range is greater than the start date of the range.";
     @NotNull(message = "Start range must not be empty")
     private LocalDateTime from;
     @NotNull(message = "End range must not be empty")
@@ -56,7 +56,7 @@ public class DateTimeRange {
     public void validate() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         if(!isValid()) {
-            throw new NotFoundException(DateTimeRange.errString);
+            throw new NotFoundException(DateTimeRange.ERR_STRING);
         }
     }
 }

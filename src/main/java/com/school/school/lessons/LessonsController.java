@@ -79,25 +79,4 @@ public class LessonsController {
     public void edit(@Valid @RequestBody Lesson editLesson){
         lessonService.edit(editLesson);
     }
-
-    //метод, который отправляем на UI сообщение об ошибке
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorMessage> handleException(NotFoundException exception) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessage(exception.getMessage()));
-    }
-
-    //метод, который отправляет на UI сообщение об ошибках валидаций объектов
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleException(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-                String fieldName = ((FieldError) error).getField();
-                String errorMessage = error.getDefaultMessage();
-                errors.put(fieldName, errorMessage);
-            });
-        return errors;
-    }
 }

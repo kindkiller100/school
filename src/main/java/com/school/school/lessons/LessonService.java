@@ -57,7 +57,7 @@ public class LessonService {
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            stringError.append(DateTimeRange.errString);
+            stringError.append(DateTimeRange.ERR_STRING);
         }
         //выводим сообщение об ошибке
         if (!stringError.isEmpty()) {
@@ -76,7 +76,7 @@ public class LessonService {
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            stringError.append(DateTimeRange.errString);
+            stringError.append(DateTimeRange.ERR_STRING);
         }
         //выводим сообщение об ошибке
         if (!stringError.isEmpty()) {
