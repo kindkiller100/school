@@ -13,7 +13,7 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     List<Student> findAllByDeletedIsFalse();
 
-    @Query(value = "SELECT * FROM students " +
+    @Query(value = "SELECT * FROM school_db.students " +
             "WHERE name ILIKE %?1% " +
             "OR secondname ILIKE %?1% " +
             "OR lastname ILIKE %?1% " +
@@ -21,6 +21,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             , nativeQuery = true)
     List<Student> findAllByFilter(String like);
 
-    @Query(value ="SELECT * FROM students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
+    @Query(value ="SELECT * FROM school_db.students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
     List<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate);
 }

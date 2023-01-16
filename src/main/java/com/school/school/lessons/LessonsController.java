@@ -37,11 +37,4 @@ public class LessonsController {
         lessonService.editById(editLesson);
     }
 
-    //метод, который отправляем на UI сообщение об ошибке
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorMessage> handleException(NotFoundException exception) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessage(exception.getMessage()));
-    }
 }
