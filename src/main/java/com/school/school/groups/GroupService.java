@@ -28,6 +28,12 @@ public class GroupService {
         groupRepository.save(groupClone);
     }
 
+    public void delete(long id) {
+        Group group = getIfExists(id);
+
+        groupRepository.delete(group);
+    }
+
     private Group getIfExists(long id) {
         return groupRepository
                 .findById(id)
