@@ -29,17 +29,14 @@ public class GroupService {
     }
 
     public void delete(long id) {
-        if (checkIfExists(id)) {
-            groupRepository.deleteById(id);
-        }
+        checkIfExists(id);
+        groupRepository.deleteById(id);
     }
 
-    private boolean checkIfExists(long id) {
-        if (groupRepository.existsById(id)) {
-            return true;
+    private void checkIfExists(long id) {
+        if (!groupRepository.existsById(id)) {
+            throw new NotFoundException("Group with id «" + id + "» not found.");
         }
-
-        throw new NotFoundException("Group with id «" + id + "» not found.");
     }
 
     private Group getIfExists(long id) {
