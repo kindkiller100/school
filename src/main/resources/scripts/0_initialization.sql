@@ -63,15 +63,3 @@ CREATE TABLE school_db.payments
     auto_identified boolean DEFAULT NULL,
     info varchar(200)
 );
-
-CREATE TABLE school_db.groups
-(
-    id serial PRIMARY KEY,
-    title varchar(20) NOT NULL
-);
-
-CREATE TABLE school_db.groups_students
-(
-    group_id int NOT NULL REFERENCES school_db.groups(id),
-    student_id int NOT NULL REFERENCES school_db.students(id)
-);
