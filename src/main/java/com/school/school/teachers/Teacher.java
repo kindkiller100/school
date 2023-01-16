@@ -36,7 +36,7 @@ public class Teacher {
     private String info;
     private boolean deleted;
 
-    private Teacher() {
+    protected Teacher() {
     }
 
     private Teacher(long id,
@@ -137,6 +137,10 @@ public class Teacher {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public String getFullName() {
+        return lastName + " " + name + " " + secondName;
     }
 
     public Builder clone() {

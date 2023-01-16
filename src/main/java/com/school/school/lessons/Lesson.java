@@ -26,8 +26,10 @@ public class Lesson {
     @Min(value = 30, message = "Duration of the lesson should be in the range from 30 to 210")
     @Max(value = 210, message = "Duration of the lesson should be in the range from 30 to 210")
     private short duration;             //продолжительность занятия в минутах
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     private Subject subject;            //предмет
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     private Teacher teacher;            //преподаватель
     @Size(max = 40, message = "Size of description must be less than 40 characters.")
@@ -96,7 +98,7 @@ public class Lesson {
     public String toString() {
         return "Lesson{" +
                 "subject: «" + subject.getTitle() +
-                "», teacher: " + teacher.getLastName() + " " + teacher.getName() + " " + teacher.getSecondName() +  //тут нвыерное в классе Teacher можно было бы и метод какой-нибудь забабахать, но это не точно
+                "», teacher: " + teacher.getFullName() +
                 ", date of lesson: " + startDateTime.toLocalDate() +        //получаем дату занятия
                 ", start at: " + startDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) +     //получаем время занятия в формате ЧЧ.ММ
                 ", end at: " + startDateTime.toLocalTime().plusMinutes(duration).format(DateTimeFormatter.ofPattern("HH:mm")) + //получаем время занятия, добавляем продолжительность занятия и форматируем результат

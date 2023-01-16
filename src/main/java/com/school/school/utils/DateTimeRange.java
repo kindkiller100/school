@@ -1,5 +1,6 @@
 package com.school.school.utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.webjars.NotFoundException;
 
 import javax.validation.constraints.NotNull;
@@ -44,16 +45,17 @@ public class DateTimeRange {
     }
 
     //метод вилидаций объекта
-    public boolean validation() {
+    @JsonIgnore
+    public boolean isValid() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         //true - если диапазон дат корректный
         return !this.from.isAfter(this.to);
     }
 
     //метод вилидаций объекта
-    public void rangeValidation() {
+    public void validate() {
         //проверка, что начало диапазона меньше или равно конца диапазона
-        if(this.from.isAfter(this.to)) {
+        if(!isValid()) {
             throw new NotFoundException(DateTimeRange.errString);
         }
     }

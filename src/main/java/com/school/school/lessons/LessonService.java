@@ -1,6 +1,7 @@
 package com.school.school.lessons;
 
 import com.school.school.students.StudentRepository;
+import com.school.school.teachers.TeacherRepository;
 import com.school.school.utils.DateTimeRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,10 @@ import java.util.List;
 public class LessonService {
     @Autowired
     private LessonRepository lessonRepository;
-
     @Autowired
     private StudentRepository studentRepository;
+    @Autowired
+    private TeacherRepository teacherRepository;
 
     //текст сообщения об ошибке
     private static StringBuilder stringError = new StringBuilder();
@@ -32,7 +34,7 @@ public class LessonService {
 
     //получить все занятия из диапазона дат
     public List<Lesson> getAllInDateRange(DateTimeRange dateRange){
-        dateRange.rangeValidation();
+        dateRange.validate();
         return lessonRepository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo());
     }
 
@@ -50,12 +52,16 @@ public class LessonService {
     public double countHoursOfLessonsByTeacherInRange(long id, DateTimeRange dateTimeRange) {
         stringError.setLength(0);
         //проверяем, что записть с таким Id существует
-        if (!lessonRepository.existsById(id)) {
-            stringError.append("Lesson with id «" + id + "» not found.");
+        if (!teacherRepository.existsById(id)) {
+            stringError.append("Teacher with id «" + id + "» not found.");
         }
         // проверка диапазона дат
-        if (!dateTimeRange.validation()) {
+        if (!dateTimeRange.isValid()) {
             stringError.append(DateTimeRange.errString);
+        }
+        //выводим сообщение об ошибке
+        if (!stringError.isEmpty()) {
+            throw new NotFoundException(stringError.toString());
         }
         //получаем количество минут занятий, проведенных преподавателем за период, и переводим в часы
         return lessonRepository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
@@ -69,8 +75,12 @@ public class LessonService {
             stringError.append("Student with id «" + id + "» not found.");
         }
         // проверка диапазона дат
-        if (!dateTimeRange.validation()) {
+        if (!dateTimeRange.isValid()) {
             stringError.append(DateTimeRange.errString);
+        }
+        //выводим сообщение об ошибке
+        if (!stringError.isEmpty()) {
+            throw new NotFoundException(stringError.toString());
         }
         //получаем количество минут занятий, посещенных студеном за период, и переводим в часы
         return lessonRepository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;

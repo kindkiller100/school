@@ -35,7 +35,7 @@ public class LessonsController {
     }
 
     @PostMapping("/date_range")
-    public List<Lesson> getAllInDateRange(@Valid @RequestBody DateTimeRange dateRange)
+    public List<Lesson> getAllInDateRange(@RequestBody @Valid DateTimeRange dateRange)
     {
         return lessonService.getAllInDateRange(dateRange);
     }
