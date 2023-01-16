@@ -2,6 +2,7 @@ package com.school.school.subjects;
 
 import java.util.List;
 
+import com.school.school.students.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -20,6 +21,9 @@ public class SubjectService
     //возвращает список всех subject с deleted == true
     public List<Subject> getAllDeleted() {
         return subjectRepository.findAllByDeletedIsTrue();
+    }
+    public Subject getIfExists(long id) {
+        return subjectRepository.getIfExists(id);
     }
 
     //создает subject

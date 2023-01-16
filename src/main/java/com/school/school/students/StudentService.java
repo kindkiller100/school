@@ -17,11 +17,7 @@ public class StudentService {
     }
 
     public Student getIfExists(long id) {
-        return studentRepository
-                .findById(id)
-                .orElseThrow(
-                        () -> new NotFoundException("Student with id «" + id + "» not found")
-                );
+        return studentRepository.getIfExists(id);
     }
 
     public List<Student> getAllDeleted() {
