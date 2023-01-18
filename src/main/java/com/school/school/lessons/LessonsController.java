@@ -1,26 +1,22 @@
 package com.school.school.lessons;
 
 import com.school.school.utils.DateTimeRange;
+import com.school.school.utils.LessonDtoIn;
+import com.school.school.utils.LessonDtoInService;
 import com.school.school.utils.LessonsCalculationsDtoIn;
-import org.springdoc.api.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.webjars.NotFoundException;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/lessons")
 public class LessonsController {
     @Autowired
     private LessonService lessonService;
+    @Autowired
+    private LessonDtoInService lessonDtoInService;
 
     @GetMapping
     public List<Lesson> list()
@@ -65,9 +61,9 @@ public class LessonsController {
     }
 
     @PostMapping
-    public void create(@Valid @RequestBody Lesson lesson)
+    public void create(@Valid @RequestBody LessonDtoIn lessonDto)
     {
-        lessonService.create(lesson);
+        lessonService.create(lessonDtoInService.convertDtoToEntity(lessonDto, true));
     }
 
     @DeleteMapping("/{id}")
@@ -76,7 +72,7 @@ public class LessonsController {
     }
 
     @PutMapping
-    public void edit(@Valid @RequestBody Lesson editLesson){
-        lessonService.edit(editLesson);
+    public void edit(@Valid @RequestBody LessonDtoIn editLessonDto){
+        lessonService.edit(lessonDtoInService.convertDtoToEntity(editLessonDto, false));
     }
 }
