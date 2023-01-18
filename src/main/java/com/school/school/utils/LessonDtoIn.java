@@ -7,6 +7,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public class LessonDtoIn {
+    @Min(value = 0, message = "Can't be negative")
     private long id;                    //id занятия
     @NotNull(message = "Start of lesson must not be empty")
     private LocalDateTime startDateTime;//дата и время начала занятия
