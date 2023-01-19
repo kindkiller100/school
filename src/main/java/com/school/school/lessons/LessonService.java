@@ -1,5 +1,6 @@
 package com.school.school.lessons;
 
+import com.school.school.exceptions.ValidationException;
 import com.school.school.students.StudentRepository;
 import com.school.school.teachers.TeacherRepository;
 import com.school.school.utils.DateTimeRange;
@@ -17,9 +18,7 @@ public class LessonService {
     private StudentRepository studentRepository;
     @Autowired
     private TeacherRepository teacherRepository;
-
-    //текст сообщения об ошибке
-    private static StringBuilder stringError = new StringBuilder();
+    private final ValidationException validationException = new ValidationException();
 
     //получить все занятия
     public List<Lesson> list(){
@@ -50,38 +49,38 @@ public class LessonService {
 
     //количество часов занятий, проведенных преподавателем за период
     public double countHoursOfLessonsByTeacherInRange(long id, DateTimeRange dateTimeRange) {
-        stringError.setLength(0);
+        validationException.clear();
+
         //проверяем, что записть с таким Id существует
         if (!teacherRepository.existsById(id)) {
-            stringError.append("Teacher with id «" + id + "» not found.");
+            validationException.put("id", "Teacher with id «" + id + "» not found.");
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            stringError.append(DateTimeRange.ERR_STRING);
+            validationException.put("dateTimeRange", DateTimeRange.ERR_STRING);
         }
-        //выводим сообщение об ошибке
-        if (!stringError.isEmpty()) {
-            throw new NotFoundException(stringError.toString());
-        }
+
+        validationException.throwExceptionIfIsNotEmpty();
+
         //получаем количество минут занятий, проведенных преподавателем за период, и переводим в часы
         return lessonRepository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
     }
 
     //количество часов занятий, посещенных студентом за период
     public double countHoursOfLessonsByStudentInRange(long id, DateTimeRange dateTimeRange) {
-        stringError.setLength(0);
+        validationException.clear();
+
         //проверяем, что записть с таким Id существует
         if (!studentRepository.existsById(id)) {
-            stringError.append("Student with id «" + id + "» not found.");
+            validationException.put("id", "Student with id «" + id + "» not found.");
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            stringError.append(DateTimeRange.ERR_STRING);
+            validationException.put("dateTimeRange", DateTimeRange.ERR_STRING);
         }
-        //выводим сообщение об ошибке
-        if (!stringError.isEmpty()) {
-            throw new NotFoundException(stringError.toString());
-        }
+
+        validationException.throwExceptionIfIsNotEmpty();
+
         //получаем количество минут занятий, посещенных студеном за период, и переводим в часы
         return lessonRepository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;
     }
@@ -97,7 +96,9 @@ public class LessonService {
         if (lessonRepository.existsById(id)) {      //проверяем, есть ли запись с таким id в базе данных
             lessonRepository.deleteById(id);        //удаляем запись по id
         } else {                                    //если записи нет - выбрасываем ошибку
-            throw new NotFoundException("Lesson with id «" + id + "» not found.");
+            validationException.clear();
+            validationException.put("id", "Lesson with id «" + id + "» not found.");
+            validationException.throwExceptionIfIsNotEmpty();
         }
     }
 
@@ -107,8 +108,9 @@ public class LessonService {
             editLesson.startDateValidation();                   //проверка даты начала занятия
             lessonRepository.save(editLesson);                  //сохраняем запись с измененными данными в БД
         } else {                                                //иначе выбрасываем ошибку
-            //TODO: add custom exception
-            throw new NotFoundException("Lesson with id «" + editLesson.getId() + "» not found.");
+            validationException.clear();
+            validationException.put("id", "Lesson with id «" + editLesson.getId() + "» not found.");
+            validationException.throwExceptionIfIsNotEmpty();
         }
     }
 }

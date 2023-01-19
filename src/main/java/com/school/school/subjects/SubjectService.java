@@ -12,6 +12,7 @@ public class SubjectService
 {
     @Autowired
     private SubjectRepository subjectRepository;
+    private final ValidationException validationException = new ValidationException();
 
     //возвращает список всех subject с deleted == false
     public List<Subject> getAll() {
@@ -27,7 +28,8 @@ public class SubjectService
     public void create(Subject subject) {
         long id = subject.getId();
         String title = subject.getTitle();
-        ValidationException validationException = new ValidationException();
+
+        validationException.clear();
 
         if (subjectRepository.existsById(id)) {
             validationException.put("id", "Subject with id «" + id + "» already exists.");
@@ -37,9 +39,7 @@ public class SubjectService
             validationException.put("title", "Subject with title «" + title + "» already exists.");
         }
 
-        if(!validationException.get().isEmpty()) {
-            throw validationException;
-        }
+        validationException.throwExceptionIfIsNotEmpty();
 
         subjectRepository.save(subject);
     }
@@ -49,10 +49,13 @@ public class SubjectService
         long id = subject.getId();
         String title = subject.getTitle();
 
-        //TODO: change exceptions
+        validationException.clear();
+
         if (subjectRepository.existsByTitleAndIdNot(title, id)) {
-            throw new NotFoundException("Subject with title «" + title + "» already exists.");
+            validationException.put("title", "Subject with title «" + title + "» already exists.");
         }
+
+        validationException.throwExceptionIfIsNotEmpty();
 
         Subject subjectClone = subjectRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Subject with id «" + id + "» not found."))

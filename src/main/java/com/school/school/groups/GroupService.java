@@ -1,5 +1,6 @@
 package com.school.school.groups;
 
+import com.school.school.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -10,6 +11,7 @@ import java.util.List;
 public class GroupService {
     @Autowired
     GroupRepository groupRepository;
+    private final ValidationException validationException = new ValidationException();
 
     public List<Group> getAll() {
         return groupRepository.findAll();
@@ -35,7 +37,9 @@ public class GroupService {
 
     private void checkIfExists(long id) {
         if (!groupRepository.existsById(id)) {
-            throw new NotFoundException("Group with id «" + id + "» not found.");
+            validationException.clear();
+            validationException.put("id", "Group with id «" + id + "» not found.");
+            validationException.throwExceptionIfIsNotEmpty();
         }
     }
 

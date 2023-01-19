@@ -14,4 +14,14 @@ public class ValidationException extends RuntimeException {
     public Map<String, String> get() {
         return this.errors;
     }
+
+    public void clear() {
+        this.errors.clear();
+    }
+
+    public void throwExceptionIfIsNotEmpty() {
+        if(!this.errors.isEmpty()) {
+            throw this;
+        }
+    }
 }
