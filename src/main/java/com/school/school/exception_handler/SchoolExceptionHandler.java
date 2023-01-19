@@ -34,6 +34,11 @@ public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(SchoolValidationException.class)
+    protected ResponseEntity<Object> handleSchoolValidationException(SchoolValidationException exception) {
+        return new ResponseEntity(exception.getErrors(), HttpStatus.BAD_REQUEST);
+    }
+
     //обработка исключений вызванных валидациями сущностей, возвращает список ошибок со статусом 400
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(

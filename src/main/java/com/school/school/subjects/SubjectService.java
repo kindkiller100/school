@@ -2,6 +2,7 @@ package com.school.school.subjects;
 
 import java.util.List;
 
+import com.school.school.exception_handler.SchoolValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -23,15 +24,21 @@ public class SubjectService
     }
 
     //создает subject
-    public void create(Subject subject) {
+    public void create(Subject subject) throws SchoolValidationException {
         long id = subject.getId();
         String title = subject.getTitle();
+        SchoolValidationException schoolValidationException = new SchoolValidationException();
 
-        //TODO: change exceptions
         if (subjectRepository.existsById(id)) {
-            throw new NotFoundException("Subject with id «" + id + "» already exists.");
-        } else if (subjectRepository.existsByTitle(title)) {
-            throw new NotFoundException("Subject with title «" + title + "» already exists.");
+            schoolValidationException.addError("id", "Subject with id «" + id + "» already exists.");
+        }
+
+        if (subjectRepository.existsByTitle(title)) {
+            schoolValidationException.addError("title", "Subject with title «" + title + "» already exists.");
+        }
+
+        if(!schoolValidationException.getErrors().isEmpty()) {
+            throw schoolValidationException;
         }
 
         subjectRepository.save(subject);
