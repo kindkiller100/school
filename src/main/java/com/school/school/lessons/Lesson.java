@@ -108,13 +108,14 @@ public class Lesson {
     }
 
     //валидация даты начала занятия. Дата начала занятия не должна быть позже, чем день назад.
-    public void startDateValidation() {
+    public String startDateValidation() {
         if (startDateTime == null) {
-            throw new NotFoundException("In lesson with id «" + id + "» date of start is null.");
+            return "В занятии по id «" + id + "» не указана дата начала занятия.";
         }
         if (startDateTime.toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
-            throw new NotFoundException("Lesson must start no later than one day ago.");
+            return "Дата начала занятия должна быть не позднее, чем день назад.";
         }
+        return "";
     }
 
     public Builder clone() {

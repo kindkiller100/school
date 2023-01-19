@@ -1,6 +1,7 @@
 package com.school.school.lessons;
 
 import com.school.school.students.StudentRepository;
+import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
 import com.school.school.utils.DateTimeRange;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ public class LessonService {
     private StudentRepository studentRepository;
     @Autowired
     private TeacherRepository teacherRepository;
+    @Autowired
+    private SubjectRepository subjectRepository;
 
     //текст сообщения об ошибке
     private static StringBuilder stringError = new StringBuilder();
@@ -87,8 +90,9 @@ public class LessonService {
     }
 
     //создание занятия
+    //параметр lesson содержит поля subject и teacher, у которых заполнен только id (после маппинга из LessonDtoIn)
     public void create(Lesson lesson){
-        lesson.startDateValidation();   //проверка даты начала занятия
+        validate(lesson, false);
         lessonRepository.save(lesson);
     }
 
@@ -102,13 +106,33 @@ public class LessonService {
     }
 
     //редактирование занятия
+    //параметр editLesson содержит поля subject и teacher, у которых заполнен только id (после маппинга из LessonDtoIn)
     public void edit(Lesson editLesson){
-        if (lessonRepository.existsById(editLesson.getId())){   //проверяем, есть ли запись с таким id в базе данных
-            editLesson.startDateValidation();                   //проверка даты начала занятия
-            lessonRepository.save(editLesson);                  //сохраняем запись с измененными данными в БД
-        } else {                                                //иначе выбрасываем ошибку
-            //TODO: add custom exception
-            throw new NotFoundException("Lesson with id «" + editLesson.getId() + "» not found.");
+        validate(editLesson, true);
+        //сохраняем запись с измененными данными в БД
+        lessonRepository.save(editLesson);
+    }
+
+    private void validate(Lesson lesson, boolean editFlag) {
+        //очищаем строку ошибок
+        stringError.setLength(0);
+        //проверяем, есть ли запись с таким id в базе данных
+        if (editFlag && !lessonRepository.existsById(lesson.getId())) {
+            stringError.append("Занятие по id «" + lesson.getId() + "» не найдено.");
+        }
+        //проверяем существует ли предмет с указанным Id
+        if (!subjectRepository.existsById(lesson.getSubject().getId())) {
+            stringError.append("Предмет по id «" + lesson.getSubject().getId() + "» не найден.");
+        }
+        //проверяем существует ли преподаватель с указанным Id
+        if (!teacherRepository.existsById(lesson.getTeacher().getId())) {
+            stringError.append("Преподаватель по id «" + lesson.getTeacher().getId() + "» не найден.");
+        }
+        //проверка даты начала занятия
+        stringError.append(lesson.startDateValidation());
+        //если строка не пустая, то выбрасываем эксэпшн
+        if (!stringError.isEmpty()) {
+            throw new NotFoundException(stringError.toString());
         }
     }
 }
