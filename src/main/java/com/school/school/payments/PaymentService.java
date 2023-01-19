@@ -1,5 +1,6 @@
 package com.school.school.payments;
 
+import com.school.school.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -25,12 +26,18 @@ public class PaymentService {
     }
 
     public void add(Payment payment) {
+        ValidationException validationException = new ValidationException();
+
         if (payment.getSum() <= 0){
-            throw new IllegalArgumentException("Сумма должна быть больше нуля.");
+            validationException.put("sum", "Сумма должна быть больше нуля.");
         }
+
         if(repository.existsById(payment.getId())){
-            throw new IllegalArgumentException("Платеж с таким номером уже существует.");
+            validationException.put("id", "Платеж с номером «" + payment.getId() + "» уже существует.");
         }
+
+        validationException.throwExceptionIfIsNotEmpty();
+
         repository.save(payment);
     }
 

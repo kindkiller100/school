@@ -16,7 +16,7 @@ import java.util.Map;
 
 
 @ControllerAdvice
-public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     //обработка ошибок со статусом 400 и 404
     @ExceptionHandler(IllegalArgumentException.class)
@@ -36,7 +36,7 @@ public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
 
     //обработка валидации бизнес-логики
     @ExceptionHandler(ValidationException.class)
-    protected ResponseEntity<Object> handleSchoolValidationException(ValidationException exception) {
+    protected ResponseEntity<Object> handleValidationException(ValidationException exception) {
         return new ResponseEntity(exception.get(), HttpStatus.BAD_REQUEST);
     }
 

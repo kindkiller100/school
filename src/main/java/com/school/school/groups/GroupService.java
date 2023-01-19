@@ -11,7 +11,6 @@ import java.util.List;
 public class GroupService {
     @Autowired
     GroupRepository groupRepository;
-    private final ValidationException validationException = new ValidationException();
 
     public List<Group> getAll() {
         return groupRepository.findAll();
@@ -37,8 +36,8 @@ public class GroupService {
 
     private void checkIfExists(long id) {
         if (!groupRepository.existsById(id)) {
-            validationException.clear();
-            validationException.put("id", "Group with id «" + id + "» not found.");
+            ValidationException validationException = new ValidationException();
+            validationException.put("id", "Группа с id «" + id + "» не найдена.");
             validationException.throwExceptionIfIsNotEmpty();
         }
     }
