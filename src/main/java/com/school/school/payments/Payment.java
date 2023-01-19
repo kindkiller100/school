@@ -1,6 +1,7 @@
 package com.school.school.payments;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -15,10 +16,12 @@ public class Payment {
     private double sum;
     @Column(name = "student_id")
     private long studentId;
-    @Column(name = "auto_identified")
-    private Boolean autoIdentified;
+    @Column(name = "auto_identified")//значние обьекто получено из обработчика тру
+    private Boolean autoIdentified; //null-hz false- надо перепроверить вручную
     private String info;
 
+    private Payment(){
+    }
     private Payment(long id,
                     LocalDateTime dateTime,
                     double sum,
