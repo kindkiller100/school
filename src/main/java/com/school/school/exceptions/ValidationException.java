@@ -1,17 +1,17 @@
-package com.school.school.exception_handler;
+package com.school.school.exceptions;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SchoolValidationException extends RuntimeException {
+public class ValidationException extends RuntimeException {
     //ключ - название поля, значение - сообщение об ошибке, связанное с этим полем
     private Map<String, String> errors = new HashMap<>();
 
-    public void addError(String fieldName, String errorMessage) {
+    public void put(String fieldName, String errorMessage) {
         this.errors.put(fieldName, errorMessage);
     }
 
-    public Map<String, String> getErrors() {
-        return errors;
+    public Map<String, String> get() {
+        return this.errors;
     }
 }

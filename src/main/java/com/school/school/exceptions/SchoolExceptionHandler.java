@@ -1,4 +1,4 @@
-package com.school.school.exception_handler;
+package com.school.school.exceptions;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,9 +34,10 @@ public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
     }
 
-    @ExceptionHandler(SchoolValidationException.class)
-    protected ResponseEntity<Object> handleSchoolValidationException(SchoolValidationException exception) {
-        return new ResponseEntity(exception.getErrors(), HttpStatus.BAD_REQUEST);
+    //обработка валидации бизнес-логики
+    @ExceptionHandler(ValidationException.class)
+    protected ResponseEntity<Object> handleSchoolValidationException(ValidationException exception) {
+        return new ResponseEntity(exception.get(), HttpStatus.BAD_REQUEST);
     }
 
     //обработка исключений вызванных валидациями сущностей, возвращает список ошибок со статусом 400
