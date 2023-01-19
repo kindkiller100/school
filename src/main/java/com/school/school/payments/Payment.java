@@ -1,6 +1,8 @@
 package com.school.school.payments;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -17,7 +19,16 @@ public class Payment {
     private long studentId;
     @Column(name = "auto_identified")
     private Boolean autoIdentified;
+    /*
+    autoIdentified может принимать следующие значения:
+        true - запись идентифицирована автоматически
+        false - запись идентифицирована вручную
+        null - запись не идентифицирована
+     */
     private String info;
+
+    private Payment() {
+    }
 
     private Payment(long id,
                     LocalDateTime dateTime,
