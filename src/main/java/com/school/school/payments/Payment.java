@@ -17,12 +17,19 @@ public class Payment {
     private double sum;
     @Column(name = "student_id")
     private long studentId;
-    @Column(name = "auto_identified")//если значние обьекто получено из обработчика = true
-    private Boolean autoIdentified; //null - ?, false - надо перепроверить вручную
+    @Column(name = "auto_identified")
+    private Boolean autoIdentified;
+    /*
+    autoIdentified может принимать следующие значения:
+        true - запись создана обработчиком, идентифицирована студентом и не требует ручной проверки
+        false - запись создана обработчиком, но требует ручной проверки
+        null - запись создана но не идентифицирована студентом
+     */
     private String info;
 
-    private Payment(){
+    private Payment() {
     }
+
     private Payment(long id,
                     LocalDateTime dateTime,
                     double sum,

@@ -10,10 +10,10 @@ import java.util.List;
 public class PaymentService {
 
     @Autowired
-    private PaymentRepository paymentRepository;
+    private PaymentRepository repository;
 
     public Payment getIfExists(long id) {
-        return paymentRepository
+        return repository
                 .findById(id)
                 .orElseThrow(
                         () -> new NotFoundException("Платеж с номером " + id + " не найден.")
@@ -21,14 +21,17 @@ public class PaymentService {
     }
 
     public List<Payment> getAll() {
-        return paymentRepository.findAll();
+        return repository.findAll();
     }
 
     public void add(Payment payment) {
         if (payment.getSum() <= 0){
-            throw new NumberFormatException("Сумма должна быть больше нуля.");
+            throw new IllegalArgumentException("Сумма должна быть больше нуля.");
         }
-        paymentRepository.save(payment);
+        if(repository.existsById(payment.getId())){
+            throw new IllegalArgumentException("Платеж с таким номером уже существует.");
+        }
+        repository.save(payment);
     }
 
     public void addList(List<Payment> payments) {
@@ -44,7 +47,7 @@ public class PaymentService {
                 .setAutoIdentified(editPayment.isAutoIdentified()) //
                 .setStudentId(editPayment.getStudentId())
                 .build();
-        paymentRepository.save(paymentUpdated);
+        repository.save(paymentUpdated);
     }
 
     public void editList(List<Payment> editPayments) {
@@ -53,6 +56,6 @@ public class PaymentService {
 
     public void delete(long id){
         Payment existedPayment = getIfExists(id);
-        paymentRepository.delete(existedPayment);
+        repository.delete(existedPayment);
     }
 }

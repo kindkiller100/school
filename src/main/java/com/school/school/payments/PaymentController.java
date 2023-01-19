@@ -1,7 +1,6 @@
 package com.school.school.payments;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,38 +10,38 @@ import java.util.List;
 public class PaymentController {
 
     @Autowired
-    PaymentService paymentService;
+    PaymentService service;
 
     @GetMapping("/{id}")
     public Payment getById(long id){
-        return paymentService.getIfExists(id);
+        return service.getIfExists(id);
     }
     @GetMapping
     public List<Payment> getAll(){
-        return paymentService.getAll();
+        return service.getAll();
     }
 
     @PostMapping
     public void add(@RequestBody Payment payment){
-        paymentService.add(payment);
+        service.add(payment);
     }
 
     @PostMapping("/list")
     public void addList(@RequestBody List<Payment> payments){
-        paymentService.addList(payments);
+        service.addList(payments);
     }
     @PutMapping
     public void edit(@RequestBody Payment payment){
-       paymentService.edit(payment);
+       service.edit(payment);
     }
 
     @PutMapping("/list")
     public void editList(@RequestBody List<Payment> payments){
-        paymentService.editList(payments);
+        service.editList(payments);
     }
 
     @DeleteMapping("/{id}")
     public void delete(long id){
-        paymentService.delete(id);
+        service.delete(id);
     }
 }
