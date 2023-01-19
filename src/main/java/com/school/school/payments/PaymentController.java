@@ -13,9 +13,12 @@ public class PaymentController {
     @Autowired
     PaymentService paymentService;
 
-    //@GetMapping("/{id}") //нужен ли?
+    @GetMapping("/{id}")
+    public Payment getById(long id){
+        return paymentService.getIfExists(id);
+    }
     @GetMapping
-    public List<Payment> getAll(){ //потом убрать
+    public List<Payment> getAll(){
         return paymentService.getAll();
     }
 
@@ -28,15 +31,18 @@ public class PaymentController {
     public void addList(@RequestBody List<Payment> payments){
         paymentService.addList(payments);
     }
-    @PutMapping("/edit")
+    @PutMapping
     public void edit(@RequestBody Payment payment){
        paymentService.edit(payment);
     }
 
-    @PutMapping("/edit/list")
+    @PutMapping("/list")
     public void editList(@RequestBody List<Payment> payments){
         paymentService.editList(payments);
     }
 
-    //@DeleteMapping //нужен ли?
+    @DeleteMapping("/{id}")
+    public void delete(long id){
+        paymentService.delete(id);
+    }
 }
