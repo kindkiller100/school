@@ -16,8 +16,8 @@ public class Payment {
     private double sum;
     @Column(name = "student_id")
     private long studentId;
-    @Column(name = "auto_identified")//значние обьекто получено из обработчика тру
-    private Boolean autoIdentified; //null-hz false- надо перепроверить вручную
+    @Column(name = "auto_identified")//если значние обьекто получено из обработчика = true
+    private Boolean autoIdentified; //null - ?, false - надо перепроверить вручную
     private String info;
 
     private Payment(){

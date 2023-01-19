@@ -6,14 +6,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
-@RequestMapping("/payments")//?
+@RestController
+@RequestMapping("/payments")
 public class PaymentController {
 
     @Autowired
     PaymentService paymentService;
 
-    //@GetMapping("/{id}") //??
+    //@GetMapping("/{id}") //нужен ли?
+    @GetMapping
+    public List<Payment> getAll(){ //потом убрать
+        return paymentService.getAll();
+    }
 
     @PostMapping
     public void add(@RequestBody Payment payment){
@@ -29,8 +33,10 @@ public class PaymentController {
        paymentService.edit(payment);
     }
 
-    @PutMapping("/list")
+    @PutMapping("/edit/list")
     public void editList(@RequestBody List<Payment> payments){
         paymentService.editList(payments);
     }
+
+    //@DeleteMapping //нужен ли?
 }

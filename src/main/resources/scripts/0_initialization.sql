@@ -55,7 +55,7 @@ CREATE TABLE school_db.payments
 (
     id serial PRIMARY KEY,
     date_time timestamp NOT NULL,
-    sum money NOT NULL,
+    sum int NOT NULL,
     student_id int REFERENCES students(id),
     auto_identified boolean DEFAULT NULL,
     info varchar(200)
