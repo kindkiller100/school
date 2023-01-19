@@ -1,8 +1,6 @@
 package com.school.school.lessons;
 
 import com.school.school.utils.DateTimeRange;
-import com.school.school.utils.LessonDtoIn;
-import com.school.school.utils.LessonDtoInService;
 import com.school.school.utils.LessonsCalculationsDtoIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +14,7 @@ public class LessonsController {
     @Autowired
     private LessonService lessonService;
     @Autowired
-    private LessonDtoInService lessonDtoInService;
+    private LessonDtoMapper lessonDtoInService;
 
     @GetMapping
     public List<Lesson> list()

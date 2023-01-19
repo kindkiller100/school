@@ -1,4 +1,4 @@
-package com.school.school.utils;
+package com.school.school.lessons;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

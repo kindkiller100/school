@@ -1,18 +1,16 @@
-package com.school.school.utils;
+package com.school.school.lessons;
 
-import com.school.school.lessons.Lesson;
-import com.school.school.lessons.LessonRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.webjars.NotFoundException;
 
-@Service
-public class LessonDtoInService {
+@Component
+public class LessonDtoMapper {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -45,16 +43,16 @@ public class LessonDtoInService {
         } else {
             //если это редактирование существующего предмета, то проверяем наличие в БД записи по такому Id
             if (!lessonRepository.existsById(lessonDto.getId())) {
-                errString.append("Lesson with id «" + lessonDto.getId() + "» not found.");
+                errString.append("Занятие по id «" + lessonDto.getId() + "» не найдено.");
             }
         }
         //проверяем существует ли предмет с указанным Id
         if (!subjectRepository.existsById(lessonDto.getSubjectId())) {
-            errString.append("Subject with id «" + lessonDto.getSubjectId() + "» not found.");
+            errString.append("Предмет по id «" + lessonDto.getSubjectId() + "» не найден.");
         }
         //проверяем существует ли преподаватель с указанным Id
         if (!teacherRepository.existsById(lessonDto.getTeacherId())) {
-            errString.append("Teacher with id «" + lessonDto.getTeacherId() + "» not found.");
+            errString.append("Преподаватель по id «" + lessonDto.getTeacherId() + "» не найден.");
         }
         //если строка не пустая, то выбрасываем эксэпшн
         if (!errString.isEmpty()) {
