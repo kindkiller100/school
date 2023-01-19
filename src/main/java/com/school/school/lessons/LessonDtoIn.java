@@ -7,18 +7,18 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 public class LessonDtoIn {
-    @Min(value = 0, message = "Can't be negative")
+    @Min(value = 0, message = "Id занятия должно быть положительным.")
     private long id;                    //id занятия
-    @NotNull(message = "Start of lesson must not be empty")
+    @NotNull(message = "Дата начала занятия не может быть пустой.")
     private LocalDateTime startDateTime;//дата и время начала занятия
-    @Min(value = 30, message = "Duration of the lesson should be in the range from 30 to 210")
-    @Max(value = 210, message = "Duration of the lesson should be in the range from 30 to 210")
+    @Min(value = 30, message = "Продолжительность занятия должна быть в диапазоне от 30 до 210 минут.")
+    @Max(value = 210, message = "Продолжительность занятия должна быть в диапазоне от 30 до 210 минут.")
     private short duration;             //продолжительность занятия в минутах
-    @Min(value = 1, message = "Must be greater than 0")
+    @Min(value = 1, message = "Id предмета должно быть больше нуля 0")
     private long subjectId;             //предмет
-    @Min(value = 1, message = "Must be greater than 0")
+    @Min(value = 1, message = "Id преподавателя должно быть больше нуля 0")
     private long teacherId;             //преподаватель
-    @Size(max = 40, message = "Size of description must be less than 40 characters.")
+    @Size(max = 40, message = "Подробное описание занятия не должно быть больше 40 символов.")
     private String description;
 
     public LessonDtoIn() {

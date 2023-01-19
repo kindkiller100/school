@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -129,8 +130,12 @@ public class LessonService {
             stringError.append("Преподаватель по id «" + lesson.getTeacher().getId() + "» не найден.");
         }
         //проверка даты начала занятия
-        stringError.append(lesson.startDateValidation());
-        //если строка не пустая, то выбрасываем эксэпшн
+        if (lesson.getStartDateTime() == null) {
+            stringError.append("В занятии по id «" + lesson.getId() + "» не указана дата начала занятия.");
+        } else if (lesson.getStartDateTime().toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
+            stringError.append("Дата начала занятия должна быть не позднее, чем день назад.");
+        }
+        //если строка не пустая, то выбрасываем исключение
         if (!stringError.isEmpty()) {
             throw new NotFoundException(stringError.toString());
         }
