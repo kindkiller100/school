@@ -6,6 +6,7 @@ import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
 import com.school.school.utils.DateTimeRange;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
@@ -60,7 +61,7 @@ public class LessonService {
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            validationException.put("dateTimeRange", DateTimeRange.ERR_STRING);
+            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
         }
 
         validationException.throwExceptionIfIsNotEmpty();
@@ -79,7 +80,7 @@ public class LessonService {
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            validationException.put("dateTimeRange", DateTimeRange.ERR_STRING);
+            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
         }
 
         validationException.throwExceptionIfIsNotEmpty();
@@ -100,9 +101,7 @@ public class LessonService {
         if (lessonRepository.existsById(id)) {      //проверяем, есть ли запись с таким id в базе данных
             lessonRepository.deleteById(id);        //удаляем запись по id
         } else {                                    //если записи нет - выбрасываем ошибку
-            ValidationException validationException = new ValidationException();
-            validationException.put("id", "Занятие с id «" + id + "» не найдено.");
-            validationException.throwExceptionIfIsNotEmpty();
+            throw new ValidationException("id", "Занятие с id «" + id + "» не найдено.").setStatus(HttpStatus.NOT_FOUND);
         }
     }
 

@@ -17,7 +17,7 @@ public class PaymentService {
         return repository
                 .findById(id)
                 .orElseThrow(
-                        () -> new NotFoundException("Платеж с номером " + id + " не найден.")
+                        () -> new NotFoundException("Платеж с id «" + id + "» не найден.")
                 );
     }
 
@@ -33,7 +33,7 @@ public class PaymentService {
         }
 
         if(repository.existsById(payment.getId())){
-            validationException.put("id", "Платеж с номером «" + payment.getId() + "» уже существует.");
+            validationException.put("id", "Платеж с id «" + payment.getId() + "» уже существует.");
         }
 
         validationException.throwExceptionIfIsNotEmpty();

@@ -26,6 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(status)
                 .body(exception.getMessage());
     }
+
     //обработка ошибок со статусом 500
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(Exception exception) {
@@ -37,7 +38,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     //обработка валидации бизнес-логики
     @ExceptionHandler(ValidationException.class)
     protected ResponseEntity<Object> handleValidationException(ValidationException exception) {
-        return new ResponseEntity(exception.get(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(exception.getStatus())
+                .body(exception.get());
     }
 
     //обработка исключений вызванных валидациями сущностей, возвращает список ошибок со статусом 400
