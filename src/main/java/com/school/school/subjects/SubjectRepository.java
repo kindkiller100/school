@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SubjectRepository extends CustomRepository<Subject> {
+public interface SubjectRepository extends JpaRepository<Subject, Long>, CustomRepository<Subject> {
     List<Subject> findAllByDeletedIsTrue();
     List<Subject> findAllByDeletedIsFalse();
     boolean existsByTitle(String title);

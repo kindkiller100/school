@@ -6,8 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.webjars.NotFoundException;
 
+import java.util.Optional;
+
 @Repository
-public interface CustomRepository<T> extends JpaRepository<T, Long> {
+public interface CustomRepository<T>  {
+    Optional<T> findById(Long id);
     default T getIfExists(Long id) {
         return  findById(id)
                 .orElseThrow(

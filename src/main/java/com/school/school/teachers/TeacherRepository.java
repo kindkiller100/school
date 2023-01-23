@@ -1,6 +1,7 @@
 package com.school.school.teachers;
 
 import com.school.school.CustomRepository;
+import com.school.school.students.Student;
 import com.school.school.subjects.Subject;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TeacherRepository extends CustomRepository<Teacher>
+public interface TeacherRepository extends JpaRepository<Teacher, Long>,CustomRepository<Teacher>
 {
     List<Teacher> findAllByDeletedIsTrue();
     List<Teacher> findAllByDeletedIsFalse();

@@ -51,8 +51,7 @@ public class SubjectService
             throw new NotFoundException("Subject with title «" + title + "» already exists.");
         }
 
-        Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Subject with id «" + id + "» not found."))
+        Subject subjectClone = subjectRepository.getIfExists(id)
                 .clone()
                 .setTitle(title)
                 .setDescription(subject.getDescription())
@@ -74,8 +73,7 @@ public class SubjectService
     //устанавливает/снимает флаг deleted по id
     private void setDeletedById(long id, boolean deleted) {
         //TODO: change exceptions
-        Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Subject with id «" + id + "» not found."))
+        Subject subjectClone = subjectRepository.getIfExists(id)
                 .clone()
                 .setDeleted(deleted)
                 .build();

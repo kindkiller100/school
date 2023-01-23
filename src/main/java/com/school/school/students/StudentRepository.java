@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 
-public interface StudentRepository extends CustomRepository<Student> {
+public interface StudentRepository extends JpaRepository<Student, Long>, CustomRepository<Student> {
     List<Student> findAllByDeletedIsTrue();
 
     List<Student> findAllByDeletedIsFalse();
