@@ -1,5 +1,6 @@
 package com.school.school.students;
 
+import com.school.school.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -35,7 +36,7 @@ public class StudentService {
 
     public List<Student> getAllByAge(Byte fromAge, Byte uptoAge) {
         if (fromAge < 0 || uptoAge < 0 || fromAge > uptoAge) {
-            throw new NumberFormatException("Wrong age period, from: " + fromAge + ", upto: " + uptoAge);
+            throw new ValidationException("age", "Неверный период, от: " + fromAge + ", до: " + uptoAge);
         }
         LocalDate fromDate = LocalDate.now().minusYears(uptoAge);
         LocalDate uptoDate = LocalDate.now().minusYears(fromAge);
