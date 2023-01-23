@@ -1,5 +1,6 @@
 package com.school.school.teachers;
 
+import com.school.school.students.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -12,11 +13,7 @@ public class TeacherService {
     private TeacherRepository teacherRepository;
 
     public Teacher getIfExists(long id) {
-        return teacherRepository
-                .findById(id)
-                .orElseThrow(
-                        () -> new NotFoundException("Teacher with id «" + id + "» not found")
-                );
+        return teacherRepository.getIfExists(id);
     }
 
     public List<Teacher> getAllDeleted() {

@@ -1,5 +1,6 @@
 package com.school.school.lessons;
 
+import com.school.school.CustomRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface LessonRepository extends JpaRepository<Lesson, Long> {
+public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRepository<Lesson> {
     List<Lesson> findLessonsByStartDateTimeBetween(LocalDateTime dateFrom, LocalDateTime dateTo);
 
     List<Lesson> findLessonsByTeacherId(long id);

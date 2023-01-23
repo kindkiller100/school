@@ -22,6 +22,9 @@ public class SubjectService
     public List<Subject> getAllDeleted() {
         return subjectRepository.findAllByDeletedIsTrue();
     }
+    public Subject getIfExists(long id) {
+        return subjectRepository.getIfExists(id);
+    }
 
     //создает subject
     public void create(Subject subject) {
@@ -52,11 +55,7 @@ public class SubjectService
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
-        validationException.throwExceptionIfIsNotEmpty();
-
-        //TODO: change to getIfExists()
-        Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Предмет с id «" + id + "» не найден."))
+        Subject subjectClone = subjectRepository.getIfExists(id)
                 .clone()
                 .setTitle(title)
                 .setDescription(subject.getDescription())
@@ -77,9 +76,7 @@ public class SubjectService
 
     //устанавливает/снимает флаг deleted по id
     private void setDeletedById(long id, boolean deleted) {
-        //TODO: change to getIfExists()
-        Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Предмет с id «" + id + "» не найден."))
+        Subject subjectClone = subjectRepository.getIfExists(id)
                 .clone()
                 .setDeleted(deleted)
                 .build();
