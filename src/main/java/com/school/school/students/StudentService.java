@@ -20,7 +20,7 @@ public class StudentService {
         return studentRepository
                 .findById(id)
                 .orElseThrow(
-                        () -> new NotFoundException("Student with id «" + id + "» not found")
+                        () -> new NotFoundException("Ученик с id «" + id + "» не найден")
                 );
     }
 
@@ -35,7 +35,7 @@ public class StudentService {
 
     public List<Student> getAllByAge(Byte fromAge, Byte uptoAge) {
         if (fromAge < 0 || uptoAge < 0 || fromAge > uptoAge) {
-            throw new NumberFormatException("Wrong age period, from: " + fromAge + ", upto: " + uptoAge);
+            throw new NumberFormatException("Неверный возрастной период, с: " + fromAge + ", по: " + uptoAge);
         }
         LocalDate fromDate = LocalDate.now().minusYears(uptoAge);
         LocalDate uptoDate = LocalDate.now().minusYears(fromAge);

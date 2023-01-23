@@ -15,7 +15,7 @@ public class TeacherService {
         return teacherRepository
                 .findById(id)
                 .orElseThrow(
-                        () -> new NotFoundException("Teacher with id «" + id + "» not found")
+                        () -> new NotFoundException("Преподаватель с id «" + id + "» не найден")
                 );
     }
 

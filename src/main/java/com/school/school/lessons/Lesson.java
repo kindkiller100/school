@@ -20,11 +20,11 @@ public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;                    //id занятия
-    @NotNull(message = "Start of lesson must not be empty")
+    @NotNull(message = "Необходимо указать начало занятия.")
     @Column(name = "startdatetime")
     private LocalDateTime startDateTime;//дата и время начала занятия
-    @Min(value = 30, message = "Duration of the lesson should be in the range from 30 to 210")
-    @Max(value = 210, message = "Duration of the lesson should be in the range from 30 to 210")
+    @Min(value = 30, message = "Продолжительность занятия должна быть в пределах от 30 до 210 минут")
+    @Max(value = 210, message = "Продолжительность занятия должна быть в пределах от 30 до 210 минут")
     private short duration;             //продолжительность занятия в минутах
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
@@ -32,7 +32,7 @@ public class Lesson {
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     private Teacher teacher;            //преподаватель
-    @Size(max = 40, message = "Size of description must be less than 40 characters.")
+    @Size(max = 40, message = "Размер описания не должен превышать 40 символов.")
     private String description;         //расшифровка (подробное описание) занятия
 
     //конструктор без параметров

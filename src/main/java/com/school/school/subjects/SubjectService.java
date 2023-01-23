@@ -29,9 +29,9 @@ public class SubjectService
 
         //TODO: change exceptions
         if (subjectRepository.existsById(id)) {
-            throw new NotFoundException("Subject with id «" + id + "» already exists.");
+            throw new NotFoundException("Предмет с id «" + id + "» уже существует.");
         } else if (subjectRepository.existsByTitle(title)) {
-            throw new NotFoundException("Subject with title «" + title + "» already exists.");
+            throw new NotFoundException("Предмет с названием «" + title + "» уже существует.");
         }
 
         subjectRepository.save(subject);
@@ -44,11 +44,11 @@ public class SubjectService
 
         //TODO: change exceptions
         if (subjectRepository.existsByTitleAndIdNot(title, id)) {
-            throw new NotFoundException("Subject with title «" + title + "» already exists.");
+            throw new NotFoundException("Предмет с названием «" + title + "» уже существует.");
         }
 
         Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Subject with id «" + id + "» not found."))
+                .orElseThrow(() -> new NotFoundException("Предмет с id «" + id + "» не найден."))
                 .clone()
                 .setTitle(title)
                 .setDescription(subject.getDescription())
@@ -71,7 +71,7 @@ public class SubjectService
     private void setDeletedById(long id, boolean deleted) {
         //TODO: change exceptions
         Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Subject with id «" + id + "» not found."))
+                .orElseThrow(() -> new NotFoundException("Предмет с id «" + id + "» не найден."))
                 .clone()
                 .setDeleted(deleted)
                 .build();

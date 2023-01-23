@@ -42,6 +42,6 @@ public class GroupService {
     private Group getIfExists(long id) {
         return groupRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Group with id «" + id + "» not found."));
+                .orElseThrow(() -> new NotFoundException("Группа с id «" + id + "» не найдена."));
     }
 }
