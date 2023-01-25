@@ -27,7 +27,7 @@ public interface StudentRepository extends JpaRepository<Student, Long>, CustomR
     Page<Student> findAllByFilter(String like, Pageable pageable);
 
     @Query(value ="SELECT * FROM school_db.students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
-    List<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate);
+    Page<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate, Pageable pageable);
 
 
 }

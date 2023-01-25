@@ -40,8 +40,8 @@ public class StudentController {
     }
     @GetMapping("/filter/age/{from}/{upto}")
     //поиск по возрасту "от" и "до", в годах
-    public List<Student> getAllByAge(@PathVariable Byte from, @PathVariable Byte upto){
-        return studentService.getAllByAge(from, upto);
+    public Page<Student> getAllByAge(@PathVariable Byte from, @PathVariable Byte upto, Pageable pageable){
+        return studentService.getAllByAge(from, upto, pageable);
     }
 
     @PostMapping
