@@ -8,7 +8,6 @@ import com.school.school.utils.DateTimeRange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,8 +30,7 @@ public class LessonService {
 
     //получить занятие по id
     public Lesson getIfExists(long id){
-        return lessonRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Lesson with id «" + id + "» not found."));
+        return lessonRepository.getIfExists(id);
     }
 
     //получить все занятия из диапазона дат
@@ -133,6 +131,10 @@ public class LessonService {
             validationException.put("startdatetime", "В занятии с id «" + lesson.getId() + "» не указана дата начала занятия.");
         } else if (lesson.getStartDateTime().toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
             validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
+        }
+        //проверка группы занятий
+        if (lesson.getGroupId() != null && lesson.getGroupId() < 1) {
+            validationException.put("groupId", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
         }
 
         validationException.throwExceptionIfIsNotEmpty();
