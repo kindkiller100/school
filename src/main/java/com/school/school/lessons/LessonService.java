@@ -31,8 +31,7 @@ public class LessonService {
 
     //получить занятие по id
     public Lesson getIfExists(long id){
-        return lessonRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Lesson with id «" + id + "» not found."));
+        return lessonRepository.getIfExists(id);
     }
 
     //получить все занятия из диапазона дат
