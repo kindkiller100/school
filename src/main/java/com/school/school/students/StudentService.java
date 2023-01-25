@@ -2,9 +2,14 @@ package com.school.school.students;
 
 import com.school.school.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,21 +18,35 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
-    public List<Student> getAll() {
-        return studentRepository.findAllByDeletedIsFalse();
+    public Page<Student> getAll(Pageable pageable) {
+
+        Sort sort = pageable.getSort();
+        //работает, перенести в метод
+        //сделать универсальным?
+        try {//+коммент
+            for (Sort.Order order : sort) {
+                String property = order.getProperty();
+                Field field = Student.class.getDeclaredField(property);
+            }
+        } catch (NoSuchFieldException e) {
+            String fieldName = e.getMessage();
+            throw new ValidationException(fieldName,
+                    "Неверные параметры сортировки, поля c именем " + fieldName + " не существует.");
+        }
+        return studentRepository.findAllByDeletedIsFalse(pageable);
     }
 
     public Student getIfExists(long id) {
         return studentRepository.getIfExists(id);
     }
 
-    public List<Student> getAllDeleted() {
-        return studentRepository.findAllByDeletedIsTrue();
+    public Page<Student> getAllDeleted(Pageable pageable) {
+        return studentRepository.findAllByDeletedIsTrue(pageable);
     }
 
 
-    public List<Student> getAllByFilter(String like) {
-        return studentRepository.findAllByFilter(like);
+    public Page<Student> getAllByFilter(String like, Pageable pageable) {
+        return studentRepository.findAllByFilter(like, pageable);
     }
 
     public List<Student> getAllByAge(Byte fromAge, Byte uptoAge) {
