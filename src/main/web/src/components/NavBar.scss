@@ -1,0 +1,34 @@
+
+@use 'Colors';
+
+.navbar
+{
+    display: flex;
+    padding: .5rem;
+
+    align-items: center;
+    justify-content: space-between;
+
+    background-color: Colors.$BLACK;
+
+    .MuiButtonGroup-grouped
+    {
+        border-color: Colors.$GREY !important;
+    }
+
+    .MuiButton-root
+    {
+        color: Colors.$GREY;
+
+        &:hover
+        {
+            color: Colors.$WHITE;
+        }
+    }
+
+    .focused.MuiButton-root
+        {
+            color: Colors.$WHITE !important;
+        }
+
+}

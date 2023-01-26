@@ -1,9 +1,7 @@
 package com.school.school.teachers;
 
-import com.school.school.students.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 
