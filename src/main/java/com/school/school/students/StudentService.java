@@ -4,14 +4,11 @@ import com.school.school.exceptions.ValidationException;
 import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.util.List;
+
 
 @Service
 public class StudentService {
