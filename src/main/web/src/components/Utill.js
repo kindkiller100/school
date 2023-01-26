@@ -1,4 +1,17 @@
 
+
+async function fetchJsonWithoutAuth( url, method = "GET", data = null, headers = null )
+{
+    const response = await fetchWithoutAuth( url, method, data, headers );
+    if ( response.status !== 200 )
+    {
+        const message = await response.text();
+        return Promise.reject( message );
+    }
+
+    return await response.json();
+}
+
 async function fetchWithoutAuth( url, method = "GET", data = null, headers = null )
 {
     const response = await _fetch( url, method, data, headers )
@@ -18,7 +31,7 @@ function _fetch( url, method = "GET", data = null, headers = null )
 
     return fetch
     (
-        'http://localhost:8080/' + url,
+        url,
         {
             method: method,
             headers:
@@ -35,4 +48,5 @@ function _fetch( url, method = "GET", data = null, headers = null )
 export
 {
     fetchWithoutAuth,
+    fetchJsonWithoutAuth
 }

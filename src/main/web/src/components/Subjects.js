@@ -1,5 +1,12 @@
 import React, {useEffect, useState, useRef} from "react";
-import { fetchWithoutAuth } from './Utill.js';
+import { DataGrid } from '@mui/x-data-grid';
+import { fetchJsonWithoutAuth } from './Utill.js';
+
+const columns = [
+    { field: 'id', headerName: 'ID', width: 100 },
+    { field: 'title', headerName: 'Название', width: 150 },
+    { field: 'description', headerName: 'Описание', width: 150, sortable: false }
+];
 
 const Subjects = (props) =>
 {
@@ -13,7 +20,7 @@ const Subjects = (props) =>
             if( ! calledOnce.current )
             {
                 calledOnce.current = true;
-                fetchWithoutAuth('subjects' )
+                fetchJsonWithoutAuth('subjects' )
                     .then
                     (
                         response =>
@@ -28,6 +35,15 @@ const Subjects = (props) =>
     return (
         <div>
             Subjects
+            <div style={{ height: 400, width: '100%' }}>
+                <DataGrid
+                    rows={data}
+                    columns={columns}
+                    pageSize={5}
+                    rowsPerPageOptions={[5]}
+                    checkboxSelection
+                />
+            </div>
         </div>
     )
 }
