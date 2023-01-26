@@ -3,7 +3,6 @@ package com.school.school.payments;
 import com.school.school.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -14,11 +13,7 @@ public class PaymentService {
     private PaymentRepository repository;
 
     public Payment getIfExists(long id) {
-        return repository
-                .findById(id)
-                .orElseThrow(
-                        () -> new NotFoundException("Платеж с id «" + id + "» не найден.")
-                );
+        return repository.getIfExists(id);
     }
 
     public List<Payment> getAll() {

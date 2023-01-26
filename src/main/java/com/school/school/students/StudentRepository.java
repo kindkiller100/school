@@ -9,21 +9,21 @@ import java.time.LocalDate;
 import java.util.List;
 
 
+@Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, CustomRepository<Student> {
     List<Student> findAllByDeletedIsTrue();
 
     List<Student> findAllByDeletedIsFalse();
 
     @Query(value = "SELECT * FROM school_db.students " +
-            "WHERE name ILIKE %?1% " +
-            "OR secondname ILIKE %?1% " +
-            "OR lastname ILIKE %?1% " +
-            "OR telephonenumber ILIKE %?1%"
-            , nativeQuery = true)
+        "WHERE name ILIKE %?1% " +
+        "OR secondname ILIKE %?1% " +
+        "OR lastname ILIKE %?1% " +
+        "OR telephonenumber ILIKE %?1%"
+        , nativeQuery = true)
     List<Student> findAllByFilter(String like);
 
     @Query(value ="SELECT * FROM school_db.students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
     List<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate);
-
 
 }
