@@ -1,8 +1,9 @@
 package com.school.school.groups;
 
+import com.school.school.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -35,13 +36,11 @@ public class GroupService {
 
     private void checkIfExists(long id) {
         if (!groupRepository.existsById(id)) {
-            throw new NotFoundException("Group with id «" + id + "» not found.");
+            throw new ValidationException("id", "Группа с id «" + id + "» не найдена.").setStatus(HttpStatus.NOT_FOUND);
         }
     }
 
     private Group getIfExists(long id) {
-        return groupRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Group with id «" + id + "» not found."));
+        return groupRepository.getIfExists(id);
     }
 }
