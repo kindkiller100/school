@@ -4,9 +4,9 @@ import javax.validation.constraints.Min;
 
 //класс для получения параметров id (студента/преподавателя) и диапазона
 public class LessonsCalculationsDtoIn {
-    @Min(value = 0, message = "Должно быть больше 0")
+    @Min(value = 1, message = "Must be greater than 1")
     private long id;    //id (студента/преподавателя)
-    @CorrectDateTimeRange(message = "Одна или обе даты пусты.")
+    @CorrectDateTimeRange(message = "One or both dates are empty.")
     private DateTimeRange dateTimeRange;    //диапазона дат
 
     public LessonsCalculationsDtoIn(long id, DateTimeRange dateTimeRange) {

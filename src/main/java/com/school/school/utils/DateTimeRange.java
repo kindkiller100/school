@@ -10,10 +10,10 @@ import java.time.LocalTime;
 
 public class DateTimeRange {
     //сообщение об ошибке диапазона дат
-    public static final String ERR_STRING = "Указан недопустимый диапазон дат. Дата окончания диапазона больше, чем дата начала диапазона.";
-    @NotNull(message = "Начало диапазона не должно быть пустым")
+    public static final String ERR_STRING = "Invalid date range specified. The end date of the range is greater than the start date of the range.";
+    @NotNull(message = "Start range must not be empty")
     private LocalDateTime from;
-    @NotNull(message = "Конец диапазона не должен быть пустым")
+    @NotNull(message = "End range must not be empty")
     private LocalDateTime to;
 
     public DateTimeRange(){}

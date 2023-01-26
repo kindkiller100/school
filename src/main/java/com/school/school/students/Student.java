@@ -13,13 +13,13 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank(message = "Не должно быть пустым")
-    @Size(min = 2, max = 20, message = "Длина имени должна быть от 2 до 20 символов")
+    @Size(min = 3, max = 20, message = "Длина name должна быть от 3 до 20 символов")
     @Column(name = "name")
     private String name;
     @Column(name = "secondname")
     private String secondName;
     @NotBlank(message = "Не должно быть пустым")
-    @Size(min = 2, max = 20, message = "Длина фимилии должна быть от 2 до 20 символов")
+    @Size(min = 3, max = 20, message = "Длина lastname должна быть от 3 до 20 символов")
     @Column(name = "lastname")
     private String lastName;
     @Column(name = "dateofbirth")
