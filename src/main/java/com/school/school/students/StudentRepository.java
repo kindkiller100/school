@@ -8,12 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
 
-
+@Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, CustomRepository<Student> {
 
-    //List<Student> findAll
     Page<Student> findAllByDeletedIsTrue(Pageable pageable);
 
     Page<Student> findAllByDeletedIsFalse(Pageable pageable);

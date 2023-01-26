@@ -32,7 +32,6 @@ public class LessonService {
     //получить занятие по id
     public Lesson getIfExists(long id){
         return lessonRepository.getIfExists(id);
-
     }
 
     //получить все занятия из диапазона дат

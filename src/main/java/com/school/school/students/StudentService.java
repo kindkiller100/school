@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
