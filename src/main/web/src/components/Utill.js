@@ -18,7 +18,7 @@ function _fetch( url, method = "GET", data = null, headers = null )
 
     return fetch
     (
-        url,
+        'http://localhost:8080/' + url,
         {
             method: method,
             headers:
