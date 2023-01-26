@@ -2,7 +2,6 @@ package com.school.school.utils;
 
 import com.school.school.exceptions.ValidationException;
 
-import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
