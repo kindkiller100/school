@@ -28,6 +28,7 @@ public class StudentService {
     }
 
     public Page<Student> getAllDeleted(Pageable pageable) {
+        PageableValidator.isSortValid(Student.class, pageable);
         return studentRepository.findAllByDeletedIsTrue(pageable);
     }
 
