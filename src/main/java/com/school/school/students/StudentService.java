@@ -16,7 +16,7 @@ public class StudentService {
     private StudentRepository studentRepository;
 
     public Page<Student> getAll(Pageable pageable) {
-        PageableValidator.isSortValid(Student.class, pageable);
+        PageableValidator.checkIsSortValid(Student.class, pageable);
         return studentRepository.findAllByDeletedIsFalse(pageable);
     }
 
@@ -25,21 +25,26 @@ public class StudentService {
     }
 
     public Page<Student> getAllDeleted(Pageable pageable) {
-        PageableValidator.isSortValid(Student.class, pageable);
+        PageableValidator.checkIsSortValid(Student.class, pageable);
         return studentRepository.findAllByDeletedIsTrue(pageable);
     }
 
 
     public Page<Student> getAllByFilter(String like, Pageable pageable) {
-        PageableValidator.isSortValid(Student.class, pageable);
+        PageableValidator.checkIsSortValid(Student.class, pageable);
         return studentRepository.findAllByFilter(like, pageable);
     }
 
     public Page<Student> getAllByAge(Byte fromAge, Byte uptoAge, Pageable pageable) {
-        PageableValidator.isSortValid(Student.class, pageable);
-        if (fromAge < 0 || uptoAge < 0 || fromAge > uptoAge) {
-            throw new ValidationException("age", "Неверный период, от: " + fromAge + ", до: " + uptoAge);
+        ValidationException validationException = new ValidationException();
+        if( ! PageableValidator.isSortValid(Student.class, pageable) )
+        {
+            validationException.put( "pageable", PageableValidator.currentError );
         }
+        if (fromAge < 0 || uptoAge < 0 || fromAge > uptoAge) {
+            validationException.put("age", "Неверный период, от: " + fromAge + ", до: " + uptoAge);
+        }
+        validationException.throwExceptionIfIsNotEmpty();
         LocalDate fromDate = LocalDate.now().minusYears(uptoAge);
         LocalDate uptoDate = LocalDate.now().minusYears(fromAge);
         return studentRepository.findAllByDateOfBirthRange(fromDate, uptoDate, pageable);
