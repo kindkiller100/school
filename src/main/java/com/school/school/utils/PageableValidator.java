@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 public class PageableValidator {
 
     /*
-    метод проверяет есть ли такие поля в классе Class<T> c по которым запрошена сортировка в Pageable p
+    метод проверяет есть ли такие поля в классе "Class<T> c" по которым запрошена сортировка в "Pageable p"
      */
     static public <T> boolean isSortValid(Class<T> c, Pageable p) {
         Sort sort = p.getSort();
