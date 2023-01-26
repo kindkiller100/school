@@ -1,17 +1,20 @@
 package com.school.school.students;
 
+import com.school.school.CustomRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Long> {
-    List<Student> findAllByDeletedIsTrue();
+public interface StudentRepository extends JpaRepository<Student, Long>, CustomRepository<Student> {
 
-    List<Student> findAllByDeletedIsFalse();
+    Page<Student> findAllByDeletedIsTrue(Pageable pageable);
+
+    Page<Student> findAllByDeletedIsFalse(Pageable pageable);
 
     @Query(value = "SELECT * FROM school_db.students " +
             "WHERE name ILIKE %?1% " +
@@ -19,8 +22,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             "OR lastname ILIKE %?1% " +
             "OR telephonenumber ILIKE %?1%"
             , nativeQuery = true)
-    List<Student> findAllByFilter(String like);
+    Page<Student> findAllByFilter(String like, Pageable pageable);
 
     @Query(value ="SELECT * FROM school_db.students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
-    List<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate);
+    Page<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate, Pageable pageable);
+
+
 }

@@ -6,10 +6,10 @@ import java.lang.annotation.*;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = CorrectDateTimeValidator.class)
+@Constraint(validatedBy = CorrectScheduleValidator.class)
 @Documented
-public @interface CorrectDateTime {
-    String message() default "{CorrectDateTime.invalid}";
+public @interface CorrectSchedule {
+    String message() default "{Schedule.invalid}";
 
     Class<?>[] groups() default { };
 

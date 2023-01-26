@@ -1,12 +1,13 @@
 package com.school.school.lessons;
 
+import com.school.school.exceptions.ValidationException;
 import com.school.school.students.StudentRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
 import com.school.school.utils.DateTimeRange;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,9 +23,6 @@ public class LessonService {
     @Autowired
     private SubjectRepository subjectRepository;
 
-    //текст сообщения об ошибке
-    private static StringBuilder stringError = new StringBuilder();
-
     //получить все занятия
     public List<Lesson> list(){
         return lessonRepository.findAll();
@@ -32,8 +30,7 @@ public class LessonService {
 
     //получить занятие по id
     public Lesson getIfExists(long id){
-        return lessonRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Lesson with id «" + id + "» not found."));
+        return lessonRepository.getIfExists(id);
     }
 
     //получить все занятия из диапазона дат
@@ -54,38 +51,38 @@ public class LessonService {
 
     //количество часов занятий, проведенных преподавателем за период
     public double countHoursOfLessonsByTeacherInRange(long id, DateTimeRange dateTimeRange) {
-        stringError.setLength(0);
+        ValidationException validationException = new ValidationException();
+
         //проверяем, что записть с таким Id существует
         if (!teacherRepository.existsById(id)) {
-            stringError.append("Teacher with id «" + id + "» not found.");
+            validationException.put("id", "Преподаватель с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            stringError.append(DateTimeRange.ERR_STRING);
+            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
         }
-        //выводим сообщение об ошибке
-        if (!stringError.isEmpty()) {
-            throw new NotFoundException(stringError.toString());
-        }
+
+        validationException.throwExceptionIfIsNotEmpty();
+
         //получаем количество минут занятий, проведенных преподавателем за период, и переводим в часы
         return lessonRepository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
     }
 
     //количество часов занятий, посещенных студентом за период
     public double countHoursOfLessonsByStudentInRange(long id, DateTimeRange dateTimeRange) {
-        stringError.setLength(0);
+        ValidationException validationException = new ValidationException();
+
         //проверяем, что записть с таким Id существует
         if (!studentRepository.existsById(id)) {
-            stringError.append("Student with id «" + id + "» not found.");
+            validationException.put("id", "Студент с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
         if (!dateTimeRange.isValid()) {
-            stringError.append(DateTimeRange.ERR_STRING);
+            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
         }
-        //выводим сообщение об ошибке
-        if (!stringError.isEmpty()) {
-            throw new NotFoundException(stringError.toString());
-        }
+
+        validationException.throwExceptionIfIsNotEmpty();
+
         //получаем количество минут занятий, посещенных студеном за период, и переводим в часы
         return lessonRepository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;
     }
@@ -102,7 +99,7 @@ public class LessonService {
         if (lessonRepository.existsById(id)) {      //проверяем, есть ли запись с таким id в базе данных
             lessonRepository.deleteById(id);        //удаляем запись по id
         } else {                                    //если записи нет - выбрасываем ошибку
-            throw new NotFoundException("Lesson with id «" + id + "» not found.");
+            throw new ValidationException("id", "Занятие с id «" + id + "» не найдено.").setStatus(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -115,29 +112,31 @@ public class LessonService {
     }
 
     private void validate(Lesson lesson, boolean editFlag) {
-        //очищаем строку ошибок
-        stringError.setLength(0);
+        ValidationException validationException = new ValidationException();
+
         //проверяем, есть ли запись с таким id в базе данных
         if (editFlag && !lessonRepository.existsById(lesson.getId())) {
-            stringError.append("Занятие по id «" + lesson.getId() + "» не найдено.");
+            validationException.put("id", "Занятие с id «" + lesson.getId() + "» не найдено.");
         }
         //проверяем существует ли предмет с указанным Id
         if (!subjectRepository.existsById(lesson.getSubject().getId())) {
-            stringError.append("Предмет по id «" + lesson.getSubject().getId() + "» не найден.");
+            validationException.put("id", "Предмет с id «" + lesson.getSubject().getId() + "» не найден.");
         }
         //проверяем существует ли преподаватель с указанным Id
         if (!teacherRepository.existsById(lesson.getTeacher().getId())) {
-            stringError.append("Преподаватель по id «" + lesson.getTeacher().getId() + "» не найден.");
+            validationException.put("id", "Преподаватель с id «" + lesson.getTeacher().getId() + "» не найден.");
         }
         //проверка даты начала занятия
         if (lesson.getStartDateTime() == null) {
-            stringError.append("В занятии по id «" + lesson.getId() + "» не указана дата начала занятия.");
+            validationException.put("startdatetime", "В занятии с id «" + lesson.getId() + "» не указана дата начала занятия.");
         } else if (lesson.getStartDateTime().toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
-            stringError.append("Дата начала занятия должна быть не позднее, чем день назад.");
+            validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
         }
-        //если строка не пустая, то выбрасываем исключение
-        if (!stringError.isEmpty()) {
-            throw new NotFoundException(stringError.toString());
+        //проверка группы занятий
+        if (lesson.getGroupId() != null && lesson.getGroupId() < 1) {
+            validationException.put("groupId", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
         }
+
+        validationException.throwExceptionIfIsNotEmpty();
     }
 }
