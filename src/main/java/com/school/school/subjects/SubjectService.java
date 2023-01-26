@@ -2,9 +2,9 @@ package com.school.school.subjects;
 
 import java.util.List;
 
+import com.school.school.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 @Service
 public class SubjectService
@@ -21,18 +21,26 @@ public class SubjectService
     public List<Subject> getAllDeleted() {
         return subjectRepository.findAllByDeletedIsTrue();
     }
+    public Subject getIfExists(long id) {
+        return subjectRepository.getIfExists(id);
+    }
 
     //создает subject
     public void create(Subject subject) {
         long id = subject.getId();
         String title = subject.getTitle();
+        ValidationException validationException = new ValidationException();
 
         //TODO: change exceptions
         if (subjectRepository.existsById(id)) {
-            throw new NotFoundException("Предмет с id «" + id + "» уже существует.");
-        } else if (subjectRepository.existsByTitle(title)) {
-            throw new NotFoundException("Предмет с названием «" + title + "» уже существует.");
+            validationException.put("id", "Предмет с id «" + id + "» уже существует.");
         }
+
+        if (subjectRepository.existsByTitle(title)) {
+            validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
+        }
+
+        validationException.throwExceptionIfIsNotEmpty();
 
         subjectRepository.save(subject);
     }
@@ -41,14 +49,13 @@ public class SubjectService
     public void edit(Subject subject) {
         long id = subject.getId();
         String title = subject.getTitle();
+        ValidationException validationException = new ValidationException();
 
-        //TODO: change exceptions
         if (subjectRepository.existsByTitleAndIdNot(title, id)) {
-            throw new NotFoundException("Предмет с названием «" + title + "» уже существует.");
+            validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
-        Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Предмет с id «" + id + "» не найден."))
+        Subject subjectClone = subjectRepository.getIfExists(id)
                 .clone()
                 .setTitle(title)
                 .setDescription(subject.getDescription())
@@ -69,9 +76,7 @@ public class SubjectService
 
     //устанавливает/снимает флаг deleted по id
     private void setDeletedById(long id, boolean deleted) {
-        //TODO: change exceptions
-        Subject subjectClone = subjectRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Предмет с id «" + id + "» не найден."))
+        Subject subjectClone = subjectRepository.getIfExists(id)
                 .clone()
                 .setDeleted(deleted)
                 .build();

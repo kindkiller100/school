@@ -1,4 +1,4 @@
-package com.school.school.exception_handler;
+package com.school.school.exceptions;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 
 @ControllerAdvice
-public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     //обработка ошибок со статусом 400 и 404
     @ExceptionHandler(IllegalArgumentException.class)
@@ -26,12 +26,21 @@ public class SchoolExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(status)
                 .body(exception.getMessage());
     }
+
     //обработка ошибок со статусом 500
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(Exception exception) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
+    }
+
+    //обработка валидации бизнес-логики
+    @ExceptionHandler(ValidationException.class)
+    protected ResponseEntity<Object> handleValidationException(ValidationException exception) {
+        return ResponseEntity
+                .status(exception.getStatus())
+                .body(exception.get());
     }
 
     //обработка исключений вызванных валидациями сущностей, возвращает список ошибок со статусом 400
