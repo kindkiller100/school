@@ -22,4 +22,4 @@ UPDATE school_db.lessons SET group_id = 2 WHERE id in (3,8);
 UPDATE school_db.lessons SET group_id = 3 WHERE id in (5,10);
 
 -- добавление в таблицу student_lesson колонки visit
-ALTER TABLE school_db.student_lesson ADD COLUMN visit boolean NOT NULL DEFAULT true;
+ALTER TABLE school_db.student_lesson ADD COLUMN is_visited boolean NOT NULL DEFAULT true;
