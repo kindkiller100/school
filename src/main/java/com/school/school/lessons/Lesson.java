@@ -2,14 +2,12 @@ package com.school.school.lessons;
 
 import com.school.school.subjects.Subject;
 import com.school.school.teachers.Teacher;
-import org.webjars.NotFoundException;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -34,6 +32,8 @@ public class Lesson {
     private Teacher teacher;            //преподаватель
     @Size(max = 40, message = "Size of description must be less than 40 characters.")
     private String description;         //расшифровка (подробное описание) занятия
+    @Column(name = "group_id")
+    private Long groupId;
 
     //конструктор без параметров
     protected Lesson() {
@@ -45,13 +45,15 @@ public class Lesson {
                    short duration,
                    Subject subject,
                    Teacher teacher,
-                   String description) {
+                   String description,
+                   Long groupId) {
         this.id = id;
         this.startDateTime = startDateTime;
         this.duration = duration;
         this.subject = subject;
         this.teacher = teacher;
         this.description = description;
+        this.groupId = groupId;
     }
 
     public long getId() {
@@ -76,6 +78,10 @@ public class Lesson {
 
     public String getDescription() {
         return description;
+    }
+
+    public Long getGroupId() {
+        return groupId;
     }
 
     //переопределение метода equals(). Объекты одинаковы, если у них одинаковый id
@@ -114,7 +120,8 @@ public class Lesson {
                 .setDuration(this.duration)
                 .setSubject(this.subject)
                 .setTeacher(this.teacher)
-                .setDescription(this.description);
+                .setDescription(this.description)
+                .setGroupId(this.groupId);
     }
 
     static public class Builder {
@@ -124,6 +131,7 @@ public class Lesson {
         private Subject subject;
         private Teacher teacher;
         private String description;
+        private Long groupId;
 
         public Builder setId(long id) {
             this.id = id;
@@ -155,13 +163,19 @@ public class Lesson {
             return this;
         }
 
+        public Builder setGroupId(Long groupId) {
+            this.groupId = groupId;
+            return this;
+        }
+
         public Lesson build() { //возвращает объект внешнего класса с заданными параметрами
             return new Lesson(id,
                     startDateTime,
                     duration,
                     subject,
                     teacher,
-                    description);
+                    description,
+                    groupId);
         }
     }
 }

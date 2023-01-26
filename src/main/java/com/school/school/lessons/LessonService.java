@@ -132,6 +132,10 @@ public class LessonService {
         } else if (lesson.getStartDateTime().toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
             validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
         }
+        //проверка группы занятий
+        if (lesson.getGroupId() != null && lesson.getGroupId() < 1) {
+            validationException.put("groupId", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
+        }
 
         validationException.throwExceptionIfIsNotEmpty();
     }

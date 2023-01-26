@@ -20,6 +20,7 @@ public class LessonDtoIn {
     private long teacherId;             //преподаватель
     @Size(max = 40, message = "Подробное описание занятия не должно быть больше 40 символов.")
     private String description;
+    private Long groupId;
 
     public LessonDtoIn() {
     }
@@ -70,5 +71,13 @@ public class LessonDtoIn {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
     }
 }
