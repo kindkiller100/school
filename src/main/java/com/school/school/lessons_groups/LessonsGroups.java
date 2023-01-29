@@ -1,11 +1,14 @@
 package com.school.school.lessons_groups;
 
+import com.school.school.lessons.Lesson;
 import com.school.school.utils.CorrectSchedule;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "lessons_groups", schema="school_db")
@@ -21,16 +24,21 @@ public class LessonsGroups {
     //расписание. Формат: 'день_недели,время_начала_занятия,продолжительность_занятия_в_минутах;...'
     @CorrectSchedule(message = "Расписание не соответствует нужному формату.")
     private String schedule;
+    @OneToMany
+    @JoinColumn(name = "group_id")
+    private Set<Lesson> lessons = new HashSet<>();
+    //TODO: можно ли прикрутить сюда таблицу студентов средствами аннотаций, или получать список студентов запросом к БД
 
     //конструктор без параметров
     protected LessonsGroups() {
     }
 
     //конструктор со всеми параметрами
-    public LessonsGroups(long id, String title, String schedule) {
+    private LessonsGroups(long id, String title, String schedule, Set<Lesson> lessons) {
         this.id = id;
         this.title = title;
         this.schedule = schedule;
+        this.lessons = lessons;
     }
 
     public long getId() {
@@ -43,6 +51,10 @@ public class LessonsGroups {
 
     public String getSchedule() {
         return schedule;
+    }
+
+    public Set<Lesson> getLessons() {
+        return lessons;
     }
 
     //переопределение метода equals()
@@ -74,13 +86,19 @@ public class LessonsGroups {
         return new LessonsGroups.Builder()
                 .setId(this.id)
                 .setTitle(this.title)
-                .setSchedule(this.schedule);
+                .setSchedule(this.schedule)
+                .setLessons(this.lessons);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
         private long id;
         private String title;
         private String schedule;
+        private Set<Lesson> lessons;
 
         public Builder setId(long id) {
             this.id = id;
@@ -97,8 +115,13 @@ public class LessonsGroups {
             return this;
         }
 
+        public Builder setLessons(Set<Lesson> lessons) {
+            this.lessons = lessons;
+            return this;
+        }
+
         public LessonsGroups build() {
-            return new LessonsGroups(id, title, schedule);
+            return new LessonsGroups(id, title, schedule, lessons);
         }
     }
 }

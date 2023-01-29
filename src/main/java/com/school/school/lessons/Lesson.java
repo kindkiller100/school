@@ -1,5 +1,6 @@
 package com.school.school.lessons;
 
+import com.school.school.lessons_groups.LessonsGroups;
 import com.school.school.subjects.Subject;
 import com.school.school.teachers.Teacher;
 
@@ -122,6 +123,10 @@ public class Lesson {
                 .setTeacher(this.teacher)
                 .setDescription(this.description)
                 .setGroupId(this.groupId);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     static public class Builder {

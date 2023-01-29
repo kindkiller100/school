@@ -20,8 +20,8 @@ public class LessonsGroupsService {
         return lessonsGroupsRepository.getIfExists(id);
     }
 
-    public void create(LessonsGroups lessonsGroups) {
-        lessonsGroupsRepository.save(lessonsGroups);
+    public LessonsGroups create(LessonsGroups lessonsGroups) {
+        return lessonsGroupsRepository.save(lessonsGroups);
     }
 
     public void edit(LessonsGroups editLessonsGroups) {
