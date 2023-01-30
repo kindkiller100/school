@@ -1,6 +1,8 @@
 package com.school.school.students_groups;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.students.Student;
+import com.school.school.students.StudentRepository;
 import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,15 +13,23 @@ import org.springframework.stereotype.Service;
 @Service
 public class StudentsGroupService {
     @Autowired
-    StudentsGroupRepository studentsGroupRepository;
+    StudentsGroupRepository repository;
+    @Autowired
+    StudentRepository studentRepository;
+
+    public Page<Student> getAllStudentsInGroup(long id, Pageable pageable) {
+        PageableValidator.checkIsSortValid(Student.class, pageable);
+        return studentRepository.getAllStudentsInGroup(id, pageable);
+    }
+
 
     public Page<StudentsGroup> getAll(Pageable pageable) {
         PageableValidator.checkIsSortValid(StudentsGroup.class, pageable);
-        return studentsGroupRepository.findAll(pageable);
+        return repository.findAll(pageable);
     }
 
     public void create(StudentsGroup studentsGroup) {
-        studentsGroupRepository.save(studentsGroup);
+        repository.save(studentsGroup);
     }
 
     public void edit(StudentsGroup studentsGroup) {
@@ -28,21 +38,21 @@ public class StudentsGroupService {
                 .setTitle(studentsGroup.getTitle())
                 .build();
 
-        studentsGroupRepository.save(studentsGroupClone);
+        repository.save(studentsGroupClone);
     }
 
     public void delete(long id) {
         checkIfExists(id);
-        studentsGroupRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
     private void checkIfExists(long id) {
-        if (!studentsGroupRepository.existsById(id)) {
+        if (!repository.existsById(id)) {
             throw new ValidationException("id", "Группа с id «" + id + "» не найдена.").setStatus(HttpStatus.NOT_FOUND);
         }
     }
 
     private StudentsGroup getIfExists(long id) {
-        return studentsGroupRepository.getIfExists(id);
+        return repository.getIfExists(id);
     }
 }
