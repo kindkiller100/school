@@ -32,21 +32,21 @@ public class GroupController {
     }
     @GetMapping
     public Page<Group> getAll(Pageable pageable) {
-        return groupService.getAll(pageable);
+        return service.getAll(pageable);
     }
 
     @PostMapping
     public void create(@Valid @RequestBody Group group) {
-        groupService.create(group);
+        service.create(group);
     }
 
     @PutMapping
     public void edit(@Valid @RequestBody Group group) {
-        groupService.edit(group);
+        service.edit(group);
     }
 
     @DeleteMapping
     public void delete(@PathVariable long id) {
-        groupService.delete(id);
+        service.delete(id);
     }
 }
