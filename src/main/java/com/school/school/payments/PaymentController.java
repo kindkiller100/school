@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,9 +22,10 @@ public class PaymentController {
     PaymentService service;
 
     @GetMapping("/{id}")
-    public Payment getById(long id){
+    public Payment getById(@PathVariable long id){
         return service.getIfExists(id);
     }
+
     @GetMapping
     public Page<Payment> getAll(Pageable pageable){
         return service.getAll(pageable);
@@ -49,7 +51,7 @@ public class PaymentController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(long id){
+    public void delete(@PathVariable long id){
         service.delete(id);
     }
 }

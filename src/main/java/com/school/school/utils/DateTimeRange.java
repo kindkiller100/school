@@ -52,4 +52,12 @@ public class DateTimeRange {
         //true - если диапазон дат корректный
         return !this.from.isAfter(this.to);
     }
+
+    //метод вилидаций объекта
+    public void validate() {
+        //проверка, что начало диапазона меньше или равно конца диапазона
+        if(!isValid()) {
+            throw new NotFoundException(DateTimeRange.ERR_STRING);
+        }
+    }
 }
