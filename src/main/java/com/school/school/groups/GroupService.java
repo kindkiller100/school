@@ -1,7 +1,12 @@
 package com.school.school.groups;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.students.Student;
+import com.school.school.students.StudentRepository;
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +17,13 @@ public class GroupService {
     @Autowired
     GroupRepository groupRepository;
 
+    @Autowired
+    StudentRepository studentRepository;
+
+    public Page<Student> getAllStudentsInGroup(long id, Pageable pageable){
+        PageableValidator.checkIsSortValid(Student.class, pageable);
+        return studentRepository.getAllStudentsInGroup(id, pageable);
+    }
     public List<Group> getAll() {
         return groupRepository.findAll();
     }
