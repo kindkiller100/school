@@ -1,9 +1,10 @@
 package com.school.school.subjects;
 
-import java.util.List;
-
 import com.school.school.exceptions.ValidationException;
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,13 +14,15 @@ public class SubjectService
     private SubjectRepository subjectRepository;
 
     //возвращает список всех subject с deleted == false
-    public List<Subject> getAll() {
-        return subjectRepository.findAllByDeletedIsFalse();
+    public Page<Subject> getAll(Pageable pageable) {
+        PageableValidator.checkIsSortValid(Subject.class, pageable);
+        return subjectRepository.findAllByDeletedIsFalse(pageable);
     }
 
     //возвращает список всех subject с deleted == true
-    public List<Subject> getAllDeleted() {
-        return subjectRepository.findAllByDeletedIsTrue();
+    public Page<Subject> getAllDeleted(Pageable pageable) {
+        PageableValidator.checkIsSortValid(Subject.class, pageable);
+        return subjectRepository.findAllByDeletedIsTrue(pageable);
     }
     public Subject getIfExists(long id) {
         return subjectRepository.getIfExists(id);

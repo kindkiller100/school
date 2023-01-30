@@ -5,12 +5,14 @@ import com.school.school.students.StudentRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
 import com.school.school.utils.DateTimeRange;
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 public class LessonService {
@@ -24,8 +26,9 @@ public class LessonService {
     private SubjectRepository subjectRepository;
 
     //получить все занятия
-    public List<Lesson> list(){
-        return lessonRepository.findAll();
+    public Page<Lesson> list(Pageable pageable){
+        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+        return lessonRepository.findAll(pageable);
     }
 
     //получить занятие по id
@@ -34,19 +37,33 @@ public class LessonService {
     }
 
     //получить все занятия из диапазона дат
-    public List<Lesson> getAllInDateRange(DateTimeRange dateRange){
-        dateRange.validate();
-        return lessonRepository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo());
+    public Page<Lesson> getAllInDateRange(DateTimeRange dateRange, Pageable pageable){
+        ValidationException validationException = new ValidationException();
+
+        if(!PageableValidator.isSortValid(Lesson.class, pageable)) {
+            validationException.put("pageable", PageableValidator.currentError);
+        }
+
+        //проверка, что начало диапазона меньше или равно концу диапазона
+        if(!dateRange.isValid()) {
+            validationException.put("date_range", DateTimeRange.ERR_STRING);
+        }
+
+        validationException.throwExceptionIfIsNotEmpty();
+
+        return lessonRepository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo(), pageable);
     }
 
     //получить все занятия по id преподавателя
-    public List<Lesson> getAllByTeacherId(long id) {
-        return lessonRepository.findLessonsByTeacherId(id);
+    public Page<Lesson> getAllByTeacherId(long id, Pageable pageable) {
+        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+        return lessonRepository.findLessonsByTeacherId(id, pageable);
     }
 
     //получить все занятия по id студента
-    public List<Lesson> getAllByStudentId(long id) {
-        return lessonRepository.findLessonsByStudentId(id);
+    public Page<Lesson> getAllByStudentId(long id, Pageable pageable) {
+        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+        return lessonRepository.findLessonsByStudentId(id, pageable);
     }
 
     //количество часов занятий, проведенных преподавателем за период

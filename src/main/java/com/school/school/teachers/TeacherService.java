@@ -1,9 +1,10 @@
 package com.school.school.teachers;
 
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class TeacherService {
@@ -14,15 +15,18 @@ public class TeacherService {
         return teacherRepository.getIfExists(id);
     }
 
-    public List<Teacher> getAllDeleted() {
-        return teacherRepository.findAllByDeletedIsTrue();
+    public Page<Teacher> getAllDeleted(Pageable pageable) {
+        PageableValidator.checkIsSortValid(Teacher.class, pageable);
+        return teacherRepository.findAllByDeletedIsTrue(pageable);
     }
 
-    public List<Teacher> getAll() {
-        return teacherRepository.findAllByDeletedIsFalse();
+    public Page<Teacher> getAll(Pageable pageable) {
+        PageableValidator.checkIsSortValid(Teacher.class, pageable);
+        return teacherRepository.findAllByDeletedIsFalse(pageable);
     }
-    public List<Teacher> getAllByFilter(String like) {
-        return teacherRepository.findAllByFilter(like);
+    public Page<Teacher> getAllByFilter(String like, Pageable pageable) {
+        PageableValidator.checkIsSortValid(Teacher.class, pageable);
+        return teacherRepository.findAllByFilter(like, pageable);
     }
     public void create(Teacher teacher) {
         teacherRepository.save(teacher);

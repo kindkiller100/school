@@ -1,7 +1,10 @@
 package com.school.school.payments;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,8 +19,9 @@ public class PaymentService {
         return repository.getIfExists(id);
     }
 
-    public List<Payment> getAll() {
-        return repository.findAll();
+    public Page<Payment> getAll(Pageable pageable) {
+        PageableValidator.checkIsSortValid(Payment.class, pageable);
+        return repository.findAll(pageable);
     }
 
     public void add(Payment payment) {
