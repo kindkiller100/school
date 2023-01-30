@@ -1,6 +1,7 @@
 package com.school.school.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.school.school.exceptions.ValidationException;
 import org.webjars.NotFoundException;
 
 import javax.validation.constraints.NotNull;
@@ -10,10 +11,10 @@ import java.time.LocalTime;
 
 public class DateTimeRange {
     //сообщение об ошибке диапазона дат
-    public static final String ERR_STRING = "Invalid date range specified. The end date of the range is greater than the start date of the range.";
-    @NotNull(message = "Start range must not be empty")
+    public static final String ERR_STRING = "Указан недопустимый диапазон дат. Дата окончания диапазона больше, чем дата начала диапазона.";
+    @NotNull(message = "Начало диапазона не должно быть пустым")
     private LocalDateTime from;
-    @NotNull(message = "End range must not be empty")
+    @NotNull(message = "Конец диапазона не должен быть пустым")
     private LocalDateTime to;
 
     public DateTimeRange(){}
