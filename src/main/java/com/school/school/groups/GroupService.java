@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GroupService {
     @Autowired
-    GroupRepository groupRepository;
+    GroupRepository repository;
     @Autowired
     StudentRepository studentRepository;
 
@@ -24,11 +24,11 @@ public class GroupService {
 
     public Page<Group> getAll(Pageable pageable) {
         PageableValidator.checkIsSortValid(Group.class, pageable);
-        return groupRepository.findAll(pageable);
+        return repository.findAll(pageable);
     }
 
     public void create(Group group) {
-        groupRepository.save(group);
+        repository.save(group);
     }
 
     public void edit(Group group) {
@@ -37,21 +37,21 @@ public class GroupService {
                 .setTitle(group.getTitle())
                 .build();
 
-        groupRepository.save(groupClone);
+        repository.save(groupClone);
     }
 
     public void delete(long id) {
         checkIfExists(id);
-        groupRepository.deleteById(id);
+        repository.deleteById(id);
     }
 
     private void checkIfExists(long id) {
-        if (!groupRepository.existsById(id)) {
+        if (!repository.existsById(id)) {
             throw new ValidationException("id", "Группа с id «" + id + "» не найдена.").setStatus(HttpStatus.NOT_FOUND);
         }
     }
 
     private Group getIfExists(long id) {
-        return groupRepository.getIfExists(id);
+        return repository.getIfExists(id);
     }
 }

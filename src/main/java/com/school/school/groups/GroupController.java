@@ -26,7 +26,7 @@ public class GroupController {
     @Autowired
     GroupService service;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/students")
     public Page<Student> getAllStudentsInGroup(@PathVariable long id, Pageable pageable){
         return service.getAllStudentsInGroup(id, pageable);
     }
