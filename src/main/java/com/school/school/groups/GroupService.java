@@ -1,19 +1,21 @@
 package com.school.school.groups;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class GroupService {
     @Autowired
     GroupRepository groupRepository;
 
-    public List<Group> getAll() {
-        return groupRepository.findAll();
+    public Page<Group> getAll(Pageable pageable) {
+        PageableValidator.checkIsSortValid(Group.class, pageable);
+        return groupRepository.findAll(pageable);
     }
 
     public void create(Group group) {
