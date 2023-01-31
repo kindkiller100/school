@@ -133,8 +133,8 @@ public class LessonService {
             validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
         }
         //проверка группы занятий
-        if (lesson.getGroupId() != null && lesson.getGroupId() < 1) {
-            validationException.put("groupId", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
+        if (lesson.getGroup() != null && lesson.getGroup().getId() < 1) {
+            validationException.put("group", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
         }
 
         validationException.throwExceptionIfIsNotEmpty();

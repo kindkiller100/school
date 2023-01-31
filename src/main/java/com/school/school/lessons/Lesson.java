@@ -1,5 +1,6 @@
 package com.school.school.lessons;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.school.school.lessons_groups.LessonsGroups;
 import com.school.school.subjects.Subject;
 import com.school.school.teachers.Teacher;
@@ -33,8 +34,9 @@ public class Lesson {
     private Teacher teacher;            //преподаватель
     @Size(max = 40, message = "Размер описания не должен превышать 40 символов.")
     private String description;         //расшифровка (подробное описание) занятия
-    @Column(name = "group_id")
-    private Long groupId;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private LessonsGroups group;
 
     //конструктор без параметров
     protected Lesson() {
@@ -47,14 +49,14 @@ public class Lesson {
                    Subject subject,
                    Teacher teacher,
                    String description,
-                   Long groupId) {
+                   LessonsGroups group) {
         this.id = id;
         this.startDateTime = startDateTime;
         this.duration = duration;
         this.subject = subject;
         this.teacher = teacher;
         this.description = description;
-        this.groupId = groupId;
+        this.group = group;
     }
 
     public long getId() {
@@ -81,8 +83,8 @@ public class Lesson {
         return description;
     }
 
-    public Long getGroupId() {
-        return groupId;
+    public LessonsGroups getGroup() {
+        return group;
     }
 
     //переопределение метода equals(). Объекты одинаковы, если у них одинаковый id
@@ -91,13 +93,14 @@ public class Lesson {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Lesson lesson = (Lesson) o;
-        return id == lesson.id;
+        return (id == lesson.id) & (teacher.getId() == lesson.teacher.getId()) &
+                (subject.getId() == lesson.subject.getId()) & (Objects.equals(startDateTime, lesson.getStartDateTime()));
     }
 
     //переопределение метода hashCode()
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, teacher.getId(), subject.getId(), startDateTime);
     }
 
     //переопределение метода toString()
@@ -122,7 +125,7 @@ public class Lesson {
                 .setSubject(this.subject)
                 .setTeacher(this.teacher)
                 .setDescription(this.description)
-                .setGroupId(this.groupId);
+                .setGroup(this.group);
     }
 
     public static Builder builder() {
@@ -136,7 +139,7 @@ public class Lesson {
         private Subject subject;
         private Teacher teacher;
         private String description;
-        private Long groupId;
+        private LessonsGroups group;
 
         public Builder setId(long id) {
             this.id = id;
@@ -168,8 +171,8 @@ public class Lesson {
             return this;
         }
 
-        public Builder setGroupId(Long groupId) {
-            this.groupId = groupId;
+        public Builder setGroup(LessonsGroups group) {
+            this.group = group;
             return this;
         }
 
@@ -180,7 +183,7 @@ public class Lesson {
                     subject,
                     teacher,
                     description,
-                    groupId);
+                    group);
         }
     }
 }

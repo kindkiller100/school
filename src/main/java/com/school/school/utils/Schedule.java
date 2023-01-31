@@ -50,7 +50,7 @@ public class Schedule {
     public List<LocalDateTime> createListOfDate(DateTimeRange dateRange) {
         //обе даты лиапазона приводим к типу LocalDate
         //вызываем метод datesUntil(), который запускает поток от даты начала диапазона до даты конца диапазона
-        return dateRange.getFrom().toLocalDate().datesUntil(dateRange.getTo().toLocalDate())
+        return dateRange.getFrom().toLocalDate().datesUntil(dateRange.getTo().toLocalDate().plusDays(1))
                 //фильтруем даты по дню недели
                 .filter(date -> date.getDayOfWeek() == DayOfWeek.of(dayOfWeek))
                 //преобразовываем LocalDate в LocalDateTime и добавляем время начала занятия

@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/lessons_groups")
@@ -55,27 +56,24 @@ public class LessonsGroupsController {
                 .setSchedule(lessonsGroupsDtoIn.createStringOfSchedules())
                 .setLessons(null)
                 .build();
-        lessonsGroups = service.create(lessonsGroups);
+        Set<Lesson> lessons = new HashSet<>();
         List<Schedule> listOfSchedules = lessonsGroupsDtoIn.getSchedules();
         for (Schedule schedule: listOfSchedules) {
             List<LocalDateTime> listOfDates = schedule.createListOfDate(lessonsGroupsDtoIn.getDateRange());
             for (LocalDateTime date: listOfDates) {
-                //TODO: добавить description для Lesson в LessonsGroupsDtoIn???
                 Lesson lesson = Lesson.builder()
                         .setId(0)
                         .setStartDateTime(date)
                         .setDuration(schedule.getDuration())
                         .setSubject(Subject.builder().setId(lessonsGroupsDtoIn.getSubjectId()).build())
                         .setTeacher(Teacher.builder().setId(lessonsGroupsDtoIn.getTeacherId()).build())
-                        .setGroupId(lessonsGroups.getId())
+                        .setGroup(lessonsGroups)
                         .build();
-                //или создавать через сервис? Поля объекта Lesson вроде уже провалидированы.
-                lesson = lessonRepository.save(lesson);
-                for (Long studentId: lessonsGroupsDtoIn.getStudents()) {
-                    //TODO: нужен репозиторий student_lesson для создания записей???
-                }
+                lessons.add(lesson);
             }
         }
+        lessonsGroups.setLessons(lessons);
+        service.create(lessonsGroups);
     }
 
     @PutMapping
@@ -131,6 +129,7 @@ public class LessonsGroupsController {
                 validationException.put("dateRange", DateTimeRange.ERR_STRING);
             }
         }
+        //TODO: task 87 перенести валидацию в
         if (lessonsGroupsDtoIn.getSchedules() != null) {
             ArrayList<Schedule> schedules = (ArrayList<Schedule>) lessonsGroupsDtoIn.getSchedules();
             for (int i = 0; i < schedules.size(); i++) {

@@ -24,10 +24,8 @@ public class LessonsGroups {
     //расписание. Формат: 'день_недели,время_начала_занятия,продолжительность_занятия_в_минутах;...'
     @CorrectSchedule(message = "Расписание не соответствует нужному формату.")
     private String schedule;
-    @OneToMany
-    @JoinColumn(name = "group_id")
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST})
     private Set<Lesson> lessons = new HashSet<>();
-    //TODO: можно ли прикрутить сюда таблицу студентов средствами аннотаций, или получать список студентов запросом к БД
 
     //конструктор без параметров
     protected LessonsGroups() {
@@ -55,6 +53,10 @@ public class LessonsGroups {
 
     public Set<Lesson> getLessons() {
         return lessons;
+    }
+
+    public void setLessons(Set<Lesson> lessons) {
+        this.lessons = lessons;
     }
 
     //переопределение метода equals()
