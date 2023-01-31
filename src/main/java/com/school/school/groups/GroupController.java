@@ -1,9 +1,9 @@
 package com.school.school.groups;
 
+import com.school.school.students.Student;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,25 +24,29 @@ import java.util.Map;
 @RequestMapping("/groups")
 public class GroupController {
     @Autowired
-    GroupService groupService;
+    GroupService service;
 
+    @GetMapping("/{id}/students")
+    public Page<Student> getAllStudentsInGroup(@PathVariable long id, Pageable pageable){
+        return service.getAllStudentsInGroup(id, pageable);
+    }
     @GetMapping
-    public List<Group> getAll() {
-        return groupService.getAll();
+    public Page<Group> getAll(Pageable pageable) {
+        return service.getAll(pageable);
     }
 
     @PostMapping
     public void create(@Valid @RequestBody Group group) {
-        groupService.create(group);
+        service.create(group);
     }
 
     @PutMapping
     public void edit(@Valid @RequestBody Group group) {
-        groupService.edit(group);
+        service.edit(group);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        groupService.delete(id);
+        service.delete(id);
     }
 }

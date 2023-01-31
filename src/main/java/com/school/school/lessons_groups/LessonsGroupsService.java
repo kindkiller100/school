@@ -1,19 +1,21 @@
 package com.school.school.lessons_groups;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class LessonsGroupsService {
     @Autowired
     private LessonsGroupsRepository lessonsGroupsRepository;
 
-    public List<LessonsGroups> list() {
-        return lessonsGroupsRepository.findAll();
+    public Page<LessonsGroups> list(Pageable pageable) {
+        PageableValidator.checkIsSortValid(LessonsGroups.class, pageable);
+        return lessonsGroupsRepository.findAll(pageable);
     }
 
     public LessonsGroups getIfExists(long id) {

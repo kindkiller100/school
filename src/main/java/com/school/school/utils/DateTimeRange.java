@@ -1,6 +1,7 @@
 package com.school.school.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.school.school.exceptions.ValidationException;
 import org.webjars.NotFoundException;
 
 import javax.validation.constraints.NotNull;
