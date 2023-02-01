@@ -37,10 +37,12 @@ public class StudentService {
 
     public Page<Student> getAllByAge(Byte fromAge, Byte uptoAge, Pageable pageable) {
         ValidationException validationException = new ValidationException();
-        if( ! PageableValidator.isSortValid(Student.class, pageable) )
-        {
-            validationException.put( "pageable", PageableValidator.currentError );
-        }
+        validationException.put(
+                PageableValidator.isSortValid(Student.class, pageable, validationException)
+        );
+//        {
+//            validationException.put( "pageable", PageableValidator.currentError );
+//        }
         if (fromAge < 0 || uptoAge < 0 || fromAge > uptoAge) {
             validationException.put("age", "Неверный период, от: " + fromAge + ", до: " + uptoAge);
         }

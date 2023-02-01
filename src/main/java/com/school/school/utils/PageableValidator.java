@@ -41,4 +41,20 @@ public class PageableValidator {
             throw new ValidationException(fieldName, String.format( ERROR_MESSAGE, fieldName ));
         }
     }
+
+    static public <T> ValidationException isSortValid( Class<T> c, Pageable p, ValidationException e) {
+        Sort sort = p.getSort();
+        try {
+            for (Sort.Order order : sort) {
+                String property = order.getProperty();
+                Field field = c.getDeclaredField(property);
+            }
+            return e;
+        } catch (NoSuchFieldException caughtException) {
+            String fieldName = caughtException.getMessage();
+            currentError = String.format( ERROR_MESSAGE, fieldName );
+            e.put(fieldName, currentError);
+            return e;
+        }
+    }
 }
