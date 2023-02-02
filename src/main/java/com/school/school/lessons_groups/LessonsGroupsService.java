@@ -14,7 +14,7 @@ public class LessonsGroupsService {
     private LessonsGroupsRepository lessonsGroupsRepository;
 
     public Page<LessonsGroups> list(Pageable pageable) {
-        PageableValidator.checkIsSortValid(LessonsGroups.class, pageable);
+        PageableValidator.sortValidOrThrow(LessonsGroups.class, pageable);
         return lessonsGroupsRepository.findAll(pageable);
     }
 

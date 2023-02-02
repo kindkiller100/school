@@ -18,12 +18,12 @@ public class GroupService {
     StudentRepository studentRepository;
 
     public Page<Student> getAllStudentsInGroup(long id, Pageable pageable) {
-        PageableValidator.checkIsSortValid(Student.class, pageable);
+        PageableValidator.sortValidOrThrow(Student.class, pageable);
         return studentRepository.getAllStudentsInGroup(id, pageable);
     }
 
     public Page<Group> getAll(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Group.class, pageable);
+        PageableValidator.sortValidOrThrow(Group.class, pageable);
         return repository.findAll(pageable);
     }
 

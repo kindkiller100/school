@@ -29,7 +29,7 @@ public class PageableValidator {
         }
     }
 
-    static public <T> void checkIsSortValid(Class<T> c, Pageable p) {
+    static public <T> void sortValidOrThrow(Class<T> c, Pageable p) {
         Sort sort = p.getSort();
         try {
             for (Sort.Order order : sort) {
@@ -42,19 +42,20 @@ public class PageableValidator {
         }
     }
 
-    static public <T> ValidationException isSortValid( Class<T> c, Pageable p, ValidationException e) {
+    static public <T> ValidationException sortValid(Class<T> c, Pageable p) {
+        ValidationException validationException = new ValidationException();
         Sort sort = p.getSort();
         try {
             for (Sort.Order order : sort) {
                 String property = order.getProperty();
                 Field field = c.getDeclaredField(property);
             }
-            return e;
+            return validationException;
         } catch (NoSuchFieldException caughtException) {
             String fieldName = caughtException.getMessage();
             currentError = String.format( ERROR_MESSAGE, fieldName );
-            e.put(fieldName, currentError);
-            return e;
+            validationException.put(fieldName, currentError);
+            return validationException;
         }
     }
 }

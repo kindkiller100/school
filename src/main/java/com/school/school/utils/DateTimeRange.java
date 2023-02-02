@@ -54,10 +54,19 @@ public class DateTimeRange {
     }
 
     //метод вилидаций объекта
-    public void validate() {
+    public void validateOrThrow() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         if(!isValid()) {
             throw new NotFoundException(DateTimeRange.ERR_STRING);
         }
+    }
+
+    //метод вилидаций объекта
+    public ValidationException validate() {
+        //проверка, что начало диапазона меньше или равно конца диапазона
+        if(!isValid()) {
+            return new ValidationException("range date", DateTimeRange.ERR_STRING);
+        }//+ not null 1 and 2
+        return new ValidationException();
     }
 }

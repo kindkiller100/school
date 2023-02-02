@@ -15,13 +15,13 @@ public class SubjectService
 
     //возвращает список всех subject с deleted == false
     public Page<Subject> getAll(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Subject.class, pageable);
+        PageableValidator.sortValidOrThrow(Subject.class, pageable);
         return subjectRepository.findAllByDeletedIsFalse(pageable);
     }
 
     //возвращает список всех subject с deleted == true
     public Page<Subject> getAllDeleted(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Subject.class, pageable);
+        PageableValidator.sortValidOrThrow(Subject.class, pageable);
         return subjectRepository.findAllByDeletedIsTrue(pageable);
     }
     public Subject getIfExists(long id) {

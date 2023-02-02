@@ -26,28 +26,25 @@ public class LessonService {
     private SubjectRepository subjectRepository;
 
     //получить все занятия
-    public Page<Lesson> list(Pageable pageable){
-        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+    public Page<Lesson> list(Pageable pageable) {
+        PageableValidator.sortValidOrThrow(Lesson.class, pageable);
         return lessonRepository.findAll(pageable);
     }
 
     //получить занятие по id
-    public Lesson getIfExists(long id){
+    public Lesson getIfExists(long id) {
         return lessonRepository.getIfExists(id);
     }
 
     //получить все занятия из диапазона дат
-    public Page<Lesson> getAllInDateRange(DateTimeRange dateRange, Pageable pageable){
+    public Page<Lesson> getAllInDateRange(DateTimeRange dateRange, Pageable pageable) {
         ValidationException validationException = new ValidationException();
-
-        if(!PageableValidator.isSortValid(Lesson.class, pageable)) {
-            validationException.put("pageable", PageableValidator.currentError);
-        }
-
+        validationException.put(PageableValidator.sortValid(Lesson.class, pageable));
         //проверка, что начало диапазона меньше или равно концу диапазона
-        if(!dateRange.isValid()) {
-            validationException.put("date_range", DateTimeRange.ERR_STRING);
-        }
+        validationException.put(dateRange.validate());
+//        if (!dateRange.validate()) {
+//            validationException.put("date_range", DateTimeRange.ERR_STRING);
+//        }
 
         validationException.throwExceptionIfIsNotEmpty();
 
@@ -56,13 +53,13 @@ public class LessonService {
 
     //получить все занятия по id преподавателя
     public Page<Lesson> getAllByTeacherId(long id, Pageable pageable) {
-        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+        PageableValidator.sortValidOrThrow(Lesson.class, pageable);
         return lessonRepository.findLessonsByTeacherId(id, pageable);
     }
 
     //получить все занятия по id студента
     public Page<Lesson> getAllByStudentId(long id, Pageable pageable) {
-        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+        PageableValidator.sortValidOrThrow(Lesson.class, pageable);
         return lessonRepository.findLessonsByStudentId(id, pageable);
     }
 
@@ -82,7 +79,7 @@ public class LessonService {
         validationException.throwExceptionIfIsNotEmpty();
 
         //получаем количество минут занятий, проведенных преподавателем за период, и переводим в часы
-        return lessonRepository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
+        return lessonRepository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo()) / 60d;
     }
 
     //количество часов занятий, посещенных студентом за период
@@ -101,18 +98,18 @@ public class LessonService {
         validationException.throwExceptionIfIsNotEmpty();
 
         //получаем количество минут занятий, посещенных студеном за период, и переводим в часы
-        return lessonRepository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;
+        return lessonRepository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id) / 60d;
     }
 
     //создание занятия
     //параметр lesson содержит поля subject и teacher, у которых заполнен только id (после маппинга из LessonDtoIn)
-    public void create(Lesson lesson){
+    public void create(Lesson lesson) {
         validate(lesson, false);
         lessonRepository.save(lesson);
     }
 
     //удаление занятия по id
-    public void delete(long id){
+    public void delete(long id) {
         if (lessonRepository.existsById(id)) {      //проверяем, есть ли запись с таким id в базе данных
             lessonRepository.deleteById(id);        //удаляем запись по id
         } else {                                    //если записи нет - выбрасываем ошибку
@@ -122,7 +119,7 @@ public class LessonService {
 
     //редактирование занятия
     //параметр editLesson содержит поля subject и teacher, у которых заполнен только id (после маппинга из LessonDtoIn)
-    public void edit(Lesson editLesson){
+    public void edit(Lesson editLesson) {
         validate(editLesson, true);
         //сохраняем запись с измененными данными в БД
         lessonRepository.save(editLesson);
