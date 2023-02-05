@@ -50,7 +50,7 @@ public class DateTimeRange {
     public boolean isValid() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         //true - если диапазон дат корректный
-        return !this.from.isAfter(this.to);
+        return from != null & to != null && !this.from.isAfter(this.to);
     }
 
     //метод вилидаций объекта

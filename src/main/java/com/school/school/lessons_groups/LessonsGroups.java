@@ -1,5 +1,6 @@
 package com.school.school.lessons_groups;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.school.school.lessons.Lesson;
 import com.school.school.utils.CorrectSchedule;
 
@@ -24,7 +25,8 @@ public class LessonsGroups {
     //расписание. Формат: 'день_недели,время_начала_занятия,продолжительность_занятия_в_минутах;...'
     @CorrectSchedule(message = "Расписание не соответствует нужному формату.")
     private String schedule;
-    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST})
+    @JsonIgnore
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE}) //, CascadeType.MERGE проверить обнуление занятий, которые мы уберем из сета. Если персист не справится, попробовать мерж, иначе руками
     private Set<Lesson> lessons = new HashSet<>();
 
     //конструктор без параметров
@@ -57,6 +59,14 @@ public class LessonsGroups {
 
     public void setLessons(Set<Lesson> lessons) {
         this.lessons = lessons;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setSchedule(String schedule) {
+        this.schedule = schedule;
     }
 
     //переопределение метода equals()

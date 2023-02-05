@@ -4,7 +4,9 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Schedule {
     //день недели (1...7)
@@ -13,6 +15,39 @@ public class Schedule {
     private String timeOfStart;
     //продолжительность занятия в минутах (от 30 до 210)
     private short duration;
+
+    public static Schedule convertToSchedule(String str) {
+        //TODO: добавить сообщения об ошибках
+        if (str == null) {
+            //сообщение об ошибке
+            return null;
+        }
+        if (!str.matches("[1-7],([01][0-9]|2[0-3]):[0-5][0-9],([3-9][0-9]|1[0-9][0-9]|2[01][0-9])")) {
+            //сообщение об ошибке
+            return null;
+        }
+        String[] arrayOfString = str.split(",");
+        return new Schedule(Byte.parseByte(arrayOfString[0]), arrayOfString[1], Short.parseShort(arrayOfString[2]));
+    }
+
+    public static List<Schedule> convertToListOfSchedules(String str) {
+        //TODO: добавить сообщения об ошибках
+        if (str == null) {
+            //сообщение об ошибке
+            return null;
+        }
+        if (!str.matches("[1-7],([01][0-9]|2[0-3]):[0-5][0-9],([3-9][0-9]|1[0-9][0-9]|2[01][0-9])" +
+                "(;[1-7],([01][0-9]|2[0-3]):[0-5][0-9],([3-9][0-9]|1[0-9][0-9]|2[01][0-9])){0,6}")) {
+            //сообщение об ошибке
+            return null;
+        }
+        String[] arrayOfString = str.split(";");
+        List<Schedule> list = new ArrayList<>();
+        for (String s : arrayOfString) {
+            list.add(Schedule.convertToSchedule(s));
+        }
+        return list;
+    }
 
     public Schedule() {}
 
@@ -63,5 +98,18 @@ public class Schedule {
         return dayOfWeek + "," +
                 timeOfStart + "," +
                 duration;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Schedule schedule = (Schedule) o;
+        return dayOfWeek == schedule.dayOfWeek && duration == schedule.duration && Objects.equals(timeOfStart, schedule.timeOfStart);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dayOfWeek, timeOfStart, duration);
     }
 }

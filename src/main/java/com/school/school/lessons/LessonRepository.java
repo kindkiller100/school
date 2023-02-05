@@ -4,10 +4,13 @@ import com.school.school.CustomRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRepository<Lesson> {
@@ -28,4 +31,9 @@ public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRep
         "school_db.lessons.id in (select lesson_id from school_db.student_lesson where school_db.student_lesson.student_id = ?3)"
         , nativeQuery = true)
     long findDurationByStudentIdInRange(LocalDateTime dateFrom, LocalDateTime dateTo, long id);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE FROM school_db.lessons AS lessons WHERE lessons.id IN ?1", nativeQuery = true)
+    void deleteByIdIn(Collection<Long> deletedLessons);
 }

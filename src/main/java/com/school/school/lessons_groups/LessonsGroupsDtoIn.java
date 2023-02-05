@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LessonsGroupsDtoIn {
     @Min(value = 1, message = "Id предмета должно быть больше нуля.")
@@ -97,15 +98,9 @@ public class LessonsGroupsDtoIn {
             return str;
         }
         if (schedules.size() > 0) {
-            str = schedules.get(0).convertToString();
-        } else {
-            return str;
-        }
-        if (schedules.size() > 1) {
-            for (int i = 1; i < schedules.size(); i++) {
-                str += ";";
-                str += schedules.get(0).convertToString();
-            }
+            str = schedules.stream()
+                    .map(Schedule::convertToString)
+                    .collect(Collectors.joining(";"));
         }
         return str;
     }
