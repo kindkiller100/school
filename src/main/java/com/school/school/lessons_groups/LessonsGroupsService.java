@@ -59,11 +59,17 @@ public class LessonsGroupsService {
                 .setSchedule(lessonsGroupsDtoIn.createStringOfSchedules())
                 .setLessons(null)
                 .build();
+        //создаем список студентов
+        Set<Student> students = lessonsGroupsDtoIn.getStudents()
+                .stream()
+                .map(id -> studentRepository.getIfExists(id))
+                .collect(Collectors.toSet());
         //создаем список занятий
         Set<Lesson> lessons = createSetOfLessons(lessonsGroupsDtoIn,
                 lessonsGroupsDtoIn.getSchedules(),
                 lessonsGroupsDtoIn.getDateRange(),
-                lessonsGroups);
+                lessonsGroups,
+                students);
         //присваиваем список занятий объекту LessonsGroups
         lessonsGroups.setLessons(lessons);
         //записываем объект LessonsGroups в БД
@@ -92,10 +98,10 @@ public class LessonsGroupsService {
         //создаем объекты предмета и преподавателя, а также список студентов для проверки на эквивалентность
         Subject subject = Subject.builder().setId(editLessonsGroupsDtoIn.getSubjectId()).build();
         Teacher teacher = Teacher.builder().setId(editLessonsGroupsDtoIn.getTeacherId()).build();
-        Set<Student> newStudents = editLessonsGroupsDtoIn.getStudents()
-                .stream()
-                .map(id -> studentRepository.getIfExists(id))
-                .collect(Collectors.toSet());
+        //списку учеников присваиваем null. Список формируется из БД, поэтому формируем только при необходимости один раз.
+        //Потенциально может возникнуть случай, при котором нам не понадобится список учеников. Тогда и обращения к БД тоже не будет.
+        Set<Student> newStudents = null;
+
         //если у группы занятий есть связанный с ним список занятий
         if (!oldLessonsGroups.getLessons().isEmpty()) {
             //находим самое последнее занятие, это будет базовое занятие, по которому будем проверять изменения в занятиях
@@ -124,6 +130,11 @@ public class LessonsGroupsService {
             //проверяем совпадение списков студентов
             if (!Objects.equals(baseLesson.getStudents().stream().map(Student::getId).collect(Collectors.toSet()),
                     editLessonsGroupsDtoIn.getStudents())) {
+                //если список студентов равен null, то создаем его
+                newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
+                        .stream()
+                        .map(id -> studentRepository.getIfExists(id))
+                        .collect(Collectors.toSet()));
                 Set<Student> finalNewStudents = newStudents;
                 oldLessonsGroups.getLessons()
                         .stream()
@@ -191,10 +202,15 @@ public class LessonsGroupsService {
                 }
                 //если остались новые расписания, добавляем занятия по этим расписаниям за редактируемый период
                 if (!newSchedules.isEmpty()) {
+                    newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
+                            .stream()
+                            .map(id -> studentRepository.getIfExists(id))
+                            .collect(Collectors.toSet()));
                     Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
                             newSchedules,
                             editLessonsGroupsDtoIn.getDateRange(),
-                            oldLessonsGroups);
+                            oldLessonsGroups,
+                            newStudents);
                     oldLessonsGroups.getLessons().addAll(lessons);
                 }
             }
@@ -235,18 +251,28 @@ public class LessonsGroupsService {
             dateRangeTo = editLessonsGroupsDtoIn.getDateRange().getTo().toLocalDate().atTime(LocalTime.MAX);
             if (dateRangeFrom.isBefore(dateRangeTo)) {
                 DateTimeRange dateRange = new DateTimeRange(dateRangeFrom, dateRangeTo);
+                newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
+                        .stream()
+                        .map(id -> studentRepository.getIfExists(id))
+                        .collect(Collectors.toSet()));
                 Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
                         editLessonsGroupsDtoIn.getSchedules(),
                         dateRange,
-                        oldLessonsGroups);
+                        oldLessonsGroups,
+                        newStudents);
                 oldLessonsGroups.getLessons().addAll(lessons);
             }
         } else {    //иначе (у группы занятий нет списка связанных с ней занятий)
             //добавляем занятия за редактируемый период
+            newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
+                    .stream()
+                    .map(id -> studentRepository.getIfExists(id))
+                    .collect(Collectors.toSet()));
             Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
                     editLessonsGroupsDtoIn.getSchedules(),
                     editLessonsGroupsDtoIn.getDateRange(),
-                    oldLessonsGroups);
+                    oldLessonsGroups,
+                    newStudents);
             oldLessonsGroups.setLessons(lessons);
         }
         //удаляем лишние занятия
@@ -258,19 +284,16 @@ public class LessonsGroupsService {
     }
 
     //метод для создания списка зантяий
-    public Set<Lesson> createSetOfLessons(LessonsGroupsDtoIn lessonsGroupsDtoIn,
+    private Set<Lesson> createSetOfLessons(LessonsGroupsDtoIn lessonsGroupsDtoIn,
                                           List<Schedule> schedules,
                                           DateTimeRange dateRange,
-                                          LessonsGroups lessonsGroups) {
+                                          LessonsGroups lessonsGroups,
+                                           Set<Student> students) {
         //возвращаемый список занятий
         Set<Lesson> lessons = new HashSet<>();
-        //объекты предмета, преподавателя и список студентов
+        //объекты предмета и преподавателя
         Subject subject = Subject.builder().setId(lessonsGroupsDtoIn.getSubjectId()).build();
         Teacher teacher = Teacher.builder().setId(lessonsGroupsDtoIn.getTeacherId()).build();
-        Set<Student> students = lessonsGroupsDtoIn.getStudents()
-                .stream()
-                .map(id -> studentRepository.getIfExists(id))
-                .collect(Collectors.toSet());
         //цикл по расписаниям
         for (Schedule schedule: schedules) {
             //создаем список дат для расписания

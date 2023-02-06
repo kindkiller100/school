@@ -53,7 +53,7 @@ public class Lesson
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private LessonsGroups group;
-    @ManyToMany( cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE } )
+    @ManyToMany( cascade = { CascadeType.PERSIST } )
     @JoinTable(
         name = "student_lesson",
         schema = "school_db",

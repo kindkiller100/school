@@ -25,8 +25,9 @@ public class LessonsGroups {
     //расписание. Формат: 'день_недели,время_начала_занятия,продолжительность_занятия_в_минутах;...'
     @CorrectSchedule(message = "Расписание не соответствует нужному формату.")
     private String schedule;
+    //список занятий
     @JsonIgnore
-    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE}) //, CascadeType.MERGE проверить обнуление занятий, которые мы уберем из сета. Если персист не справится, попробовать мерж, иначе руками
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Set<Lesson> lessons = new HashSet<>();
 
     //конструктор без параметров

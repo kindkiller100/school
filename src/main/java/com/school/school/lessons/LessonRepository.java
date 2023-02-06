@@ -34,6 +34,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRep
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM school_db.lessons AS lessons WHERE lessons.id IN ?1", nativeQuery = true)
+    @Query(value = "DELETE FROM school_db.lessons WHERE id IN ?1", nativeQuery = true)
     void deleteByIdIn(Collection<Long> deletedLessons);
 }
