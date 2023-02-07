@@ -262,6 +262,30 @@ public class LessonsGroupsService {
                         newStudents);
                 oldLessonsGroups.getLessons().addAll(lessons);
             }
+            //если дата начала диапазона редактирования группы меньше даты начала первого занятия в группе,
+            //то нужно добавить занятия за период от даты начала диапазона редактирования по дату начала первого занятия минус один день
+            dateRangeFrom = editLessonsGroupsDtoIn.getDateRange().getFrom().toLocalDate().atTime(LocalTime.MIN);
+            dateRangeTo = oldLessonsGroups.getLessons()
+                    .stream()
+                    .min(Comparator.comparing(Lesson::getStartDateTime))
+                    .get()
+                    .getStartDateTime()
+                    .toLocalDate()
+                    .minusDays(1)
+                    .atTime(LocalTime.MAX);
+            if (dateRangeFrom.isBefore(dateRangeTo)) {
+                DateTimeRange dateRange = new DateTimeRange(dateRangeFrom, dateRangeTo);
+                newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
+                        .stream()
+                        .map(id -> studentRepository.getIfExists(id))
+                        .collect(Collectors.toSet()));
+                Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
+                        editLessonsGroupsDtoIn.getSchedules(),
+                        dateRange,
+                        oldLessonsGroups,
+                        newStudents);
+                oldLessonsGroups.getLessons().addAll(lessons);
+            }
         } else {    //иначе (у группы занятий нет списка связанных с ней занятий)
             //добавляем занятия за редактируемый период
             newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
@@ -354,6 +378,8 @@ public class LessonsGroupsService {
                     validationException.put("studentId", "Ученик с id «" + studentId + "» не найден.");
                 }
             }
+        } else {
+            validationException.put("students", "Не удалось создать объект списка учеников.");
         }
         if (lessonsGroupsDtoIn.getDateRange() != null) {
             if (lessonsGroupsDtoIn.getDateRange().getFrom() == null) {
@@ -367,6 +393,8 @@ public class LessonsGroupsService {
             if (!lessonsGroupsDtoIn.getDateRange().isValid()) {
                 validationException.put("dateRange", DateTimeRange.ERR_STRING);
             }
+        } else {
+            validationException.put("dateRange", "Не удалось создать объект диапазона дат.");
         }
         //TODO: task 87 перенести валидацию в класс Schedule
         if (lessonsGroupsDtoIn.getSchedules() != null) {
@@ -385,6 +413,8 @@ public class LessonsGroupsService {
                     validationException.put("duration:" + (i + 1), "Продолжительность занятия должна быть в пределах от 30 до 210 минут.");
                 }
             }
+        } else {
+            validationException.put("schedules", "Не удалось создать объект писка расписаний.");
         }
         validationException.throwExceptionIfIsNotEmpty();
     }
