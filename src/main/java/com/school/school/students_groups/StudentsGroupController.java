@@ -1,6 +1,5 @@
 package com.school.school.students_groups;
 
-import com.school.school.groups.GroupService;
 import com.school.school.students.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

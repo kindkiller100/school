@@ -45,6 +45,10 @@ public class StudentController {
     public void delete(@PathVariable long id) {
         studentService.delete(id);
     }
+    @DeleteMapping("/wipe")
+    public void wipe() {
+        studentService.wipe();
+    }
 
     @PutMapping("/{id}/restore")
     public void restoreDeleted(@PathVariable long id) {
