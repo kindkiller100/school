@@ -13,5 +13,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long>, CustomR
     Page<Subject> findAllByDeletedIsTrue(Pageable pageable);
     Page<Subject> findAllByDeletedIsFalse(Pageable pageable);
     boolean existsByTitle(String title);
-    boolean existsByTitleAndIdNot(String title, long id);
+    boolean existsByTitleAndIdNotAndDeletedFalse(String title, long id);
+    boolean existsByTitleAndDeletedFalse(String title);
+
 }

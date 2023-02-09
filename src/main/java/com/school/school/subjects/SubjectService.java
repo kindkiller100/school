@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SubjectService
 {
@@ -38,7 +40,7 @@ public class SubjectService
             validationException.put("id", "Предмет с id «" + id + "» уже существует.");
         }
 
-        if (subjectRepository.existsByTitle(title)) {
+        if (subjectRepository.existsByTitleAndDeletedFalse(title) ) {
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
@@ -53,7 +55,7 @@ public class SubjectService
         String title = subject.getTitle();
         ValidationException validationException = new ValidationException();
 
-        if (subjectRepository.existsByTitleAndIdNot(title, id)) {
+        if (subjectRepository.existsByTitleAndIdNotAndDeletedFalse(title, id)) {
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
@@ -62,6 +64,8 @@ public class SubjectService
                 .setTitle(title)
                 .setDescription(subject.getDescription())
                 .build();
+
+        validationException.throwExceptionIfIsNotEmpty();
 
         subjectRepository.save(subjectClone);
     }
@@ -82,7 +86,6 @@ public class SubjectService
                 .clone()
                 .setDeleted(deleted)
                 .build();
-
         subjectRepository.save(subjectClone);
     }
 }
