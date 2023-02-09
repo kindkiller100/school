@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Service
 public class LessonService {
     @Autowired
-    private LessonRepository lessonRepository;
+    private LessonRepository repository;
     @Autowired
     private StudentRepository studentRepository;
     @Autowired
@@ -28,12 +28,12 @@ public class LessonService {
     //получить все занятия
     public Page<Lesson> list(Pageable pageable){
         PageableValidator.checkIsSortValid(Lesson.class, pageable);
-        return lessonRepository.findAll(pageable);
+        return repository.findAll(pageable);
     }
 
     //получить занятие по id
     public Lesson getIfExists(long id){
-        return lessonRepository.getIfExists(id);
+        return repository.getIfExists(id);
     }
 
     //получить все занятия из диапазона дат
@@ -51,19 +51,19 @@ public class LessonService {
 
         validationException.throwExceptionIfIsNotEmpty();
 
-        return lessonRepository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo(), pageable);
+        return repository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo(), pageable);
     }
 
     //получить все занятия по id преподавателя
     public Page<Lesson> getAllByTeacherId(long id, Pageable pageable) {
         PageableValidator.checkIsSortValid(Lesson.class, pageable);
-        return lessonRepository.findLessonsByTeacherId(id, pageable);
+        return repository.findLessonsByTeacherId(id, pageable);
     }
 
     //получить все занятия по id студента
     public Page<Lesson> getAllByStudentId(long id, Pageable pageable) {
         PageableValidator.checkIsSortValid(Lesson.class, pageable);
-        return lessonRepository.findLessonsByStudentId(id, pageable);
+        return repository.findLessonsByStudentId(id, pageable);
     }
 
     //количество часов занятий, проведенных преподавателем за период
@@ -82,14 +82,14 @@ public class LessonService {
         validationException.throwExceptionIfIsNotEmpty();
 
         //получаем количество минут занятий, проведенных преподавателем за период, и переводим в часы
-        return lessonRepository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
+        return repository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
     }
 
     //количество часов занятий, посещенных студентом за период
     public double countHoursOfLessonsByStudentInRange(long id, DateTimeRange dateTimeRange) {
         ValidationException validationException = new ValidationException();
 
-        //проверяем, что записть с таким Id существует
+        //проверяем, что запись с таким Id существует
         if (!studentRepository.existsById(id)) {
             validationException.put("id", "Студент с id «" + id + "» не найден.");
         }
@@ -101,20 +101,20 @@ public class LessonService {
         validationException.throwExceptionIfIsNotEmpty();
 
         //получаем количество минут занятий, посещенных студеном за период, и переводим в часы
-        return lessonRepository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;
+        return repository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;
     }
 
     //создание занятия
     //параметр lesson содержит поля subject и teacher, у которых заполнен только id (после маппинга из LessonDtoIn)
     public void create(Lesson lesson){
         validate(lesson, false);
-        lessonRepository.save(lesson);
+        repository.save(lesson);
     }
 
     //удаление занятия по id
     public void delete(long id){
-        if (lessonRepository.existsById(id)) {      //проверяем, есть ли запись с таким id в базе данных
-            lessonRepository.deleteById(id);        //удаляем запись по id
+        if (repository.existsById(id)) {      //проверяем, есть ли запись с таким id в базе данных
+            repository.deleteById(id);        //удаляем запись по id
         } else {                                    //если записи нет - выбрасываем ошибку
             throw new ValidationException("id", "Занятие с id «" + id + "» не найдено.").setStatus(HttpStatus.NOT_FOUND);
         }
@@ -125,14 +125,14 @@ public class LessonService {
     public void edit(Lesson editLesson){
         validate(editLesson, true);
         //сохраняем запись с измененными данными в БД
-        lessonRepository.save(editLesson);
+        repository.save(editLesson);
     }
 
     private void validate(Lesson lesson, boolean editFlag) {
         ValidationException validationException = new ValidationException();
 
         //проверяем, есть ли запись с таким id в базе данных
-        if (editFlag && !lessonRepository.existsById(lesson.getId())) {
+        if (editFlag && !repository.existsById(lesson.getId())) {
             validationException.put("id", "Занятие с id «" + lesson.getId() + "» не найдено.");
         }
         //проверяем существует ли предмет с указанным Id
