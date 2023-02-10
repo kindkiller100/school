@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,7 +36,5 @@ public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRep
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query(value = "DELETE FROM school_db.lessons AS lessons WHERE lessons.group_id = ?1 AND lessons.startdatetime > ?2",
-            nativeQuery = true)
-    void deleteAllByGroupIdAndAfterDateTime(long groupId, LocalDateTime dateTime);
+    void deleteAllByGroupIdAndStartDateTimeAfter(long groupId, LocalDateTime startDateTime);
 }

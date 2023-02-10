@@ -42,9 +42,14 @@ public class LessonsGroupService {
 
     public void delete(long id) {
         if (repository.existsById(id)) {
-            LocalDateTime dateTime = LocalDateTime.now();
-            lessonService.clearGroupIdBeforeDateTime(id, dateTime.plusSeconds(1));
-            lessonService.deleteAllByGroupIdAndAfterDateTime(id, dateTime);
+            LocalDateTime startDateTime = LocalDateTime.now();
+
+            //у занятий, которые закончились на данный момент времени или идут сейчас, устанавливаем groupId = null
+            lessonService.clearGroupIdBeforeDateTime(id, startDateTime.plusSeconds(1));
+
+            //остальные занятия, которых еще не было и они не успели начаться, удаляем
+            lessonService.deleteAllByGroupIdAndStartDateTimeAfter(id, startDateTime);
+
             repository.deleteById(id);
         } else {
             throw new ValidationException("id", "Группа занятий с id «" + id + "» не найдена.")

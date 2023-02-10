@@ -130,14 +130,15 @@ public class LessonService {
         lessonRepository.save(editLesson);
     }
 
+    //TODO: add transactional
     public void clearGroupIdBeforeDateTime(long groupId, LocalDateTime dateTime) {
         List<Lesson> lessons = lessonRepository.findLessonByGroupIdAndStartDateTimeBefore(groupId, dateTime);
 
         lessons.forEach(lesson -> lessonRepository.save(lesson.clone().setGroupId(null).build()));
     }
 
-    public void deleteAllByGroupIdAndAfterDateTime(long groupId, LocalDateTime dateTime) {
-        lessonRepository.deleteAllByGroupIdAndAfterDateTime(groupId, dateTime);
+    public void deleteAllByGroupIdAndStartDateTimeAfter(long groupId, LocalDateTime startDateTime) {
+        lessonRepository.deleteAllByGroupIdAndStartDateTimeAfter(groupId, startDateTime);
     }
 
     private void validate(Lesson lesson, boolean editFlag) {

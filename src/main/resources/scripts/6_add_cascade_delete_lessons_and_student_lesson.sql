@@ -1,3 +1,4 @@
+-- добавляем удаление каскадом записей из таблицы student_lesson при удалении записи из таблицы lessons
 ALTER TABLE school_db.student_lesson
 DROP
 CONSTRAINT student_lesson_lesson_id_fkey;
