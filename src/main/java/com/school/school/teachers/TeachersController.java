@@ -49,6 +49,10 @@ public class TeachersController {
     public void delete(@PathVariable long id) {
         teacherService.delete(id);
     }
+    @DeleteMapping("/wipe")
+    public void wipe() {
+        teacherService.wipe();
+    }
 
     @PutMapping("/edit")
     public void edit(@Valid @RequestBody Teacher editTeacher) {

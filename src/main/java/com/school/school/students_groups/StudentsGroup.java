@@ -1,17 +1,13 @@
-package com.school.school.groups;
+package com.school.school.students_groups;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
-@Table(name = "groups", schema = "school_db")
-public class Group {
+@Table(name = "students_groups", schema = "school_db")
+public class StudentsGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -19,10 +15,10 @@ public class Group {
     @Size(min = 1, max = 20)
     private String title;
 
-    protected Group() {
+    protected StudentsGroup() {
     }
 
-    private Group(long id, String title) {
+    private StudentsGroup(long id, String title) {
         this.id = id;
         this.title = title;
     }
@@ -39,8 +35,8 @@ public class Group {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Group group = (Group) o;
-        return id == group.id && Objects.equals(title, group.title);
+        StudentsGroup studentsGroup = (StudentsGroup) o;
+        return id == studentsGroup.id && Objects.equals(title, studentsGroup.title);
     }
 
     @Override
@@ -81,8 +77,8 @@ public class Group {
         }
 
         //возвращает объект внешнего класса с заданными параметрами
-        public Group build() {
-            return new Group(id, title);
+        public StudentsGroup build() {
+            return new StudentsGroup(id, title);
         }
     }
 }
