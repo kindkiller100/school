@@ -139,7 +139,7 @@ public class LessonsGroupsService {
         //создаем диапазон дат, в котором не нужно менять занятия
         DateTimeRange dateRange = dateRangeForUnchangedLessons(lessonsGroups.dateRangeOfLessons(), lessonsGroupsDtoIn.getDateRange());
         //заполняем список
-        if (!schedulesInBothLists.isEmpty()) {
+        if (!schedulesInBothLists.isEmpty() && dateRange.isValid()) {
             for (Schedule schedule: schedulesInBothLists) {
                 listOfUnchangedLessons.addAll(schedule.createListOfDate(dateRange));
             }
@@ -183,6 +183,7 @@ public class LessonsGroupsService {
                         //меняем дату начала и продолжительность занятия на новые значения
                         lesson.setStartDateTime(listOfDaysNewSchedules.get(0).date);
                         lesson.setDuration(listOfDaysNewSchedules.get(0).duration);
+                        lesson.setIfNotEquals(subject, teacher, newStudents);
                         //удаляем отработанный объект из списка
                         listOfDaysNewSchedules.remove(0);
                     } else {
