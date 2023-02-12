@@ -18,13 +18,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class LessonsGroupsService {
@@ -60,10 +57,7 @@ public class LessonsGroupsService {
                 .setLessons(null)
                 .build();
         //создаем список студентов
-        Set<Student> students = lessonsGroupsDtoIn.getStudents()
-                .stream()
-                .map(id -> studentRepository.getIfExists(id))
-                .collect(Collectors.toSet());
+        Set<Student> students = studentRepository.getAllByIdIn(lessonsGroupsDtoIn.getStudents());
         //создаем список занятий
         Set<Lesson> lessons = createSetOfLessons(lessonsGroupsDtoIn,
                 lessonsGroupsDtoIn.getSchedules(),
@@ -80,8 +74,6 @@ public class LessonsGroupsService {
     public void edit(LessonsGroupsDtoIn editLessonsGroupsDtoIn) {
         //валидация объекта LessonsGroupsDtoIn
         validateLessonsGroupsDtoIn(editLessonsGroupsDtoIn, true);
-        //создаем список занятий, которые нужно удалить
-        Set<Long> deletedLessons = new HashSet<>();
         //получаем редактируемый объект LessonsGroups из БД, чтобы в нем установить изменения и сохранить этот объект обратно в БД
         LessonsGroups oldLessonsGroups = lessonsGroupsRepository.getIfExists(editLessonsGroupsDtoIn.getLessonsGroupId());
         //проверяем совпадение названия
@@ -90,221 +82,146 @@ public class LessonsGroupsService {
         }
         //конвертируем строку расписания в список объектов
         List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(oldLessonsGroups.getSchedule());
-        //TODO: Порядок следования элементов в коллекции имеет значение. Есть ли смысл сортировать обе коллекции расписаний по дням недели?
+        //сортируем старый список расписаний по дням недели
+        oldSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
+        //создаем список новых расписаний
+        List<Schedule> newSchedules = new ArrayList<>(editLessonsGroupsDtoIn.getSchedules());
+        //сортируем новый список расписаний по дням недели
+        newSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
         //проверяем совпадение расписаний
-        if (!Objects.equals(oldSchedules, editLessonsGroupsDtoIn.getSchedules())) {
+        if (!Objects.equals(oldSchedules, newSchedules)) {
             oldLessonsGroups.setSchedule(editLessonsGroupsDtoIn.createStringOfSchedules());
         }
-        //создаем объекты предмета и преподавателя, а также список студентов для проверки на эквивалентность
-        Subject subject = Subject.builder().setId(editLessonsGroupsDtoIn.getSubjectId()).build();
-        Teacher teacher = Teacher.builder().setId(editLessonsGroupsDtoIn.getTeacherId()).build();
-        //списку учеников присваиваем null. Список формируется из БД, поэтому формируем только при необходимости один раз.
-        //Потенциально может возникнуть случай, при котором нам не понадобится список учеников. Тогда и обращения к БД тоже не будет.
-        Set<Student> newStudents = null;
 
-        //если у группы занятий есть связанный с ним список занятий
-        if (!oldLessonsGroups.getLessons().isEmpty()) {
-            //находим самое последнее занятие, это будет базовое занятие, по которому будем проверять изменения в занятиях
-            Lesson baseLesson = oldLessonsGroups.getLessons()
-                    .stream()
-                    .max(Comparator.comparing(Lesson::getStartDateTime))
-                    .get();
-            //проверяем совпадение предмета
-            if (baseLesson.getSubject().getId() != editLessonsGroupsDtoIn.getSubjectId()) {
-                oldLessonsGroups.getLessons()
-                        .stream()
-                        //отбираем только те занятия, которые лежат в диапазоне редактирования группы
-                        .filter(lesson -> lesson.getStartDateTime().isAfter(editLessonsGroupsDtoIn.getDateRange().getFrom()) &&
-                                lesson.getStartDateTime().isBefore(editLessonsGroupsDtoIn.getDateRange().getTo()))
-                        //устанавливаем предмет
-                        .forEach(lesson -> lesson.setSubject(subject));
+        //проверяем поля в группе занятий и связанных с ним занятиях
+        Boolean checkFieldsLessonGroups = oldLessonsGroups.checkFields(editLessonsGroupsDtoIn);
+        if (checkFieldsLessonGroups == null) {
+            //создаем объекты предмета и преподавателя, а также список студентов для проверки на эквивалентность
+            Subject subject = Subject.builder().setId(editLessonsGroupsDtoIn.getSubjectId()).build();
+            Teacher teacher = Teacher.builder().setId(editLessonsGroupsDtoIn.getTeacherId()).build();
+            Set<Student> newStudents = studentRepository.getAllByIdIn(editLessonsGroupsDtoIn.getStudents());
+            //меняем только поля в занятиях
+            oldLessonsGroups.setFieldsIntoLessons(subject, teacher, newStudents, editLessonsGroupsDtoIn.getDateRange());
+        } else if (!checkFieldsLessonGroups) {
+            //создаем список занятий, которые нужно удалить
+            Set<Long> deletedLessons = new HashSet<>();
+            //меняем расписания, диапазон занятий и пеля в занятиях
+            changeLessons(oldLessonsGroups, editLessonsGroupsDtoIn, deletedLessons, oldSchedules);
+            //удаляем лишние занятия
+            if (!deletedLessons.isEmpty()) {
+                lessonRepository.deleteByIdIn(deletedLessons);
             }
-            //проверяем совпадение преподавателя
-            if (baseLesson.getTeacher().getId() != editLessonsGroupsDtoIn.getTeacherId()) {
-                oldLessonsGroups.getLessons()
-                        .stream()
-                        .filter(lesson -> lesson.getStartDateTime().isAfter(editLessonsGroupsDtoIn.getDateRange().getFrom()) &&
-                                lesson.getStartDateTime().isBefore(editLessonsGroupsDtoIn.getDateRange().getTo()))
-                        .forEach(lesson -> lesson.setTeacher(teacher));
-            }
-            //проверяем совпадение списков студентов
-            if (!Objects.equals(baseLesson.getStudents().stream().map(Student::getId).collect(Collectors.toSet()),
-                    editLessonsGroupsDtoIn.getStudents())) {
-                //если список студентов равен null, то создаем его
-                newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
-                        .stream()
-                        .map(id -> studentRepository.getIfExists(id))
-                        .collect(Collectors.toSet()));
-                Set<Student> finalNewStudents = newStudents;
-                oldLessonsGroups.getLessons()
-                        .stream()
-                        .filter(lesson -> lesson.getStartDateTime().isAfter(editLessonsGroupsDtoIn.getDateRange().getFrom()) &&
-                                lesson.getStartDateTime().isBefore(editLessonsGroupsDtoIn.getDateRange().getTo()))
-                        .forEach(lesson -> lesson.setStudents(finalNewStudents));
-            }
-            //проверяем совпадение расписаний
-            if (!Objects.equals(oldSchedules, editLessonsGroupsDtoIn.getSchedules())) {
-                //создаем список новых расписаний
-                List<Schedule> newSchedules = new ArrayList<>(editLessonsGroupsDtoIn.getSchedules());
-                //создаем список расписаний, которые есть в обоих списках расписаний: старом (который в БД) и новом (который пришел с UI)
-                List<Schedule> schedulesInBothLists = oldSchedules.stream()
-                        .filter(newSchedules::contains)
-                        .toList();
-                //убиаем из обоих списков одинаковые распивания
-                if (!schedulesInBothLists.isEmpty()) {
-                    newSchedules.removeIf(schedulesInBothLists::contains);
-                    oldSchedules.removeIf(schedulesInBothLists::contains);
-                }
-                //если оба списка расписаний не пусты
-                if (!newSchedules.isEmpty() & !oldSchedules.isEmpty()) {
-                    //находим минимальное количество элементов в списках
-                    byte countOfSchedules = (byte) Math.min(newSchedules.size(), oldSchedules.size());
-                    //меняем дату начала и продолжительность занятия по старому расписанию на новые значения по новому расписанию
-                    for (int i = 0; i < countOfSchedules; i++) {
-                        oldLessonsGroups.getLessons()
-                                .stream()
-                                .filter(lesson -> lesson.getStartDateTime().isAfter(editLessonsGroupsDtoIn.getDateRange().getFrom()) &&
-                                        lesson.getStartDateTime().isBefore(editLessonsGroupsDtoIn.getDateRange().getTo()))
-                                .filter(lesson -> lesson.getStartDateTime().getDayOfWeek() == DayOfWeek.of(oldSchedules.get(0).getDayOfWeek()))
-                                .forEach(lesson -> {
-                                    lesson.setDuration(newSchedules.get(0).getDuration());
-                                    //меняем дату занятия: сдвигаем дни и устанавливаем время
-                                    lesson.setStartDateTime(LocalDateTime.of(
-                                            lesson.getStartDateTime()
-                                                    .plusDays(newSchedules.get(0).getDayOfWeek() - oldSchedules.get(0).getDayOfWeek())
-                                                    .toLocalDate(),
-                                                    LocalTime.parse(newSchedules.get(0).getTimeOfStart(), DateTimeFormatter.ofPattern("HH:mm"))
-                                            )
-                                    );
-                                });
-                        //удаляем отработанные расписания
-                        newSchedules.remove(0);
-                        oldSchedules.remove(0);
-                    }
-                }
-                //после предыдущей операции остались либо новые расписания, которые необходимо добавить, либо старые, которые необходимо удалить
-                //если остались старые расписания
-                if (!oldSchedules.isEmpty()) {
-                    for (Schedule schedule: oldSchedules) {
-                        Iterator<Lesson> lessonIterator = oldLessonsGroups.getLessons().iterator();
-                        while (lessonIterator.hasNext()) {
-                            Lesson lesson = lessonIterator.next();
-                            if (lesson.getStartDateTime().isAfter(editLessonsGroupsDtoIn.getDateRange().getFrom()) &&
-                                    lesson.getStartDateTime().isBefore(editLessonsGroupsDtoIn.getDateRange().getTo()) &&
-                                    lesson.getStartDateTime().getDayOfWeek() == DayOfWeek.of(schedule.getDayOfWeek())) {
-                                //добавляем Id занятия в список удаляемых заниятий
-                                deletedLessons.add(lesson.getId());
-                                //удаляем заниятие из списка занятий, связанных с редактируемой группой занятий
-                                lessonIterator.remove();
-                            }
-                        }
-                    }
-                }
-                //если остались новые расписания, добавляем занятия по этим расписаниям за редактируемый период
-                if (!newSchedules.isEmpty()) {
-                    newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
-                            .stream()
-                            .map(id -> studentRepository.getIfExists(id))
-                            .collect(Collectors.toSet()));
-                    Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
-                            newSchedules,
-                            editLessonsGroupsDtoIn.getDateRange(),
-                            oldLessonsGroups,
-                            newStudents);
-                    oldLessonsGroups.getLessons().addAll(lessons);
-                }
-            }
-            //проверка диапазона дат
-            //если дата начала диапазона редактирования группы занятий позже текущей даты,
-            // то удаляем все занятия за период от текущей даты до даты начала диапазона минус 1 день
-            LocalDateTime dateRangeFrom = LocalDate.now().atTime(LocalTime.MIN);
-            LocalDateTime dateRangeTo = editLessonsGroupsDtoIn.getDateRange().getFrom().toLocalDate().minusDays(1).atTime(LocalTime.MAX);
-            if (dateRangeTo.isAfter(dateRangeFrom)) {
-                Iterator<Lesson> lessonIterator = oldLessonsGroups.getLessons().iterator();
-                while (lessonIterator.hasNext()) {
-                    Lesson lesson = lessonIterator.next();
-                    if (lesson.getStartDateTime().isAfter(dateRangeFrom) &&
-                            lesson.getStartDateTime().isBefore(dateRangeTo)) {
-                        deletedLessons.add(lesson.getId());
-                        lessonIterator.remove();
-                    }
-                }
-            }
-            //если дата конца диапазона редактирования группы маньше даты последнего занятия,
-            //то нужно удалить все занятия с даты конца редактирования группы плюс день по дату последнего занятия
-            dateRangeFrom = editLessonsGroupsDtoIn.getDateRange().getTo().toLocalDate().plusDays(1).atTime(LocalTime.MIN);
-            dateRangeTo = baseLesson.getStartDateTime().toLocalDate().plusDays(1).atTime(LocalTime.MAX);
-            if (dateRangeTo.isAfter(dateRangeFrom)) {
-                Iterator<Lesson> lessonIterator = oldLessonsGroups.getLessons().iterator();
-                while (lessonIterator.hasNext()) {
-                    Lesson lesson = lessonIterator.next();
-                    if (lesson.getStartDateTime().isAfter(dateRangeFrom) &&
-                            lesson.getStartDateTime().isBefore(dateRangeTo)) {
-                        deletedLessons.add(lesson.getId());
-                        lessonIterator.remove();
-                    }
-                }
-            }
-            //если дата конца диапазона редактирования группы больше даты начала последнего занятия,
-            //то нужно добавить занятия за период от даты начала последнего занятия плюс день по дату конца диапазона редактирования
-            dateRangeFrom = baseLesson.getStartDateTime().toLocalDate().plusDays(1).atTime(LocalTime.MIN);
-            dateRangeTo = editLessonsGroupsDtoIn.getDateRange().getTo().toLocalDate().atTime(LocalTime.MAX);
-            if (dateRangeFrom.isBefore(dateRangeTo)) {
-                DateTimeRange dateRange = new DateTimeRange(dateRangeFrom, dateRangeTo);
-                newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
-                        .stream()
-                        .map(id -> studentRepository.getIfExists(id))
-                        .collect(Collectors.toSet()));
-                Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
-                        editLessonsGroupsDtoIn.getSchedules(),
-                        dateRange,
-                        oldLessonsGroups,
-                        newStudents);
-                oldLessonsGroups.getLessons().addAll(lessons);
-            }
-            //если дата начала диапазона редактирования группы меньше даты начала первого занятия в группе,
-            //то нужно добавить занятия за период от даты начала диапазона редактирования по дату начала первого занятия минус один день
-            dateRangeFrom = editLessonsGroupsDtoIn.getDateRange().getFrom().toLocalDate().atTime(LocalTime.MIN);
-            dateRangeTo = oldLessonsGroups.getLessons()
-                    .stream()
-                    .min(Comparator.comparing(Lesson::getStartDateTime))
-                    .get()
-                    .getStartDateTime()
-                    .toLocalDate()
-                    .minusDays(1)
-                    .atTime(LocalTime.MAX);
-            if (dateRangeFrom.isBefore(dateRangeTo)) {
-                DateTimeRange dateRange = new DateTimeRange(dateRangeFrom, dateRangeTo);
-                newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
-                        .stream()
-                        .map(id -> studentRepository.getIfExists(id))
-                        .collect(Collectors.toSet()));
-                Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
-                        editLessonsGroupsDtoIn.getSchedules(),
-                        dateRange,
-                        oldLessonsGroups,
-                        newStudents);
-                oldLessonsGroups.getLessons().addAll(lessons);
-            }
-        } else {    //иначе (у группы занятий нет списка связанных с ней занятий)
-            //добавляем занятия за редактируемый период
-            newStudents = Objects.requireNonNullElseGet(newStudents, () -> editLessonsGroupsDtoIn.getStudents()
-                    .stream()
-                    .map(id -> studentRepository.getIfExists(id))
-                    .collect(Collectors.toSet()));
-            Set<Lesson> lessons = createSetOfLessons(editLessonsGroupsDtoIn,
-                    editLessonsGroupsDtoIn.getSchedules(),
-                    editLessonsGroupsDtoIn.getDateRange(),
-                    oldLessonsGroups,
-                    newStudents);
-            oldLessonsGroups.setLessons(lessons);
-        }
-        //удаляем лишние занятия
-        if (!deletedLessons.isEmpty()) {
-            lessonRepository.deleteByIdIn(deletedLessons);
         }
         //записываем измененную группу занятий
         lessonsGroupsRepository.save(oldLessonsGroups);
+    }
+
+    private void changeLessons(LessonsGroups lessonsGroups,
+                               LessonsGroupsDtoIn lessonsGroupsDtoIn,
+                               Set<Long> deletedLessons,
+                               List<Schedule> oldSchedules) {
+        //создаем объекты предмета и преподавателя, а также список студентов для проверки на эквивалентность
+        Subject subject = Subject.builder().setId(lessonsGroupsDtoIn.getSubjectId()).build();
+        Teacher teacher = Teacher.builder().setId(lessonsGroupsDtoIn.getTeacherId()).build();
+        Set<Student> newStudents = studentRepository.getAllByIdIn(lessonsGroupsDtoIn.getStudents());
+        //меняем только поля в занятиях
+        lessonsGroups.setFieldsIntoLessons(subject, teacher, newStudents, lessonsGroupsDtoIn.getDateRange());
+
+        //создаем список новых расписаний
+        List<Schedule> newSchedules = new ArrayList<>(lessonsGroupsDtoIn.getSchedules());
+
+        //создаем список расписаний, которые есть в обоих списках расписаний: старом (который в БД) и новом (который пришел с UI)
+        List<Schedule> schedulesInBothLists = oldSchedules.stream()
+                .filter(newSchedules::contains)
+                .toList();
+        //создаем список дат занятий, которые не нужно менять в рамках изменений расписаний и диапазона дат
+        List<LocalDateTime> listOfUnchangedLessons = new ArrayList<>();
+        //создаем диапазон дат, в котором не нужно менять занятия
+        DateTimeRange dateRange = dateRangeForUnchangedLessons(lessonsGroups.dateRangeOfLessons(), lessonsGroupsDtoIn.getDateRange());
+        //заполняем список
+        if (!schedulesInBothLists.isEmpty()) {
+            for (Schedule schedule: schedulesInBothLists) {
+                listOfUnchangedLessons.addAll(schedule.createListOfDate(dateRange));
+            }
+        }
+        //создаем локальный класс для хранения данных: дата начала занятия и продолжительность занятия
+        class DateAndDuration {
+            LocalDateTime date;
+            short duration;
+
+            DateAndDuration(LocalDateTime date, short duration) {
+                this.date = date;
+                this.duration = duration;
+            }
+        }
+        //создаем список новых дней, которые нужно добавить или на которые нужно изменить занятия
+        List<DateAndDuration> listOfDaysNewSchedules = new ArrayList<>();
+        //заполняем этот список
+        for (Schedule schedule : newSchedules) {
+            listOfDaysNewSchedules.addAll(schedule
+                    .createListOfDate(lessonsGroupsDtoIn.getDateRange())
+                    .stream()
+                    .map(date -> new DateAndDuration(date, schedule.getDuration()))
+                    .toList());
+        }
+        //убираем дни, которые не нужно менять
+        listOfDaysNewSchedules.removeIf(day -> listOfUnchangedLessons.contains(day.date));
+        //нижняя граница даты редактирования занятий (сегодня или начало диапазона редактирования)
+        LocalDateTime dateOfRedaction = lessonsGroupsDtoIn.getDateRange().getFrom().isBefore(LocalDateTime.now()) ?
+                lessonsGroupsDtoIn.getDateRange().getFrom() : LocalDateTime.now();
+        dateOfRedaction = dateOfRedaction.toLocalDate().atTime(LocalTime.MIN);
+        //перебираем занятия
+        Iterator<Lesson> lessonIterator = lessonsGroups.getLessons().iterator();
+        while (lessonIterator.hasNext()) {
+            Lesson lesson = lessonIterator.next();
+            //отбираем только те занятия, у которых дата начала после нижней границы редактирования занятий
+            if (lesson.getStartDateTime().isAfter(dateOfRedaction)) {
+                //если даты начала занятия нету в списке дат занятий, которые не нужно менять
+                if (!listOfUnchangedLessons.contains(lesson.getStartDateTime())) {
+                    //если список новых дней непустой
+                    if (!listOfDaysNewSchedules.isEmpty()) {
+                        //меняем дату начала и продолжительность занятия на новые значения
+                        lesson.setStartDateTime(listOfDaysNewSchedules.get(0).date);
+                        lesson.setDuration(listOfDaysNewSchedules.get(0).duration);
+                        //удаляем отработанный объект из списка
+                        listOfDaysNewSchedules.remove(0);
+                    } else {
+                        //если список новых дат уже пустой, а занятия еще есть, то эти занятия нужно удалить
+                        deletedLessons.add(lesson.getId());
+                        lessonIterator.remove();
+                    }
+                }
+            }
+        }
+        //если после замен остались даты занятий, которые нужно добавить, то создаем занятия и добавляем в список
+        if (!listOfDaysNewSchedules.isEmpty()) {
+            for (DateAndDuration dateAndDuration: listOfDaysNewSchedules) {
+                //создаем занятие
+                Lesson lesson = Lesson.builder()
+                        .setId(0)
+                        .setStartDateTime(dateAndDuration.date)
+                        .setDuration(dateAndDuration.duration)
+                        .setSubject(subject)
+                        .setTeacher(teacher)
+                        .setGroup(lessonsGroups)
+                        .setStudents(newStudents)
+                        .build();
+                //добавляем в список группы
+                lessonsGroups.getLessons().add(lesson);
+            }
+        }
+    }
+
+    //метод возращает диапазон дат для занятий, которые не должны редактироваться
+    //начало диапазона: большее из даты начала диапазона редактирования группы и даты первого занятия в группе
+    //конец диапазона: меньшее из даты конца диапазона редактирования группы и даты последнего занятия
+    private DateTimeRange dateRangeForUnchangedLessons(DateTimeRange dateRangeOfGroup, DateTimeRange dateRangeDto) {
+        if (dateRangeOfGroup == null) {
+            return dateRangeDto;
+        } else {
+            return new DateTimeRange(dateRangeOfGroup.getFrom().isAfter(dateRangeDto.getFrom()) ? dateRangeOfGroup.getFrom() : dateRangeDto.getFrom(),
+                    dateRangeOfGroup.getTo().isBefore(dateRangeDto.getTo()) ? dateRangeOfGroup.getTo() : dateRangeDto.getTo());
+        }
     }
 
     //метод для создания списка зантяий
@@ -402,15 +319,15 @@ public class LessonsGroupsService {
             for (int i = 0; i < schedules.size(); i++) {
                 Schedule schedule = schedules.get(i);
                 if (schedule.getDayOfWeek() < 1 || schedule.getDayOfWeek() > 7) {
-                    validationException.put("dayOfWeek:" + (i + 1), "Номер дня недели должен быть от 1 до 7 включительно.");
+                    validationException.put("dayOfWeek:" + i, "Номер дня недели должен быть от 1 до 7 включительно.");
                 }
                 if (schedule.getTimeOfStart() == null) {
-                    validationException.put("timeOfStart:" + (i + 1), "Время начала занятия не должно быть пустым.");
+                    validationException.put("timeOfStart:" + i, "Время начала занятия не должно быть пустым.");
                 } else if (!schedule.getTimeOfStart().matches("([01][0-9]|2[0-3]):[0-5][0-9]")) {
-                    validationException.put("timeOfStart:" + (i + 1), "Время начала занятия не соответствует формату чч:мм.");
+                    validationException.put("timeOfStart:" + i, "Время начала занятия не соответствует формату чч:мм.");
                 }
                 if (schedule.getDuration() < 30 || schedule.getDuration() > 210) {
-                    validationException.put("duration:" + (i + 1), "Продолжительность занятия должна быть в пределах от 30 до 210 минут.");
+                    validationException.put("duration:" + i, "Продолжительность занятия должна быть в пределах от 30 до 210 минут.");
                 }
             }
         } else {

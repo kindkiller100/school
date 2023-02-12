@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.school.school.lessons_groups.LessonsGroups;
@@ -164,9 +165,9 @@ public class Lesson
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Lesson lesson = (Lesson) o;
-        return (id == lesson.id) &
-                ((teacher != null ? teacher.getId() : 0) == (lesson.teacher != null ? lesson.teacher.getId() : 0)) &
-                ((subject != null ? subject.getId() : 0) == (lesson.subject != null ? lesson.subject.getId() : 0)) &
+        return (id == lesson.id) &&
+                ((teacher != null ? teacher.getId() : 0) == (lesson.teacher != null ? lesson.teacher.getId() : 0)) &&
+                ((subject != null ? subject.getId() : 0) == (lesson.subject != null ? lesson.subject.getId() : 0)) &&
                 (Objects.equals(startDateTime, lesson.getStartDateTime()));
     }
 
@@ -196,6 +197,33 @@ public class Lesson
             '}';
     }
 
+    //метод пирнимает объекты предмета, преподавателя и список студентов и изменяет соответствующие поля объекта Lesson
+    public void setIfNotEquals(Subject subject, Teacher teacher, Set<Student> students) {
+        if ((subject != null ? subject.getId() : 0) != (this.subject != null ? this.subject.getId() : 0)) {
+            this.subject = subject;
+        }
+        if ((teacher != null ? teacher.getId() : 0) != (this.teacher != null ? this.teacher.getId() : 0)) {
+            this.teacher = teacher;
+        }
+        if (!Objects.equals(students, this.students)) {
+            changeStudents(students);
+        }
+    }
+
+    //метод изменяет студентов объекта Lesson на студентов из принимаемого параметра
+    private void changeStudents(Set<Student> newStudents) {
+        //очищаем старый список
+        this.students.clear();
+        //добавляем новый
+        this.students.addAll(newStudents);
+    }
+
+    //метод проверяет эквивалентность полей Lesson с параметрами
+    public boolean checkEqualsFields(long subjectId, long teacherId, Set<Long> studentsId) {
+        return (subject != null ? subject.getId() : 0) == subjectId &&
+                (teacher != null ? teacher.getId() : 0) == teacherId &&
+                Objects.equals(students != null ? students.stream().map(Student::getId).collect(Collectors.toSet()) : null, studentsId);
+    }
 
     public Builder clone()
     {

@@ -109,10 +109,6 @@ public class Student {
         return deleted;
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public Builder clone() {
         return new Student.Builder()
                 .setId(this.id)

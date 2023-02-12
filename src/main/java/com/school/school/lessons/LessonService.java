@@ -1,6 +1,7 @@
 package com.school.school.lessons;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.lessons_groups.LessonsGroupsRepository;
 import com.school.school.students.StudentRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
@@ -24,6 +25,8 @@ public class LessonService {
     private TeacherRepository teacherRepository;
     @Autowired
     private SubjectRepository subjectRepository;
+    @Autowired
+    private LessonsGroupsRepository lessonsGroupsRepository;
 
     //получить все занятия
     public Page<Lesson> list(Pageable pageable){
@@ -150,8 +153,8 @@ public class LessonService {
             validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
         }
         //проверка группы занятий
-        if (lesson.getGroup() != null && lesson.getGroup().getId() < 1) {
-            validationException.put("group", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
+        if (lesson.getGroup() != null && !lessonsGroupsRepository.existsById(lesson.getGroup().getId())) {
+            validationException.put("group", "Группа занятий с id «" + lesson.getGroup().getId() + "» не найден.");
         }
 
         validationException.throwExceptionIfIsNotEmpty();
