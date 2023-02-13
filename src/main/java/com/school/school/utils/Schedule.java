@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Schedule {
     //день недели (1...7)
@@ -47,6 +48,19 @@ public class Schedule {
             list.add(Schedule.convertToSchedule(s));
         }
         return list;
+    }
+
+    public static String createStringOfSchedules(List<Schedule> schedules) {
+        String str = new String();
+        if (schedules == null) {
+            return str;
+        }
+        if (schedules.size() > 0) {
+            str = schedules.stream()
+                    .map(Schedule::convertToString)
+                    .collect(Collectors.joining(";"));
+        }
+        return str;
     }
 
     public Schedule() {}

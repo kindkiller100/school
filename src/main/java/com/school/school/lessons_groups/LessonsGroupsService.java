@@ -53,7 +53,7 @@ public class LessonsGroupsService {
         LessonsGroups lessonsGroups = LessonsGroups.builder()
                 .setId(0)
                 .setTitle(lessonsGroupsDtoIn.getLessonsGroupTitle())
-                .setSchedule(lessonsGroupsDtoIn.createStringOfSchedules())
+                .setSchedule(Schedule.createStringOfSchedules(lessonsGroupsDtoIn.getSchedules()))
                 .setLessons(null)
                 .build();
         //создаем список студентов
@@ -76,22 +76,6 @@ public class LessonsGroupsService {
         validateLessonsGroupsDtoIn(editLessonsGroupsDtoIn, true);
         //получаем редактируемый объект LessonsGroups из БД, чтобы в нем установить изменения и сохранить этот объект обратно в БД
         LessonsGroups oldLessonsGroups = lessonsGroupsRepository.getIfExists(editLessonsGroupsDtoIn.getLessonsGroupId());
-        //проверяем совпадение названия
-        if (!oldLessonsGroups.getTitle().equals(editLessonsGroupsDtoIn.getLessonsGroupTitle())) {
-            oldLessonsGroups.setTitle(editLessonsGroupsDtoIn.getLessonsGroupTitle());
-        }
-        //конвертируем строку расписания в список объектов
-        List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(oldLessonsGroups.getSchedule());
-        //сортируем старый список расписаний по дням недели
-        oldSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
-        //создаем список новых расписаний
-        List<Schedule> newSchedules = new ArrayList<>(editLessonsGroupsDtoIn.getSchedules());
-        //сортируем новый список расписаний по дням недели
-        newSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
-        //проверяем совпадение расписаний
-        if (!Objects.equals(oldSchedules, newSchedules)) {
-            oldLessonsGroups.setSchedule(editLessonsGroupsDtoIn.createStringOfSchedules());
-        }
 
         //проверяем поля в группе занятий и связанных с ним занятиях
         Boolean checkFieldsLessonGroups = oldLessonsGroups.checkFields(editLessonsGroupsDtoIn);
@@ -106,20 +90,21 @@ public class LessonsGroupsService {
             //создаем список занятий, которые нужно удалить
             Set<Long> deletedLessons = new HashSet<>();
             //меняем расписания, диапазон занятий и пеля в занятиях
-            changeLessons(oldLessonsGroups, editLessonsGroupsDtoIn, deletedLessons, oldSchedules);
+            changeLessons(oldLessonsGroups, editLessonsGroupsDtoIn, deletedLessons);
             //удаляем лишние занятия
             if (!deletedLessons.isEmpty()) {
                 lessonRepository.deleteByIdIn(deletedLessons);
             }
         }
+        //меняем название и список расписаний в группе если нужно
+        oldLessonsGroups.setIfNotEquals(editLessonsGroupsDtoIn.getLessonsGroupTitle(), editLessonsGroupsDtoIn.getSchedules());
         //записываем измененную группу занятий
         lessonsGroupsRepository.save(oldLessonsGroups);
     }
 
     private void changeLessons(LessonsGroups lessonsGroups,
                                LessonsGroupsDtoIn lessonsGroupsDtoIn,
-                               Set<Long> deletedLessons,
-                               List<Schedule> oldSchedules) {
+                               Set<Long> deletedLessons) {
         //создаем объекты предмета и преподавателя, а также список студентов для проверки на эквивалентность
         Subject subject = Subject.builder().setId(lessonsGroupsDtoIn.getSubjectId()).build();
         Teacher teacher = Teacher.builder().setId(lessonsGroupsDtoIn.getTeacherId()).build();
@@ -129,6 +114,8 @@ public class LessonsGroupsService {
 
         //создаем список новых расписаний
         List<Schedule> newSchedules = new ArrayList<>(lessonsGroupsDtoIn.getSchedules());
+        //конвертируем строку расписания в список объектов
+        List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(lessonsGroups.getSchedule());
 
         //создаем список расписаний, которые есть в обоих списках расписаний: старом (который в БД) и новом (который пришел с UI)
         List<Schedule> schedulesInBothLists = oldSchedules.stream()

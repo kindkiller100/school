@@ -172,6 +172,23 @@ public class LessonsGroups {
                 .forEach(lesson -> lesson.setIfNotEquals(subject, teacher, students));
     }
 
+    public void setIfNotEquals(String title, List<Schedule> newSchedules) {
+        //проверяем совпадение названия
+        if (!Objects.equals(title, this.title)) {
+            this.title = title;
+        }
+        //конвертируем строку расписания в список объектов
+        List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(schedule);
+        //сортируем старый список расписаний по дням недели
+        oldSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
+        //сортируем новый список расписаний по дням недели
+        newSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
+        //проверяем совпадение расписаний
+        if (!Objects.equals(oldSchedules, newSchedules)) {
+            this.schedule = Schedule.createStringOfSchedules(newSchedules);
+        }
+    }
+
     public Builder clone() {
         return new LessonsGroups.Builder()
                 .setId(this.id)

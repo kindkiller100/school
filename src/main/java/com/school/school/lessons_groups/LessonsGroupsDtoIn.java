@@ -91,17 +91,4 @@ public class LessonsGroupsDtoIn {
     public void setSchedules(List<Schedule> schedules) {
         this.schedules = schedules;
     }
-
-    public String createStringOfSchedules() {
-        String str = new String();
-        if (schedules == null) {
-            return str;
-        }
-        if (schedules.size() > 0) {
-            str = schedules.stream()
-                    .map(Schedule::convertToString)
-                    .collect(Collectors.joining(";"));
-        }
-        return str;
-    }
 }
