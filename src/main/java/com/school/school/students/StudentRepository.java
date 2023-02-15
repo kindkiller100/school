@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 
+
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, CustomRepository<Student> {
 
@@ -24,8 +25,12 @@ public interface StudentRepository extends JpaRepository<Student, Long>, CustomR
             , nativeQuery = true)
     Page<Student> findAllByFilter(String like, Pageable pageable);
 
-    @Query(value ="SELECT * FROM school_db.students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
+    @Query(value = "SELECT * FROM school_db.students WHERE dateofbirth >= ?1 AND dateofbirth <= ?2", nativeQuery = true)
     Page<Student> findAllByDateOfBirthRange(LocalDate fromDate, LocalDate uptoDate, Pageable pageable);
 
+    @Query(value = "SELECT * FROM school_db.students WHERE id IN " +
+            "(SELECT student_id FROM school_db.students_groups_students WHERE group_id = ?1)"
+            , nativeQuery = true)
+    Page<Student> getAllStudentsInGroup(long id, Pageable pageable);
 
 }
