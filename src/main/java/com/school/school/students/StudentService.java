@@ -1,6 +1,9 @@
 package com.school.school.students;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.lessons.LessonRepository;
+import com.school.school.payments.PaymentRepository;
+import com.school.school.students_groups.StudentsGroupRepository;
 import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
