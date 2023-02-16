@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class LessonService {
@@ -114,6 +116,17 @@ public class LessonService {
         validate(editLesson, true);
         //сохраняем запись с измененными данными в БД
         repository.save(editLesson);
+    }
+
+    //TODO: add transactional
+    public void clearGroupIdBeforeDateTime(long groupId, LocalDateTime dateTime) {
+        List<Lesson> lessons = repository.findLessonByGroupIdAndStartDateTimeBefore(groupId, dateTime);
+
+        lessons.forEach(lesson -> repository.save(lesson.clone().setGroupId(null).build()));
+    }
+
+    public void deleteAllByGroupIdAndStartDateTimeAfter(long groupId, LocalDateTime startDateTime) {
+        repository.deleteAllByGroupIdAndStartDateTimeAfter(groupId, startDateTime);
     }
 
     private void validate(Lesson lesson, boolean editFlag) {
