@@ -90,6 +90,7 @@ public class LessonsGroupsService {
             //создаем список занятий, которые нужно удалить
             Set<Long> deletedLessons = new HashSet<>();
             //меняем расписания, диапазон занятий и пеля в занятиях
+            //TODO: makes changeLessons returns deletedLessons, instead of mutation
             changeLessons(oldLessonsGroups, editLessonsGroupsDtoIn, deletedLessons);
             //удаляем лишние занятия
             if (!deletedLessons.isEmpty()) {
@@ -102,33 +103,34 @@ public class LessonsGroupsService {
         lessonsGroupsRepository.save(oldLessonsGroups);
     }
 
-    private void changeLessons(LessonsGroups lessonsGroups,
-                               LessonsGroupsDtoIn lessonsGroupsDtoIn,
+    private void changeLessons(LessonsGroups oldGroup,
+                               LessonsGroupsDtoIn newGroup,
                                Set<Long> deletedLessons) {
+        //TODO: удалить отсюда, переисползовать код снаружи (место вызоыв этого метода)
         //создаем объекты предмета и преподавателя, а также список студентов для проверки на эквивалентность
-        Subject subject = Subject.builder().setId(lessonsGroupsDtoIn.getSubjectId()).build();
-        Teacher teacher = Teacher.builder().setId(lessonsGroupsDtoIn.getTeacherId()).build();
-        Set<Student> newStudents = studentRepository.getAllByIdIn(lessonsGroupsDtoIn.getStudents());
+        Subject subject = Subject.builder().setId(newGroup.getSubjectId()).build();
+        Teacher teacher = Teacher.builder().setId(newGroup.getTeacherId()).build();
+        Set<Student> newStudents = studentRepository.getAllByIdIn(newGroup.getStudents());
         //меняем только поля в занятиях
-        lessonsGroups.setFieldsIntoLessons(subject, teacher, newStudents, lessonsGroupsDtoIn.getDateRange());
-
+        oldGroup.setFieldsIntoLessons(subject, teacher, newStudents, newGroup.getDateRange());
+        //TODO
         //создаем список новых расписаний
-        List<Schedule> newSchedules = new ArrayList<>(lessonsGroupsDtoIn.getSchedules());
+        List<Schedule> newSchedules = newGroup.getSchedules();
         //конвертируем строку расписания в список объектов
-        List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(lessonsGroups.getSchedule());
+        List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(oldGroup.getSchedule());
 
         //создаем список расписаний, которые есть в обоих списках расписаний: старом (который в БД) и новом (который пришел с UI)
         List<Schedule> schedulesInBothLists = oldSchedules.stream()
                 .filter(newSchedules::contains)
                 .toList();
         //создаем список дат занятий, которые не нужно менять в рамках изменений расписаний и диапазона дат
-        List<LocalDateTime> listOfUnchangedLessons = new ArrayList<>();
+        List<LocalDateTime> listOfUnchangedLessonsDates = new ArrayList<>();
         //создаем диапазон дат, в котором не нужно менять занятия
-        DateTimeRange dateRange = dateRangeForUnchangedLessons(lessonsGroups.dateRangeOfLessons(), lessonsGroupsDtoIn.getDateRange());
+        DateTimeRange dateRange = dateRangeForUnchangedLessons(oldGroup.dateRangeOfLessons(), newGroup.getDateRange());
         //заполняем список
         if (!schedulesInBothLists.isEmpty() && dateRange.isValid()) {
             for (Schedule schedule: schedulesInBothLists) {
-                listOfUnchangedLessons.addAll(schedule.createListOfDate(dateRange));
+                listOfUnchangedLessonsDates.addAll(schedule.createListOfDate(dateRange));
             }
         }
         //создаем локальный класс для хранения данных: дата начала занятия и продолжительность занятия
@@ -146,25 +148,25 @@ public class LessonsGroupsService {
         //заполняем этот список
         for (Schedule schedule : newSchedules) {
             listOfDaysNewSchedules.addAll(schedule
-                    .createListOfDate(lessonsGroupsDtoIn.getDateRange())
+                    .createListOfDate(newGroup.getDateRange())
                     .stream()
                     .map(date -> new DateAndDuration(date, schedule.getDuration()))
                     .toList());
         }
         //убираем дни, которые не нужно менять
-        listOfDaysNewSchedules.removeIf(day -> listOfUnchangedLessons.contains(day.date));
+        listOfDaysNewSchedules.removeIf(day -> listOfUnchangedLessonsDates.contains(day.date));
         //нижняя граница даты редактирования занятий (сегодня или начало диапазона редактирования)
-        LocalDateTime dateOfRedaction = lessonsGroupsDtoIn.getDateRange().getFrom().isBefore(LocalDateTime.now()) ?
-                lessonsGroupsDtoIn.getDateRange().getFrom() : LocalDateTime.now();
-        dateOfRedaction = dateOfRedaction.toLocalDate().atTime(LocalTime.MIN);
+        //TODO: добавить статические методы в DateTimeRange по поиску мин и макс дат из двух
+        LocalDateTime dateOfRedaction = newGroup.getDateRange().getFrom().isBefore(LocalDateTime.now()) ?
+                newGroup.getDateRange().getFrom() : LocalDateTime.now();
         //перебираем занятия
-        Iterator<Lesson> lessonIterator = lessonsGroups.getLessons().iterator();
+        Iterator<Lesson> lessonIterator = oldGroup.getLessons().iterator();
         while (lessonIterator.hasNext()) {
             Lesson lesson = lessonIterator.next();
             //отбираем только те занятия, у которых дата начала после нижней границы редактирования занятий
             if (lesson.getStartDateTime().isAfter(dateOfRedaction)) {
                 //если даты начала занятия нету в списке дат занятий, которые не нужно менять
-                if (!listOfUnchangedLessons.contains(lesson.getStartDateTime())) {
+                if (!listOfUnchangedLessonsDates.contains(lesson.getStartDateTime())) {
                     //если список новых дней непустой
                     if (!listOfDaysNewSchedules.isEmpty()) {
                         //меняем дату начала и продолжительность занятия на новые значения
@@ -191,11 +193,11 @@ public class LessonsGroupsService {
                         .setDuration(dateAndDuration.duration)
                         .setSubject(subject)
                         .setTeacher(teacher)
-                        .setGroup(lessonsGroups)
+                        .setGroup(oldGroup)
                         .setStudents(newStudents)
                         .build();
                 //добавляем в список группы
-                lessonsGroups.getLessons().add(lesson);
+                oldGroup.getLessons().add(lesson);
             }
         }
     }
@@ -203,12 +205,12 @@ public class LessonsGroupsService {
     //метод возращает диапазон дат для занятий, которые не должны редактироваться
     //начало диапазона: большее из даты начала диапазона редактирования группы и даты первого занятия в группе
     //конец диапазона: меньшее из даты конца диапазона редактирования группы и даты последнего занятия
-    private DateTimeRange dateRangeForUnchangedLessons(DateTimeRange dateRangeOfGroup, DateTimeRange dateRangeDto) {
-        if (dateRangeOfGroup == null) {
-            return dateRangeDto;
+    private DateTimeRange dateRangeForUnchangedLessons(DateTimeRange oldDateRange, DateTimeRange newDateRange) {
+        if (oldDateRange == null) {
+            return newDateRange;
         } else {
-            return new DateTimeRange(dateRangeOfGroup.getFrom().isAfter(dateRangeDto.getFrom()) ? dateRangeOfGroup.getFrom() : dateRangeDto.getFrom(),
-                    dateRangeOfGroup.getTo().isBefore(dateRangeDto.getTo()) ? dateRangeOfGroup.getTo() : dateRangeDto.getTo());
+            return new DateTimeRange(oldDateRange.getFrom().isAfter(newDateRange.getFrom()) ? oldDateRange.getFrom() : newDateRange.getFrom(),
+                    oldDateRange.getTo().isBefore(newDateRange.getTo()) ? oldDateRange.getTo() : newDateRange.getTo());
         }
     }
 
@@ -257,7 +259,6 @@ public class LessonsGroupsService {
 
     private void validateLessonsGroupsDtoIn(LessonsGroupsDtoIn lessonsGroupsDtoIn, boolean editFlag) {
         ValidationException validationException = new ValidationException();
-        //TODO: если объекты = null тоже ругаться. Без них не создать всех записей.
         if (editFlag) {
             if (!lessonsGroupsRepository.existsById(lessonsGroupsDtoIn.getLessonsGroupId())) {
                 validationException.put("lessonsGroupId", "Группа занятий с id «" + lessonsGroupsDtoIn.getLessonsGroupId() + "» не найдена.");
@@ -302,7 +303,7 @@ public class LessonsGroupsService {
             validationException.put("dateRange", "Не удалось создать объект диапазона дат.");
         }
         //TODO: task 87 перенести валидацию в класс Schedule
-        if (lessonsGroupsDtoIn.getSchedules() != null) {
+        if (lessonsGroupsDtoIn.getSchedules() != null && !lessonsGroupsDtoIn.getSchedules().isEmpty()) {
             ArrayList<Schedule> schedules = (ArrayList<Schedule>) lessonsGroupsDtoIn.getSchedules();
             for (int i = 0; i < schedules.size(); i++) {
                 Schedule schedule = schedules.get(i);
@@ -319,7 +320,7 @@ public class LessonsGroupsService {
                 }
             }
         } else {
-            validationException.put("schedules", "Не удалось создать объект писка расписаний.");
+            validationException.put("schedules", "Не удалось создать объект списка расписаний.");
         }
         validationException.throwExceptionIfIsNotEmpty();
     }

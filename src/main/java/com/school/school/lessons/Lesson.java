@@ -3,6 +3,7 @@ package com.school.school.lessons;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -220,7 +221,7 @@ public class Lesson
 
     //метод проверяет эквивалентность полей Lesson с параметрами
     public boolean checkEqualsFields(long subjectId, long teacherId, Set<Long> studentsId) {
-        return (subject != null ? subject.getId() : 0) == subjectId &&
+        return Optional.of( subject ).map( Subject::getId ).orElse( 0L ) == subjectId &&
                 (teacher != null ? teacher.getId() : 0) == teacherId &&
                 Objects.equals(students != null ? students.stream().map(Student::getId).collect(Collectors.toSet()) : null, studentsId);
     }
