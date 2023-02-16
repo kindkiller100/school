@@ -43,8 +43,7 @@ public class SubjectService {
             validationException.put("id", "Предмет с id «" + id + "» уже существует.");
         }
 
-        if (repository.existsByTitleAndDeletedFalse(title) ) {
-        if (repository.existsByTitle(title)) {
+        if (repository.existsByTitleAndDeletedFalse(title)) {
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
@@ -92,10 +91,12 @@ public class SubjectService {
 
         repository.save(subjectClone);
     }
-//удаляет все subject с deleted == true,
-// на которые нет ссылок в связанной таблице lessons
-     public void wipe() {
-     repository.findAllByDeletedIsTrue(null).stream()
-        .filter(subject -> !lessonRepository.existsBySubjectId(subject.getId()))
-        .forEach(subject -> repository.deleteById(subject.getId()));
+
+    //удаляет все subject с deleted == true,
+    // на которые нет ссылок в связанной таблице lessons
+    public void wipe() {
+        repository.findAllByDeletedIsTrue(null).stream()
+                .filter(subject -> !lessonRepository.existsBySubjectId(subject.getId()))
+                .forEach(subject -> repository.deleteById(subject.getId()));
+    }
 }
