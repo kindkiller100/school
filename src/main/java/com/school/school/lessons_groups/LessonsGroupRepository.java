@@ -1,9 +1,9 @@
-package com.school.school.groups;
+package com.school.school.lessons_groups;
 
 import com.school.school.CustomRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface GroupRepository extends JpaRepository<Group, Long>, CustomRepository<Group> {
+public interface LessonsGroupRepository extends JpaRepository<LessonsGroup, Long>, CustomRepository<LessonsGroup> {
 }

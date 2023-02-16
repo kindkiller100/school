@@ -2,14 +2,18 @@ package com.school.school.lessons_groups;
 
 import com.school.school.utils.CorrectSchedule;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
 @Table(name = "lessons_groups", schema="school_db")
-public class LessonsGroups {
+public class LessonsGroup {
     //id группы занятий
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,11 +27,11 @@ public class LessonsGroups {
     private String schedule;
 
     //конструктор без параметров
-    protected LessonsGroups() {
+    protected LessonsGroup() {
     }
 
     //конструктор со всеми параметрами
-    public LessonsGroups(long id, String title, String schedule) {
+    private LessonsGroup(long id, String title, String schedule) {
         this.id = id;
         this.title = title;
         this.schedule = schedule;
@@ -50,7 +54,7 @@ public class LessonsGroups {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LessonsGroups that = (LessonsGroups) o;
+        LessonsGroup that = (LessonsGroup) o;
         return id == that.id;
     }
 
@@ -71,10 +75,14 @@ public class LessonsGroups {
     }
 
     public Builder clone() {
-        return new LessonsGroups.Builder()
+        return new LessonsGroup.Builder()
                 .setId(this.id)
                 .setTitle(this.title)
                 .setSchedule(this.schedule);
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
@@ -97,8 +105,8 @@ public class LessonsGroups {
             return this;
         }
 
-        public LessonsGroups build() {
-            return new LessonsGroups(id, title, schedule);
+        public LessonsGroup build() {
+            return new LessonsGroup(id, title, schedule);
         }
     }
 }

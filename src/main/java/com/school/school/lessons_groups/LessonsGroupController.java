@@ -1,48 +1,43 @@
-package com.school.school.groups;
+package com.school.school.lessons_groups;
 
-import com.school.school.students.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/groups")
-public class GroupController {
+@RequestMapping("/lessons_groups")
+public class LessonsGroupController {
     @Autowired
-    GroupService service;
+    private LessonsGroupService service;
 
-    @GetMapping("/{id}/students")
-    public Page<Student> getAllStudentsInGroup(@PathVariable long id, Pageable pageable){
-        return service.getAllStudentsInGroup(id, pageable);
-    }
     @GetMapping
-    public Page<Group> getAll(Pageable pageable) {
-        return service.getAll(pageable);
+    public Page<LessonsGroup> list(Pageable pageable) {
+        return service.list(pageable);
+    }
+
+    @GetMapping("/{id}")
+    public LessonsGroup getById(@PathVariable long id) {
+        return service.getIfExists(id);
     }
 
     @PostMapping
-    public void create(@Valid @RequestBody Group group) {
-        service.create(group);
+    public void create(@Valid @RequestBody LessonsGroup lessonsGroup) {
+        service.create(lessonsGroup);
     }
 
     @PutMapping
-    public void edit(@Valid @RequestBody Group group) {
-        service.edit(group);
+    public void edit(@Valid @RequestBody LessonsGroup lessonsGroup) {
+        service.edit(lessonsGroup);
     }
 
     @DeleteMapping("/{id}")
