@@ -4,44 +4,34 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.school.school.exceptions.ValidationException;
 import org.webjars.NotFoundException;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
-public class DateTimeRange {
+public class DateRange {
     //сообщение об ошибке диапазона дат
     public static final String ERR_STRING = "Указан недопустимый диапазон дат. Дата окончания диапазона больше, чем дата начала диапазона.";
-    @NotNull(message = "Начало диапазона не должно быть пустым")
-    private LocalDateTime from;
-    @NotNull(message = "Конец диапазона не должен быть пустым")
-    private LocalDateTime to;
+    private LocalDate from;
+    private LocalDate to;
 
-    public DateTimeRange(){}
+    public DateRange(){}
 
-    public DateTimeRange(LocalDate from, LocalDate to) {
-        this.from = LocalDateTime.of(from, LocalTime.MIN);
-        this.to = LocalDateTime.of(to, LocalTime.MAX);
-    }
-
-    public DateTimeRange(LocalDateTime from, LocalDateTime to) {
+    public DateRange(LocalDate from, LocalDate to) {
         this.from = from;
         this.to = to;
     }
 
-    public LocalDateTime getFrom() {
+    public LocalDate getFrom() {
         return from;
     }
 
-    public void setFrom(LocalDateTime from) {
+    public void setFrom(LocalDate from) {
         this.from = from;
     }
 
-    public LocalDateTime getTo() {
+    public LocalDate getTo() {
         return to;
     }
 
-    public void setTo(LocalDateTime to) {
+    public void setTo(LocalDate to) {
         this.to = to;
     }
 
@@ -57,7 +47,7 @@ public class DateTimeRange {
     public void validateOrThrow() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         if(!isValid()) {
-            throw new NotFoundException(DateTimeRange.ERR_STRING);
+            throw new NotFoundException(DateRange.ERR_STRING);
         }
     }
 
@@ -66,12 +56,12 @@ public class DateTimeRange {
         ValidationException validationException = new ValidationException();
         //проверка, что начало и конец диапазона не null
         if(this.from == null | this.to == null){
-            validationException.put("date_time_range", "Начало и конец диапазона не должны быть пустыми");
+            validationException.put("date_range", "Начало и конец диапазона не должны быть пустыми");
             return validationException;
         }
         //проверка, что начало диапазона меньше или равно конца диапазона
         if(this.from.isAfter(this.to)) {
-            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
+            validationException.put("date_range", DateRange.ERR_STRING);
         }
         return validationException;
     }

@@ -7,11 +7,11 @@ public class LessonsCalculationsDtoIn {
     @Min(value = 0, message = "Должно быть больше 0")
     private long id;    //id (студента/преподавателя)
     @CorrectDateTimeRange(message = "Одна или обе даты пусты.")
-    private DateTimeRange dateTimeRange;    //диапазона дат
+    private DateRange dateRange;    //диапазона дат
 
-    public LessonsCalculationsDtoIn(long id, DateTimeRange dateTimeRange) {
+    public LessonsCalculationsDtoIn(long id, DateRange dateRange) {
         this.id = id;
-        this.dateTimeRange = dateTimeRange;
+        this.dateRange = dateRange;
     }
 
     public long getId() {
@@ -22,11 +22,11 @@ public class LessonsCalculationsDtoIn {
         this.id = id;
     }
 
-    public DateTimeRange getDateTimeRange() {
-        return dateTimeRange;
+    public DateRange getDateTimeRange() {
+        return dateRange;
     }
 
-    public void setDateTimeRange(DateTimeRange dateTimeRange) {
-        this.dateTimeRange = dateTimeRange;
+    public void setDateTimeRange(DateRange dateRange) {
+        this.dateRange = dateRange;
     }
 }

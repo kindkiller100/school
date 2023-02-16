@@ -4,7 +4,7 @@ import com.school.school.exceptions.ValidationException;
 import com.school.school.students.StudentRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
-import com.school.school.utils.DateTimeRange;
+import com.school.school.utils.DateRange;
 import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,7 +39,7 @@ public class LessonService {
     }
 
     //получить все занятия из диапазона дат
-    public Page<Lesson> getAllInDateRange(DateTimeRange dateRange, Pageable pageable){
+    public Page<Lesson> getAllInDateRange(DateRange dateRange, Pageable pageable){
         ValidationException validationException = new ValidationException();
         validationException.put(PageableValidator.sortValid(Lesson.class, pageable));
         validationException.put(dateRange.validate());
@@ -61,7 +61,7 @@ public class LessonService {
     }
 
     //количество часов занятий, проведенных преподавателем за период
-    public double countHoursOfLessonsByTeacherInRange(long id, DateTimeRange dateTimeRange) {
+    public double countHoursOfLessonsByTeacherInRange(long id, DateRange dateRange) {
         ValidationException validationException = new ValidationException();
 
         //проверяем, что записть с таким Id существует
@@ -69,16 +69,16 @@ public class LessonService {
             validationException.put("id", "Преподаватель с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        validationException.put(dateTimeRange.validate());
+        validationException.put(dateRange.validate());
 
         validationException.throwExceptionIfIsNotEmpty();
 
         //получаем количество минут занятий, проведенных преподавателем за период, и переводим в часы
-        return repository.countDurationOfLessonsByTeacherInRange(id, dateTimeRange.getFrom(), dateTimeRange.getTo())/60d;
+        return repository.countDurationOfLessonsByTeacherInRange(id, dateRange.getFrom(), dateRange.getTo())/60d;
     }
 
     //количество часов занятий, посещенных студентом за период
-    public double countHoursOfLessonsByStudentInRange(long id, DateTimeRange dateTimeRange) {
+    public double countHoursOfLessonsByStudentInRange(long id, DateRange dateRange) {
         ValidationException validationException = new ValidationException();
 
         //проверяем, что запись с таким Id существует
@@ -86,12 +86,12 @@ public class LessonService {
             validationException.put("id", "Студент с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        validationException.put(dateTimeRange.validate());
+        validationException.put(dateRange.validate());
 
         validationException.throwExceptionIfIsNotEmpty();
 
         //получаем количество минут занятий, посещенных студеном за период, и переводим в часы
-        return repository.findDurationByStudentIdInRange(dateTimeRange.getFrom(), dateTimeRange.getTo(), id)/ 60d;
+        return repository.findDurationByStudentIdInRange(dateRange.getFrom(), dateRange.getTo(), id)/ 60d;
     }
 
     //создание занятия

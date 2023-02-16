@@ -3,11 +3,11 @@ package com.school.school.utils;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class CorrectDateTimeRangeValidator implements ConstraintValidator<CorrectDateTimeRange, DateTimeRange> {
+public class CorrectDateTimeRangeValidator implements ConstraintValidator<CorrectDateTimeRange, DateRange> {
     @Override
-    public boolean isValid(DateTimeRange dateTimeRange, ConstraintValidatorContext constraintValidatorContext) {
-        if (dateTimeRange != null){
-            return (dateTimeRange.getFrom() != null) & (dateTimeRange.getTo() != null);
+    public boolean isValid(DateRange dateRange, ConstraintValidatorContext constraintValidatorContext) {
+        if (dateRange != null){
+            return (dateRange.getFrom() != null) & (dateRange.getTo() != null);
         }
         return false;
     }

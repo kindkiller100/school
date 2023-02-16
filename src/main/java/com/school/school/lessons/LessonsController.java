@@ -1,6 +1,6 @@
 package com.school.school.lessons;
 
-import com.school.school.utils.DateTimeRange;
+import com.school.school.utils.DateRange;
 import com.school.school.utils.LessonsCalculationsDtoIn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,7 +37,7 @@ public class LessonsController {
     }
 
     @PostMapping("/date_range")
-    public Page<Lesson> getAllInDateRange(@RequestBody DateTimeRange dateRange, Pageable pageable)
+    public Page<Lesson> getAllInDateRange(@RequestBody DateRange dateRange, Pageable pageable)
     {
         return service.getAllInDateRange(dateRange, pageable);
     }
