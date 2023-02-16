@@ -131,11 +131,14 @@ public class Lesson
     }
 
 
-    public Set<Student> getstudents()
+    public Set<Student> getStudents()
     {
         return students;
     }
 
+    public void setStudents(Set<Student> students) {
+        this.students = students;
+    }
 
     //переопределение метода equals(). Объекты одинаковы, если у них одинаковый id
     @Override
