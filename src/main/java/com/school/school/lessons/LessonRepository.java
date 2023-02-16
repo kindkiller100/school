@@ -4,10 +4,13 @@ import com.school.school.CustomRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRepository<Lesson> {
@@ -34,4 +37,10 @@ public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRep
     @Query(value = "SELECT COUNT(*) FROM school_db.student_lesson " +
             "WHERE student_id = ?1", nativeQuery = true)
     int countStudentIdInLessons(long id);
+
+    List<Lesson> findLessonByGroupIdAndStartDateTimeBefore(long groupId, LocalDateTime dateTime);
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    void deleteAllByGroupIdAndStartDateTimeAfter(long groupId, LocalDateTime startDateTime);
 }
