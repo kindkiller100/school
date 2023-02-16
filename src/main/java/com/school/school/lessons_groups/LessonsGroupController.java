@@ -16,17 +16,17 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/lessons_groups")
-public class LessonsGroupsController {
+public class LessonsGroupController {
     @Autowired
-    private LessonsGroupsService service;
+    private LessonsGroupService service;
 
     @GetMapping
-    public Page<LessonsGroups> list(Pageable pageable) {
+    public Page<LessonsGroup> list(Pageable pageable) {
         return service.list(pageable);
     }
 
     @GetMapping("/{id}")
-    public LessonsGroups getById(@PathVariable long id) {
+    public LessonsGroup getById(@PathVariable long id) {
         return service.getIfExists(id);
     }
 

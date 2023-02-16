@@ -9,7 +9,11 @@ import com.school.school.utils.CorrectSchedule;
 import com.school.school.utils.DateTimeRange;
 import com.school.school.utils.Schedule;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -17,7 +21,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "lessons_groups", schema="school_db")
-public class LessonsGroups {
+public class LessonsGroup {
     //id группы занятий
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +39,7 @@ public class LessonsGroups {
     private Set<Lesson> lessons = new HashSet<>();
 
     //конструктор без параметров
-    protected LessonsGroups() {
+    protected LessonsGroup() {
     }
 
     //конструктор со всеми параметрами
@@ -79,7 +83,7 @@ public class LessonsGroups {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LessonsGroups that = (LessonsGroups) o;
+        LessonsGroup that = (LessonsGroup) o;
         return id == that.id;
     }
 
@@ -190,7 +194,7 @@ public class LessonsGroups {
     }
 
     public Builder clone() {
-        return new LessonsGroups.Builder()
+        return new LessonsGroup.Builder()
                 .setId(this.id)
                 .setTitle(this.title)
                 .setSchedule(this.schedule)
