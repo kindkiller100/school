@@ -1,6 +1,7 @@
 package com.school.school.subjects;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.lessons.LessonRepository;
 import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,24 +9,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SubjectService
-{
+public class SubjectService {
     @Autowired
-    private SubjectRepository subjectRepository;
+    private SubjectRepository repository;
+    @Autowired
+    private LessonRepository lessonRepository;
 
     //возвращает список всех subject с deleted == false
     public Page<Subject> getAll(Pageable pageable) {
         PageableValidator.sortValidOrThrow(Subject.class, pageable);
-        return subjectRepository.findAllByDeletedIsFalse(pageable);
+        return repository.findAllByDeletedIsFalse(pageable);
     }
 
     //возвращает список всех subject с deleted == true
     public Page<Subject> getAllDeleted(Pageable pageable) {
         PageableValidator.sortValidOrThrow(Subject.class, pageable);
-        return subjectRepository.findAllByDeletedIsTrue(pageable);
+        return repository.findAllByDeletedIsTrue(pageable);
     }
+
     public Subject getIfExists(long id) {
-        return subjectRepository.getIfExists(id);
+        return repository.getIfExists(id);
     }
 
     //создает subject
@@ -34,17 +37,17 @@ public class SubjectService
         String title = subject.getTitle();
         ValidationException validationException = new ValidationException();
 
-        if (subjectRepository.existsById(id)) {
+        if (repository.existsById(id)) {
             validationException.put("id", "Предмет с id «" + id + "» уже существует.");
         }
 
-        if (subjectRepository.existsByTitle(title)) {
+        if (repository.existsByTitle(title)) {
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
         validationException.throwExceptionIfIsNotEmpty();
 
-        subjectRepository.save(subject);
+        repository.save(subject);
     }
 
     //изменяет title и description по id
@@ -53,17 +56,17 @@ public class SubjectService
         String title = subject.getTitle();
         ValidationException validationException = new ValidationException();
 
-        if (subjectRepository.existsByTitleAndIdNot(title, id)) {
+        if (repository.existsByTitleAndIdNot(title, id)) {
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
-        Subject subjectClone = subjectRepository.getIfExists(id)
+        Subject subjectClone = repository.getIfExists(id)
                 .clone()
                 .setTitle(title)
                 .setDescription(subject.getDescription())
                 .build();
 
-        subjectRepository.save(subjectClone);
+        repository.save(subjectClone);
     }
 
     //устанавливает флаг deleted по id
@@ -78,11 +81,18 @@ public class SubjectService
 
     //устанавливает/снимает флаг deleted по id
     private void setDeletedById(long id, boolean deleted) {
-        Subject subjectClone = subjectRepository.getIfExists(id)
+        Subject subjectClone = repository.getIfExists(id)
                 .clone()
                 .setDeleted(deleted)
                 .build();
 
-        subjectRepository.save(subjectClone);
+        repository.save(subjectClone);
     }
+//удаляет все subject с deleted == true,
+// на которые нет ссылок в связанной таблице lessons
+     public void wipe() {
+     repository.findAllByDeletedIsTrue(null).stream()
+        .filter(subject -> !lessonRepository.existsBySubjectId(subject.getId()))
+        .forEach(subject -> repository.deleteById(subject.getId()));
+}
 }

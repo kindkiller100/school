@@ -1,9 +1,9 @@
-package com.school.school.groups;
+package com.school.school.students_groups;
 
 import com.school.school.exceptions.ValidationException;
-import com.school.school.utils.PageableValidator;
 import com.school.school.students.Student;
 import com.school.school.students.StudentRepository;
+import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,9 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GroupService {
+public class StudentsGroupService {
     @Autowired
-    GroupRepository repository;
+    StudentsGroupRepository repository;
     @Autowired
     StudentRepository studentRepository;
 
@@ -22,22 +22,22 @@ public class GroupService {
         return studentRepository.getAllStudentsInGroup(id, pageable);
     }
 
-    public Page<Group> getAll(Pageable pageable) {
-        PageableValidator.sortValidOrThrow(Group.class, pageable);
+    public Page<StudentsGroup> getAll(Pageable pageable) {
+        PageableValidator.sortValidOrThrow(StudentsGroup.class, pageable);
         return repository.findAll(pageable);
     }
 
-    public void create(Group group) {
-        repository.save(group);
+    public void create(StudentsGroup studentsGroup) {
+        repository.save(studentsGroup);
     }
 
-    public void edit(Group group) {
-        Group groupClone = getIfExists(group.getId())
+    public void edit(StudentsGroup studentsGroup) {
+        StudentsGroup studentsGroupClone = getIfExists(studentsGroup.getId())
                 .clone()
-                .setTitle(group.getTitle())
+                .setTitle(studentsGroup.getTitle())
                 .build();
 
-        repository.save(groupClone);
+        repository.save(studentsGroupClone);
     }
 
     public void delete(long id) {
@@ -51,7 +51,7 @@ public class GroupService {
         }
     }
 
-    private Group getIfExists(long id) {
+    private StudentsGroup getIfExists(long id) {
         return repository.getIfExists(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.school.school.teachers;
 
+import com.school.school.lessons.LessonRepository;
 import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,27 +10,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class TeacherService {
     @Autowired
-    private TeacherRepository teacherRepository;
+    private TeacherRepository repository;
+    @Autowired
+    private LessonRepository lessonRepository;
 
     public Teacher getIfExists(long id) {
-        return teacherRepository.getIfExists(id);
+        return repository.getIfExists(id);
     }
 
     public Page<Teacher> getAllDeleted(Pageable pageable) {
         PageableValidator.sortValidOrThrow(Teacher.class, pageable);
-        return teacherRepository.findAllByDeletedIsTrue(pageable);
+        return repository.findAllByDeletedIsTrue(pageable);
     }
 
     public Page<Teacher> getAll(Pageable pageable) {
         PageableValidator.sortValidOrThrow(Teacher.class, pageable);
-        return teacherRepository.findAllByDeletedIsFalse(pageable);
+        return repository.findAllByDeletedIsFalse(pageable);
     }
+
     public Page<Teacher> getAllByFilter(String like, Pageable pageable) {
         PageableValidator.sortValidOrThrow(Teacher.class, pageable);
-        return teacherRepository.findAllByFilter(like, pageable);
+        return repository.findAllByFilter(like, pageable);
     }
+
     public void create(Teacher teacher) {
-        teacherRepository.save(teacher);
+        repository.save(teacher);
     }
 
     public void delete(long id) {
@@ -37,7 +42,7 @@ public class TeacherService {
                 .clone()
                 .setDeleted(true)
                 .build();
-        teacherRepository.save(teacher);
+        repository.save(teacher);
     }
 
     //восстанавливает удаленного
@@ -46,8 +51,9 @@ public class TeacherService {
                 .clone()
                 .setDeleted(false)
                 .build();
-        teacherRepository.save(teacher);
+        repository.save(teacher);
     }
+
     //редактируем запись
     public void edit(Teacher editTeacher) {
         long id = editTeacher.getId();
@@ -58,7 +64,15 @@ public class TeacherService {
                 .clone()
                 .setDeleted(isDeleted)//перезаписываем значение deleted у обновленного объекта
                 .build();
-        teacherRepository.save(updatedTeacher);
+        repository.save(updatedTeacher);
+    }
+
+    //удаляет всех teacher с deleted == true,
+    //на которых нет ссылок в связанной таблице lessons
+    public void wipe() {
+        repository.findAllByDeletedIsTrue(null).stream()
+                .filter(teacher -> !lessonRepository.existsByTeacherId(teacher.getId()))
+                .forEach(teacher -> repository.deleteById(teacher.getId()));
     }
 }
 

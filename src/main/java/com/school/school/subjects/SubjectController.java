@@ -19,36 +19,41 @@ import javax.validation.Valid;
 public class SubjectController {
 
     @Autowired
-    SubjectService subjectService;
+    SubjectService service;
 
     @GetMapping
     public Page<Subject> getAll(Pageable pageable) {
-        return subjectService.getAll(pageable);
+        return service.getAll(pageable);
     }
 
     @GetMapping("/deleted")
     public Page<Subject> getAllDeleted(Pageable pageable) {
-        return subjectService.getAllDeleted(pageable);
+        return service.getAllDeleted(pageable);
     }
 
     @PostMapping
     public void create(@Valid @RequestBody Subject subject) {
-        subjectService.create(subject);
+        service.create(subject);
     }
 
     @PutMapping
     public void edit(@Valid @RequestBody Subject subject) {
-        subjectService.edit(subject);
+        service.edit(subject);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable long id) {
-        subjectService.delete(id);
+        service.delete(id);
+    }
+
+    @DeleteMapping("/wipe")
+    public void wipe() {
+        service.wipe();
     }
 
     @PutMapping("/{id}/restore")
     public void restoreDeleted(@PathVariable long id) {
-        subjectService.restoreDeleted(id);
+        service.restoreDeleted(id);
     }
 
 }
