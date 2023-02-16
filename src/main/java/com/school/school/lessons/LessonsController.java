@@ -37,7 +37,7 @@ public class LessonsController {
     }
 
     @PostMapping("/date_range")
-    public Page<Lesson> getAllInDateRange(@RequestBody @Valid DateTimeRange dateRange, Pageable pageable)
+    public Page<Lesson> getAllInDateRange(@RequestBody DateTimeRange dateRange, Pageable pageable)
     {
         return service.getAllInDateRange(dateRange, pageable);
     }

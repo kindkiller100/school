@@ -35,6 +35,11 @@ public class ValidationException extends RuntimeException {
         this.errors.put(fieldName, errorMessage);
     }
 
+    public void put(ValidationException exception) {
+        this.errors.putAll(exception.get());
+
+    }
+
     public void throwExceptionIfIsNotEmpty() {
         if(!this.errors.isEmpty()) {
             throw this;
