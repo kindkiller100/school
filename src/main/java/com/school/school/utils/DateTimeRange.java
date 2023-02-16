@@ -63,10 +63,16 @@ public class DateTimeRange {
 
     //метод вилидаций объекта
     public ValidationException validate() {
+        ValidationException validationException = new ValidationException();
+        //проверка, что начало и конец диапазона не null
+        if(this.from == null | this.to == null){
+            validationException.put("date_time_range", "Начало и конец диапазона не должны быть пустыми");
+            return validationException;
+        }
         //проверка, что начало диапазона меньше или равно конца диапазона
-        if(!isValid()) {
-            return new ValidationException("range date", DateTimeRange.ERR_STRING);
-        }//+ not null 1 and 2
-        return new ValidationException();
+        if(this.from.isAfter(this.to)) {
+            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
+        }
+        return validationException;
     }
 }
