@@ -1,7 +1,6 @@
 package com.school.school.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.school.school.exceptions.ValidationException;
 import org.webjars.NotFoundException;
 
 import javax.validation.constraints.NotNull;
@@ -16,6 +15,16 @@ public class DateTimeRange {
     private LocalDateTime from;
     @NotNull(message = "Конец диапазона не должен быть пустым")
     private LocalDateTime to;
+
+    //статический метод, определяющий минимальную из двух дат
+    public static LocalDateTime min(LocalDateTime firstDate, LocalDateTime secondDate) {
+        return firstDate.isBefore(secondDate) ? firstDate : secondDate;
+    }
+
+    //статический метод, определяющий максимальную из двух дат
+    public static LocalDateTime max(LocalDateTime firstDate, LocalDateTime secondDate) {
+        return firstDate.isAfter(secondDate) ? firstDate : secondDate;
+    }
 
     public DateTimeRange(){}
 

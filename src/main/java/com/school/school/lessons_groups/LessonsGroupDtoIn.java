@@ -8,9 +8,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class LessonsGroupsDtoIn {
+public class LessonsGroupDtoIn {
     @Min(value = 1, message = "Id предмета должно быть больше нуля.")
     private long subjectId;
     @Min(value = 1, message = "Id преподавателя должно быть больше нуля.")
@@ -24,9 +23,9 @@ public class LessonsGroupsDtoIn {
     private DateTimeRange dateRange;
     private List<Schedule> schedules;
 
-    public LessonsGroupsDtoIn() {}
+    public LessonsGroupDtoIn() {}
 
-    public LessonsGroupsDtoIn(long subjectId, long teacherId, long lessonsGroupId, String lessonsGroupTitle, Set<Long> students, DateTimeRange dateRange, List<Schedule> schedules) {
+    public LessonsGroupDtoIn(long subjectId, long teacherId, long lessonsGroupId, String lessonsGroupTitle, Set<Long> students, DateTimeRange dateRange, List<Schedule> schedules) {
         this.subjectId = subjectId;
         this.teacherId = teacherId;
         this.lessonsGroupId = lessonsGroupId;

@@ -9,11 +9,7 @@ import com.school.school.utils.CorrectSchedule;
 import com.school.school.utils.DateTimeRange;
 import com.school.school.utils.Schedule;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -43,7 +39,7 @@ public class LessonsGroup {
     }
 
     //конструктор со всеми параметрами
-    private LessonsGroups(long id, String title, String schedule, Set<Lesson> lessons) {
+    private LessonsGroup(long id, String title, String schedule, Set<Lesson> lessons) {
         this.id = id;
         this.title = title;
         this.schedule = schedule;
@@ -108,10 +104,10 @@ public class LessonsGroup {
     //возвращаемое значение: true - все поля совпадают
     //                       false - не совпадают списки расписаний и диапазоны дат
     //                       null - не совпадают только поля объектов Lesson
-    public Boolean checkFields(LessonsGroupsDtoIn lessonsGroupsDtoIn) {
+    public Boolean checkFields(LessonsGroupDtoIn lessonsGroupDtoIn) {
         //создаем диапазон дат по занятиям группы
         DateTimeRange dateTimeRange = dateRangeOfLessons();
-        if (!Objects.equals(dateTimeRange, lessonsGroupsDtoIn.getDateRange())) {
+        if (!Objects.equals(dateTimeRange, lessonsGroupDtoIn.getDateRange())) {
             return false;
         }
         //конвертируем строку расписания в список объектов
@@ -122,7 +118,7 @@ public class LessonsGroup {
         }
         //сравниваем старый и новый списки расписаний
         //(если прошла предыдущая проверка, значит есть список занятий, который нужно актуализировать)
-        if (!Objects.equals(oldSchedules, lessonsGroupsDtoIn
+        if (!Objects.equals(oldSchedules, lessonsGroupDtoIn
                 .getSchedules()
                 .stream()
                 .sorted(Comparator.comparingInt(Schedule::getDayOfWeek))
@@ -136,9 +132,9 @@ public class LessonsGroup {
                 .orElse(null);
         if (baseLesson != null) {
             //проверяем совпадение предмета, преподавателя и списка студентов
-            return baseLesson.checkEqualsFields(lessonsGroupsDtoIn.getSubjectId(),
-                    lessonsGroupsDtoIn.getTeacherId(),
-                    lessonsGroupsDtoIn.getStudents()) ? true : null;
+            return baseLesson.checkEqualsFields(lessonsGroupDtoIn.getSubjectId(),
+                    lessonsGroupDtoIn.getTeacherId(),
+                    lessonsGroupDtoIn.getStudents()) ? true : null;
         }
         return true;
     }
@@ -231,8 +227,8 @@ public class LessonsGroup {
             return this;
         }
 
-        public LessonsGroups build() {
-            return new LessonsGroups(id, title, schedule, lessons);
+        public LessonsGroup build() {
+            return new LessonsGroup(id, title, schedule, lessons);
         }
     }
 }

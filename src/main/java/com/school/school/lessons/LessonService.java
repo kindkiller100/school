@@ -1,7 +1,7 @@
 package com.school.school.lessons;
 
 import com.school.school.exceptions.ValidationException;
-import com.school.school.lessons_groups.LessonsGroupsRepository;
+import com.school.school.lessons_groups.LessonsGroupRepository;
 import com.school.school.students.StudentRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
@@ -28,7 +28,7 @@ public class LessonService {
     @Autowired
     private SubjectRepository subjectRepository;
     @Autowired
-    private LessonsGroupsRepository lessonsGroupsRepository;
+    private LessonsGroupRepository lessonsGroupRepository;
 
     //получить все занятия
     public Page<Lesson> list(Pageable pageable){
@@ -137,7 +137,7 @@ public class LessonService {
     public void clearGroupIdBeforeDateTime(long groupId, LocalDateTime dateTime) {
         List<Lesson> lessons = repository.findLessonByGroupIdAndStartDateTimeBefore(groupId, dateTime);
 
-        lessons.forEach(lesson -> repository.save(lesson.clone().setGroupId(null).build()));
+        lessons.forEach(lesson -> repository.save(lesson.clone().setGroup(null).build()));
     }
 
     public void deleteAllByGroupIdAndStartDateTimeAfter(long groupId, LocalDateTime startDateTime) {
@@ -166,7 +166,7 @@ public class LessonService {
             validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
         }
         //проверка группы занятий
-        if (lesson.getGroup() != null && !lessonsGroupsRepository.existsById(lesson.getGroup().getId())) {
+        if (lesson.getGroup() != null && !lessonsGroupRepository.existsById(lesson.getGroup().getId())) {
             validationException.put("group", "Группа занятий с id «" + lesson.getGroup().getId() + "» не найден.");
         }
 

@@ -31,13 +31,13 @@ public class LessonsGroupController {
     }
 
     @PostMapping
-    public void create(@Valid @RequestBody LessonsGroupsDtoIn lessonsGroupsDtoIn) {
-        service.create(lessonsGroupsDtoIn);
+    public void create(@Valid @RequestBody LessonsGroupDtoIn lessonsGroupDtoIn) {
+        service.create(lessonsGroupDtoIn);
     }
 
     @PutMapping
-    public void edit(@Valid @RequestBody LessonsGroupsDtoIn lessonsGroupsDtoIn) {
-        service.edit(lessonsGroupsDtoIn);
+    public void edit(@Valid @RequestBody LessonsGroupDtoIn lessonsGroupDtoIn) {
+        service.edit(lessonsGroupDtoIn);
     }
 
     @DeleteMapping("/{id}")

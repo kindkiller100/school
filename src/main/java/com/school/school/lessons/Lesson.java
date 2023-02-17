@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.school.school.lessons_groups.LessonsGroups;
+import com.school.school.lessons_groups.LessonsGroup;
 import com.school.school.subjects.Subject;
 import com.school.school.teachers.Teacher;
 
@@ -54,7 +54,7 @@ public class Lesson
     private String description;         //расшифровка (подробное описание) занятия
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    private LessonsGroups group;
+    private LessonsGroup group;
     @ManyToMany( cascade = { CascadeType.PERSIST } )
     @JoinTable(
         name = "student_lesson",
@@ -79,7 +79,7 @@ public class Lesson
         Subject subject,
         Teacher teacher,
         String description,
-        LessonsGroups group,
+        LessonsGroup group,
         Set<Student> students
     )
     {
@@ -130,7 +130,7 @@ public class Lesson
     }
 
 
-    public LessonsGroups getGroup() {
+    public LessonsGroup getGroup() {
         return group;
     }
 
@@ -251,7 +251,7 @@ public class Lesson
         private Subject subject;
         private Teacher teacher;
         private String description;
-        private LessonsGroups group;
+        private LessonsGroup group;
         private Set<Student> students;
 
 
@@ -297,7 +297,7 @@ public class Lesson
         }
 
 
-        public Builder setGroup( LessonsGroups group )
+        public Builder setGroup( LessonsGroup group )
         {
             this.group = group;
             return this;
