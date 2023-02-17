@@ -45,7 +45,7 @@ public class LessonService {
     public Page<Lesson> getAllInDateRange(DateTimeRange dateRange, Pageable pageable){
         ValidationException validationException = new ValidationException();
         validationException.put(PageableValidator.sortValid(Lesson.class, pageable));
-        validationException.put(dateRange.validate());
+        validationException.put(dateRange.validate(false));
         validationException.throwExceptionIfIsNotEmpty();
 
         return repository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo(), pageable);
@@ -72,7 +72,7 @@ public class LessonService {
             validationException.put("id", "Преподаватель с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        validationException.put(dateTimeRange.validate());
+        validationException.put(dateTimeRange.validate(false));
 
         validationException.throwExceptionIfIsNotEmpty();
 
@@ -89,7 +89,7 @@ public class LessonService {
             validationException.put("id", "Студент с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        validationException.put(dateTimeRange.validate());
+        validationException.put(dateTimeRange.validate(false));
 
         validationException.throwExceptionIfIsNotEmpty();
 

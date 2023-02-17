@@ -297,36 +297,15 @@ public class LessonsGroupService {
             validationException.put("students", "Не удалось создать объект списка учеников.");
         }
         if (lessonsGroupDtoIn.getDateRange() != null) {
-            if (lessonsGroupDtoIn.getDateRange().getFrom() == null) {
-                validationException.put("dateRange.from", "Начало диапазона дат не должно быть пустым.");
-            } else if (lessonsGroupDtoIn.getDateRange().getFrom().toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
-                validationException.put("dateRange.from", "Дата начала занятий должна быть не позднее, чем день назад.");
-            }
-            if (lessonsGroupDtoIn.getDateRange().getTo() == null) {
-                validationException.put("dateRange.to", "Конец диапазона дат не должно быть пустым.");
-            }
-            if (!lessonsGroupDtoIn.getDateRange().isValid()) {
-                validationException.put("dateRange", DateTimeRange.ERR_STRING);
-            }
+            validationException.put(lessonsGroupDtoIn.getDateRange().validate(true));
         } else {
             validationException.put("dateRange", "Не удалось создать объект диапазона дат.");
         }
-        //TODO: task 87 перенести валидацию в класс Schedule
         if (lessonsGroupDtoIn.getSchedules() != null && !lessonsGroupDtoIn.getSchedules().isEmpty()) {
             ArrayList<Schedule> schedules = (ArrayList<Schedule>) lessonsGroupDtoIn.getSchedules();
             for (int i = 0; i < schedules.size(); i++) {
                 Schedule schedule = schedules.get(i);
-                if (schedule.getDayOfWeek() < 1 || schedule.getDayOfWeek() > 7) {
-                    validationException.put("dayOfWeek:" + i, "Номер дня недели должен быть от 1 до 7 включительно.");
-                }
-                if (schedule.getTimeOfStart() == null) {
-                    validationException.put("timeOfStart:" + i, "Время начала занятия не должно быть пустым.");
-                } else if (!schedule.getTimeOfStart().matches("([01][0-9]|2[0-3]):[0-5][0-9]")) {
-                    validationException.put("timeOfStart:" + i, "Время начала занятия не соответствует формату чч:мм.");
-                }
-                if (schedule.getDuration() < 30 || schedule.getDuration() > 210) {
-                    validationException.put("duration:" + i, "Продолжительность занятия должна быть в пределах от 30 до 210 минут.");
-                }
+                validationException.put(schedule.validate(i));
             }
         } else {
             validationException.put("schedules", "Не удалось создать объект списка расписаний.");

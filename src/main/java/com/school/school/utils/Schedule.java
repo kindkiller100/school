@@ -1,5 +1,7 @@
 package com.school.school.utils;
 
+import com.school.school.exceptions.ValidationException;
+
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -125,5 +127,22 @@ public class Schedule {
     @Override
     public int hashCode() {
         return Objects.hash(dayOfWeek, timeOfStart, duration);
+    }
+
+    public ValidationException validate(int indexOfList) {
+        String index = indexOfList >= 0 ? String.valueOf(indexOfList) : "";
+        ValidationException validationException = new ValidationException();
+        if (this.dayOfWeek < 1 || this.dayOfWeek > 7) {
+            validationException.put("dayOfWeek:" + index, "Номер дня недели должен быть от 1 до 7 включительно.");
+        }
+        if (this.timeOfStart == null) {
+            validationException.put("timeOfStart:" + index, "Время начала занятия не должно быть пустым.");
+        } else if (!this.timeOfStart.matches("([01][0-9]|2[0-3]):[0-5][0-9]")) {
+            validationException.put("timeOfStart:" + index, "Время начала занятия не соответствует формату чч:мм.");
+        }
+        if (this.duration < 30 || this.duration > 210) {
+            validationException.put("duration:" + index, "Продолжительность занятия должна быть в пределах от 30 до 210 минут.");
+        }
+        return validationException;
     }
 }

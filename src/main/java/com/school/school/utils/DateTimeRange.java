@@ -72,7 +72,7 @@ public class DateTimeRange {
     }
 
     //метод вилидаций объекта
-    public ValidationException validate() {
+    public ValidationException validate(boolean flag) {
         ValidationException validationException = new ValidationException();
         //проверка, что начало и конец диапазона не null
         if(this.from == null | this.to == null){
@@ -80,8 +80,11 @@ public class DateTimeRange {
             return validationException;
         }
         //проверка, что начало диапазона меньше или равно конца диапазона
-        if(this.from.isAfter(this.to)) {
+        if(!isValid()) {
             validationException.put("date_time_range", DateTimeRange.ERR_STRING);
+        }
+        if (flag && this.from.toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
+            validationException.put("dateRange.from", "Дата начала занятий должна быть не позднее, чем день назад.");
         }
         return validationException;
     }
