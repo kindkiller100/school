@@ -1,6 +1,7 @@
 package com.school.school.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.school.school.exceptions.ValidationException;
 import org.webjars.NotFoundException;
 
 import javax.validation.constraints.NotNull;
@@ -59,14 +60,29 @@ public class DateTimeRange {
     public boolean isValid() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         //true - если диапазон дат корректный
-        return from != null & to != null && !this.from.isAfter(this.to);
+        return !this.from.isAfter(this.to);
     }
 
     //метод вилидаций объекта
-    public void validate() {
+    public void validateOrThrow() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         if(!isValid()) {
             throw new NotFoundException(DateTimeRange.ERR_STRING);
         }
+    }
+
+    //метод вилидаций объекта
+    public ValidationException validate() {
+        ValidationException validationException = new ValidationException();
+        //проверка, что начало и конец диапазона не null
+        if(this.from == null | this.to == null){
+            validationException.put("date_time_range", "Начало и конец диапазона не должны быть пустыми");
+            return validationException;
+        }
+        //проверка, что начало диапазона меньше или равно конца диапазона
+        if(this.from.isAfter(this.to)) {
+            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
+        }
+        return validationException;
     }
 }

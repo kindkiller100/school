@@ -39,7 +39,7 @@ public class LessonsGroupService {
     private LessonService lessonService;
 
     public Page<LessonsGroup> list(Pageable pageable) {
-        PageableValidator.checkIsSortValid(LessonsGroup.class, pageable);
+        PageableValidator.sortValidOrThrow(LessonsGroup.class, pageable);
         return repository.findAll(pageable);
     }
 

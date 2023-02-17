@@ -20,7 +20,7 @@ public class PaymentService {
     }
 
     public Page<Payment> getAll(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Payment.class, pageable);
+        PageableValidator.sortValidOrThrow(Payment.class, pageable);
         return repository.findAll(pageable);
     }
 
