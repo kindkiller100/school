@@ -1,15 +1,11 @@
 package com.school.school.lessons;
 
-import com.school.school.students.Student;
 import com.school.school.students.StudentService;
-import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class LessonDtoMapper {
@@ -25,24 +21,10 @@ public class LessonDtoMapper {
         }
 
         //настраиваем маппер для конвертации Set<Long> studentsIds в Set<Student> students
-        TypeMap<LessonDtoIn, Lesson> typeMap = modelMapper.getTypeMap(LessonDtoIn.class, Lesson.class);
-
-        if (typeMap == null) {
-            typeMap = modelMapper.createTypeMap(LessonDtoIn.class, Lesson.class);
-        }
-
-        class StudentIdsToStudentsConverter extends AbstractConverter<Set<Long>, Set<Student>> {
-            @Override
-            protected Set<Student> convert(Set<Long> studentIds) {
-                return studentIds
-                        .stream()
-                        .map(id -> studentService.getIfExists(id))
-                        .collect(Collectors.toSet());
-            }
-        }
-
-        typeMap.addMappings(mapper -> mapper.using(new StudentIdsToStudentsConverter())
-                .map(LessonDtoIn::getStudentIds, Lesson::setStudents));
+        modelMapper.typeMap(LessonDtoIn.class, Lesson.class).addMappings(
+                mapper -> mapper.using(context -> studentService.getAllById((Set<Long>) context.getSource()))
+                        .map(LessonDtoIn::getStudentIds, Lesson::setStudents)
+        );
 
         //мапим DTO-объект в объект класса Lesson и возвращаем в качестве результата
         //результатом маппинга будет объект класса Lesson, в котором у полей subject и teacher будут заполнены только id
