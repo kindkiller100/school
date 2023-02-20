@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -38,6 +39,9 @@ public interface LessonRepository extends JpaRepository<Lesson, Long>, CustomRep
     @Query(value = "SELECT COUNT(*) FROM school_db.student_lesson " +
             "WHERE is_visited AND student_id = ?1", nativeQuery = true)
     int countStudentIdInLessons(long id);
+
+    @Transactional
+    void deleteByIdIn(Collection<Long> deletedLessons);
 
     List<Lesson> findLessonByGroupIdAndStartDateTimeBefore(long groupId, LocalDateTime dateTime);
 

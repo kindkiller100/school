@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LessonsGroupRepository extends JpaRepository<LessonsGroup, Long>, CustomRepository<LessonsGroup> {
+    boolean existsByTitle(String title);
+    boolean existsByTitleAndIdNot(String title, long id);
 }

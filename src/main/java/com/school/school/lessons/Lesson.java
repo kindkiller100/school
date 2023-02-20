@@ -3,8 +3,12 @@ package com.school.school.lessons;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.school.school.lessons_groups.LessonsGroup;
 import com.school.school.subjects.Subject;
 import com.school.school.teachers.Teacher;
 
@@ -48,8 +52,9 @@ public class Lesson
     private Teacher teacher;            //преподаватель
     @Size( max = 40, message = "Размер описания не должен превышать 40 символов." )
     private String description;         //расшифровка (подробное описание) занятия
-    @Column( name = "group_id" )
-    private Long groupId;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private LessonsGroup group;
     @ManyToMany( cascade = { CascadeType.PERSIST } )
     @JoinTable(
         name = "student_lesson",
@@ -74,7 +79,7 @@ public class Lesson
         Subject subject,
         Teacher teacher,
         String description,
-        Long groupId,
+        LessonsGroup group,
         Set<Student> students
     )
     {
@@ -84,7 +89,7 @@ public class Lesson
         this.subject = subject;
         this.teacher = teacher;
         this.description = description;
-        this.groupId = groupId;
+        this.group = group;
         this.students = students;
     }
 
@@ -125,40 +130,56 @@ public class Lesson
     }
 
 
-    public Long getGroupId()
-    {
-        return groupId;
+    public LessonsGroup getGroup() {
+        return group;
     }
 
 
-    public Set<Student> getstudents()
+    public Set<Student> getStudents()
     {
         return students;
     }
 
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
 
-    //переопределение метода equals(). Объекты одинаковы, если у них одинаковый id
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
+    }
+
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public void setDuration(short duration) {
+        this.duration = duration;
+    }
+
+    public void setStudents(Set<Student> students) {
+        this.students = students;
+    }
+
+    //переопределение метода equals(). Объекты одинаковы, если у них одинаковый id, id преподавателя, id предмета и дата начала занятия
     @Override
-    public boolean equals( Object o )
-    {
-        if( this == o )
-        {
-            return true;
-        }
-        if( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-        Lesson lesson = ( Lesson ) o;
-        return id == lesson.id;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Lesson lesson = (Lesson) o;
+        return (id == lesson.id) &&
+                ((teacher != null ? teacher.getId() : 0) == (lesson.teacher != null ? lesson.teacher.getId() : 0)) &&
+                ((subject != null ? subject.getId() : 0) == (lesson.subject != null ? lesson.subject.getId() : 0)) &&
+                (Objects.equals(startDateTime, lesson.getStartDateTime()));
     }
 
 
     //переопределение метода hashCode()
     @Override
-    public int hashCode()
-    {
-        return Objects.hash( id );
+    public int hashCode() {
+        return Objects.hash(id,
+                teacher != null ? teacher.getId() : 0,
+                subject != null ? subject.getId() : 0,
+                startDateTime);
     }
 
 
@@ -177,6 +198,33 @@ public class Lesson
             '}';
     }
 
+    //метод пирнимает объекты предмета, преподавателя и список студентов и изменяет соответствующие поля объекта Lesson
+    public void setIfNotEquals(Subject subject, Teacher teacher, Set<Student> students) {
+        if ((subject != null ? subject.getId() : 0) != (this.subject != null ? this.subject.getId() : 0)) {
+            this.subject = subject;
+        }
+        if ((teacher != null ? teacher.getId() : 0) != (this.teacher != null ? this.teacher.getId() : 0)) {
+            this.teacher = teacher;
+        }
+        if (!Objects.equals(students, this.students)) {
+            changeStudents(students);
+        }
+    }
+
+    //метод изменяет студентов объекта Lesson на студентов из принимаемого параметра
+    private void changeStudents(Set<Student> newStudents) {
+        //очищаем старый список
+        this.students.clear();
+        //добавляем новый
+        this.students.addAll(newStudents);
+    }
+
+    //метод проверяет эквивалентность полей Lesson с параметрами
+    public boolean checkEqualsFields(long subjectId, long teacherId, Set<Long> studentsId) {
+        return Optional.of( subject ).map( Subject::getId ).orElse( 0L ) == subjectId &&
+                (teacher != null ? teacher.getId() : 0) == teacherId &&
+                Objects.equals(students != null ? students.stream().map(Student::getId).collect(Collectors.toSet()) : null, studentsId);
+    }
 
     public Builder clone()
     {
@@ -187,10 +235,13 @@ public class Lesson
             .setSubject( this.subject )
             .setTeacher( this.teacher )
             .setDescription( this.description )
-            .setGroupId( this.groupId )
+            .setGroup( this.group )
             .setStudents( this.students );
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
 
     static public class Builder
     {
@@ -200,7 +251,7 @@ public class Lesson
         private Subject subject;
         private Teacher teacher;
         private String description;
-        private Long groupId;
+        private LessonsGroup group;
         private Set<Student> students;
 
 
@@ -246,9 +297,9 @@ public class Lesson
         }
 
 
-        public Builder setGroupId( Long groupId )
+        public Builder setGroup( LessonsGroup group )
         {
-            this.groupId = groupId;
+            this.group = group;
             return this;
         }
 
@@ -269,7 +320,7 @@ public class Lesson
                 subject,
                 teacher,
                 description,
-                groupId,
+                group,
                 students
             );
         }

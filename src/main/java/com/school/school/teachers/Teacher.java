@@ -156,6 +156,10 @@ public class Teacher {
                 .setDeleted(this.deleted);
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     static public class Builder {
         private long id;
         private String name;

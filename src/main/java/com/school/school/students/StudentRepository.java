@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Set;
 
 
 @Repository
@@ -33,4 +35,5 @@ public interface StudentRepository extends JpaRepository<Student, Long>, CustomR
             , nativeQuery = true)
     Page<Student> getAllStudentsInGroup(long id, Pageable pageable);
 
+    Set<Student> getAllByIdIn(Collection<Long> findStudents);
 }

@@ -1,15 +1,19 @@
 package com.school.school.lessons_groups;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.school.school.lessons.Lesson;
+import com.school.school.students.Student;
+import com.school.school.subjects.Subject;
+import com.school.school.teachers.Teacher;
 import com.school.school.utils.CorrectSchedule;
+import com.school.school.utils.DateTimeRange;
+import com.school.school.utils.Schedule;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 
 @Entity
 @Table(name = "lessons_groups", schema="school_db")
@@ -25,16 +29,21 @@ public class LessonsGroup {
     //расписание. Формат: 'день_недели,время_начала_занятия,продолжительность_занятия_в_минутах;...'
     @CorrectSchedule(message = "Расписание не соответствует нужному формату.")
     private String schedule;
+    //список занятий
+    @JsonIgnore
+    @OneToMany(mappedBy = "group", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Lesson> lessons = new HashSet<>();
 
     //конструктор без параметров
     protected LessonsGroup() {
     }
 
     //конструктор со всеми параметрами
-    private LessonsGroup(long id, String title, String schedule) {
+    private LessonsGroup(long id, String title, String schedule, Set<Lesson> lessons) {
         this.id = id;
         this.title = title;
         this.schedule = schedule;
+        this.lessons = lessons;
     }
 
     public long getId() {
@@ -47,6 +56,22 @@ public class LessonsGroup {
 
     public String getSchedule() {
         return schedule;
+    }
+
+    public Set<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(Set<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setSchedule(String schedule) {
+        this.schedule = schedule;
     }
 
     //переопределение метода equals()
@@ -74,11 +99,102 @@ public class LessonsGroup {
                 '}';
     }
 
+    //метод, который проверяет соответствие полей текущей группы и объекта LessonsGroupsDtoIn
+    //проверяемые поля: диапазон дат занятий, список расписаний, предмет, преподаватель и список студентов
+    //возвращаемое значение: true - все поля совпадают
+    //                       false - не совпадают списки расписаний и диапазоны дат
+    //                       null - не совпадают только поля объектов Lesson
+    public Boolean checkFields(LessonsGroupDtoIn lessonsGroupDtoIn) {
+        //создаем диапазон дат по занятиям группы
+        DateTimeRange dateTimeRange = dateRangeOfLessons();
+        if (!Objects.equals(dateTimeRange, lessonsGroupDtoIn.getDateRange())) {
+            return false;
+        }
+        //конвертируем строку расписания в список объектов
+        List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(this.schedule);
+        if (oldSchedules != null) {
+            //сортируем старый список расписаний по дням недели
+            oldSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
+        }
+        //сравниваем старый и новый списки расписаний
+        //(если прошла предыдущая проверка, значит есть список занятий, который нужно актуализировать)
+        if (!Objects.equals(oldSchedules, lessonsGroupDtoIn
+                .getSchedules()
+                .stream()
+                .sorted(Comparator.comparingInt(Schedule::getDayOfWeek))
+                .toList())) {
+            return false;
+        }
+        //находим самое последнее занятие, это будет базовое занятие, по которому будем проверять изменения в занятиях
+        Lesson baseLesson = lessons
+                .stream()
+                .max(Comparator.comparing(Lesson::getStartDateTime))
+                .orElse(null);
+        if (baseLesson != null) {
+            //проверяем совпадение предмета, преподавателя и списка студентов
+            return baseLesson.checkEqualsFields(lessonsGroupDtoIn.getSubjectId(),
+                    lessonsGroupDtoIn.getTeacherId(),
+                    lessonsGroupDtoIn.getStudents()) ? true : null;
+        }
+        return true;
+    }
+
+    //метод возвращает диапазон дат занятий текущей группы
+    public DateTimeRange dateRangeOfLessons() {
+        if (lessons == null || lessons.isEmpty()) {
+            return null;
+        }
+        //дата начала самого первого занятия
+        LocalDate from = lessons
+                .stream()
+                .min(Comparator.comparing(Lesson::getStartDateTime))
+                .get()
+                .getStartDateTime()
+                .toLocalDate();
+        //дата начала самого последнего занятия
+        LocalDate to = lessons
+                .stream()
+                .max(Comparator.comparing(Lesson::getStartDateTime))
+                .get()
+                .getStartDateTime()
+                .toLocalDate();
+        return new DateTimeRange(from, to);
+    }
+
+    //метод устанавливает значения полей занятий в списке в диапазоне дат
+    public void setFieldsIntoLessons(Subject subject, Teacher teacher, Set<Student> students, DateTimeRange dateRange) {
+        //проверяем и меняем поля в занятиях
+        lessons.stream()
+                //отбираем только те занятия, которые лежат в диапазоне редактирования группы
+                .filter(lesson -> lesson.getStartDateTime().isAfter(dateRange.getFrom()) &&
+                        lesson.getStartDateTime().isBefore(dateRange.getTo()))
+                //проверяем и меняем поля в занятии
+                .forEach(lesson -> lesson.setIfNotEquals(subject, teacher, students));
+    }
+
+    public void setIfNotEquals(String title, List<Schedule> newSchedules) {
+        //проверяем совпадение названия
+        if (!Objects.equals(title, this.title)) {
+            this.title = title;
+        }
+        //конвертируем строку расписания в список объектов
+        List<Schedule> oldSchedules = Schedule.convertToListOfSchedules(schedule);
+        //сортируем старый список расписаний по дням недели
+        oldSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
+        //сортируем новый список расписаний по дням недели
+        newSchedules.sort(Comparator.comparingInt(Schedule::getDayOfWeek));
+        //проверяем совпадение расписаний
+        if (!Objects.equals(oldSchedules, newSchedules)) {
+            this.schedule = Schedule.createStringOfSchedules(newSchedules);
+        }
+    }
+
     public Builder clone() {
         return new LessonsGroup.Builder()
                 .setId(this.id)
                 .setTitle(this.title)
-                .setSchedule(this.schedule);
+                .setSchedule(this.schedule)
+                .setLessons(this.lessons);
     }
 
     public static Builder builder() {
@@ -89,6 +205,7 @@ public class LessonsGroup {
         private long id;
         private String title;
         private String schedule;
+        private Set<Lesson> lessons;
 
         public Builder setId(long id) {
             this.id = id;
@@ -105,8 +222,13 @@ public class LessonsGroup {
             return this;
         }
 
+        public Builder setLessons(Set<Lesson> lessons) {
+            this.lessons = lessons;
+            return this;
+        }
+
         public LessonsGroup build() {
-            return new LessonsGroup(id, title, schedule);
+            return new LessonsGroup(id, title, schedule, lessons);
         }
     }
 }

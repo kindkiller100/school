@@ -1,6 +1,7 @@
 package com.school.school.lessons;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.lessons_groups.LessonsGroupRepository;
 import com.school.school.students.StudentRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
@@ -26,6 +27,8 @@ public class LessonService {
     private TeacherRepository teacherRepository;
     @Autowired
     private SubjectRepository subjectRepository;
+    @Autowired
+    private LessonsGroupRepository lessonsGroupRepository;
 
     //получить все занятия
     public Page<Lesson> list(Pageable pageable) {
@@ -42,7 +45,7 @@ public class LessonService {
     public Page<Lesson> getAllInDateRange(DateTimeRange dateRange, Pageable pageable){
         ValidationException validationException = new ValidationException();
         validationException.put(PageableValidator.sortValid(Lesson.class, pageable));
-        validationException.put(dateRange.validate());
+        validationException.put(dateRange.validate(false));
         validationException.throwExceptionIfIsNotEmpty();
 
         return repository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo(), pageable);
@@ -69,7 +72,7 @@ public class LessonService {
             validationException.put("id", "Преподаватель с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        validationException.put(dateTimeRange.validate());
+        validationException.put(dateTimeRange.validate(false));
 
         validationException.throwExceptionIfIsNotEmpty();
 
@@ -86,7 +89,7 @@ public class LessonService {
             validationException.put("id", "Студент с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        validationException.put(dateTimeRange.validate());
+        validationException.put(dateTimeRange.validate(false));
 
         validationException.throwExceptionIfIsNotEmpty();
 
@@ -122,7 +125,7 @@ public class LessonService {
     public void clearGroupIdBeforeDateTime(long groupId, LocalDateTime dateTime) {
         List<Lesson> lessons = repository.findLessonByGroupIdAndStartDateTimeBefore(groupId, dateTime);
 
-        lessons.forEach(lesson -> repository.save(lesson.clone().setGroupId(null).build()));
+        lessons.forEach(lesson -> repository.save(lesson.clone().setGroup(null).build()));
     }
 
     public void deleteAllByGroupIdAndStartDateTimeAfter(long groupId, LocalDateTime startDateTime) {
@@ -151,8 +154,8 @@ public class LessonService {
             validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
         }
         //проверка группы занятий
-        if (lesson.getGroupId() != null && lesson.getGroupId() < 1) {
-            validationException.put("groupId", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
+        if (lesson.getGroup() != null && !lessonsGroupRepository.existsById(lesson.getGroup().getId())) {
+            validationException.put("group", "Группа занятий с id «" + lesson.getGroup().getId() + "» не найден.");
         }
 
         validationException.throwExceptionIfIsNotEmpty();
