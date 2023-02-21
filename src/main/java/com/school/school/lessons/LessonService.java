@@ -160,4 +160,58 @@ public class LessonService {
 
         validationException.throwExceptionIfIsNotEmpty();
     }
+
+    //метод, который осуществляет поиск коллизий расписания по Id преподавателя
+    public List<Lesson> findScheduleCollisionsByTeacher(long teacherId) {
+        ValidationException validationException = new ValidationException();
+        //проверяем, что запись с таким Id существует
+        if (!teacherRepository.existsById(teacherId)) {
+            validationException.put("id", "Преподпаптель с id «" + teacherId + "» не найден.");
+        }
+        validationException.throwExceptionIfIsNotEmpty();
+        //ищем коллизии в списке занятий
+        return findScheduleCollisions(repository.findLessonsByTeacherId(teacherId));
+    }
+
+    //метод, который осуществляет поиск коллизий расписания по Id ученика
+    public List<Lesson> findScheduleCollisionsByStudent(long studentId) {
+        ValidationException validationException = new ValidationException();
+        //проверяем, что запись с таким Id существует
+        if (!studentRepository.existsById(studentId)) {
+            validationException.put("id", "Студент с id «" + studentId + "» не найден.");
+        }
+        validationException.throwExceptionIfIsNotEmpty();
+        //ищем коллизии в списке занятий
+        return findScheduleCollisions(repository.findLessonsByStudentId(studentId));
+    }
+
+    //метод, который ищет коллизии в списке занятий
+    private List<Lesson> findScheduleCollisions(List<Lesson> list) {
+        int i = 0;
+        //перебираем список занятий
+        while (i < list.size()) {
+            //текущее занятие преобразуем в диапазон дат
+            DateTimeRange baseRange = list.get(i).getDateTimeRange();
+            //флаг удаления текущего занятия из списка
+            boolean flag = false;
+            //перебираем список занятий для сравнения с остальными занятиями
+            for (int j = 0; j < list.size(); j++) {
+                //не сравниваем с самим собой
+                if (i == j) {
+                    continue;
+                }
+                //занятие, с которым сравниваем, преобразуем в диапазон дат
+                DateTimeRange rangeForComparison = list.get(j).getDateTimeRange();
+                //если диапазоны пересекаются, то флагу присваиваем значение true
+                flag |= baseRange.intersection(rangeForComparison);
+            }
+            //если flag = false (текущее занятие не пересекается с остальными занятиями), то удаляем его
+            if (!flag) {
+                list.remove(i);
+            } else {
+                i++;
+            }
+        }
+        return list;
+    }
 }
