@@ -71,6 +71,28 @@ public class DateTimeRange {
         }
     }
 
+    //метод проверки пересечения диапазонов дат
+    public boolean intersection(DateTimeRange dateTimeRange) {
+        ValidationException validationException = new ValidationException();
+        if (dateTimeRange == null) {
+            validationException.put("dateTimeRange", "Параметр метода не должен быть пустым.");
+            validationException.throwExceptionIfIsNotEmpty();
+        }
+        validationException.put(dateTimeRange.validate(false));
+        validationException.throwExceptionIfIsNotEmpty();
+
+        return dateInRange(dateTimeRange.getFrom()) ||
+                dateInRange(dateTimeRange.getTo()) ||
+                dateTimeRange.dateInRange(from) ||
+                dateTimeRange.dateInRange(to);
+    }
+
+    //метод проверяет принадлежность даты диапазону
+    //возвращает true, если дата принадлежит диапазону
+    private boolean dateInRange(LocalDateTime dateTime) {
+        return (from.isEqual(dateTime) || from.isBefore(dateTime)) && (to.isEqual(dateTime) || to.isAfter(dateTime));
+    }
+
     //метод вилидаций объекта
     public ValidationException validate(boolean flag) {
         ValidationException validationException = new ValidationException();

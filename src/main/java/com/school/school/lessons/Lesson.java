@@ -30,6 +30,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.school.school.students.Student;
+import com.school.school.utils.DateTimeRange;
 
 @Entity
 @Table( name = "lessons", schema = "school_db" )
@@ -158,6 +159,10 @@ public class Lesson
 
     public void setStudents(Set<Student> students) {
         this.students = students;
+    }
+
+    public DateTimeRange getDateTimeRange() {
+        return new DateTimeRange(startDateTime, startDateTime.plusMinutes(duration));
     }
 
     //переопределение метода equals(). Объекты одинаковы, если у них одинаковый id, id преподавателя, id предмета и дата начала занятия

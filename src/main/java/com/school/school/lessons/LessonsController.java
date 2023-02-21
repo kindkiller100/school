@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/lessons")
@@ -54,6 +55,12 @@ public class LessonsController {
         return service.countHoursOfLessonsByTeacherInRange(lessonsCalc.getId(), lessonsCalc.getDateTimeRange());
     }
 
+    @GetMapping("/by_teacher/find_schedule_collisions/{id}")
+    public List<Lesson> getAllByTeacherId(@PathVariable long id)
+    {
+        return service.findScheduleCollisionsByTeacher(id);
+    }
+
     @GetMapping("/by_student/{id}")
     public Page<Lesson> getAllByStudentId(@PathVariable long id, Pageable pageable)
     {
@@ -64,6 +71,12 @@ public class LessonsController {
     public double countHoursOfLessonsByStudentInRange(@Valid @RequestBody LessonsCalculationsDtoIn lessonsCalc)
     {
         return service.countHoursOfLessonsByStudentInRange(lessonsCalc.getId(), lessonsCalc.getDateTimeRange());
+    }
+
+    @GetMapping("/by_student/find_schedule_collisions/{id}")
+    public List<Lesson> getAllByStudentId(@PathVariable long id)
+    {
+        return service.findScheduleCollisionsByStudent(id);
     }
 
     @PostMapping
