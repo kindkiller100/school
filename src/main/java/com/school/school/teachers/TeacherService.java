@@ -19,17 +19,17 @@ public class TeacherService {
     }
 
     public Page<Teacher> getAllDeleted(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Teacher.class, pageable);
+        PageableValidator.sortValidOrThrow(Teacher.class, pageable);
         return repository.findAllByDeletedIsTrue(pageable);
     }
 
     public Page<Teacher> getAll(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Teacher.class, pageable);
+        PageableValidator.sortValidOrThrow(Teacher.class, pageable);
         return repository.findAllByDeletedIsFalse(pageable);
     }
 
     public Page<Teacher> getAllByFilter(String like, Pageable pageable) {
-        PageableValidator.checkIsSortValid(Teacher.class, pageable);
+        PageableValidator.sortValidOrThrow(Teacher.class, pageable);
         return repository.findAllByFilter(like, pageable);
     }
 

@@ -17,6 +17,16 @@ public class DateTimeRange {
     @NotNull(message = "Конец диапазона не должен быть пустым")
     private LocalDateTime to;
 
+    //статический метод, определяющий минимальную из двух дат
+    public static LocalDateTime min(LocalDateTime firstDate, LocalDateTime secondDate) {
+        return firstDate.isBefore(secondDate) ? firstDate : secondDate;
+    }
+
+    //статический метод, определяющий максимальную из двух дат
+    public static LocalDateTime max(LocalDateTime firstDate, LocalDateTime secondDate) {
+        return firstDate.isAfter(secondDate) ? firstDate : secondDate;
+    }
+
     public DateTimeRange(){}
 
     public DateTimeRange(LocalDate from, LocalDate to) {
@@ -54,10 +64,28 @@ public class DateTimeRange {
     }
 
     //метод вилидаций объекта
-    public void validate() {
+    public void validateOrThrow() {
         //проверка, что начало диапазона меньше или равно конца диапазона
         if(!isValid()) {
             throw new NotFoundException(DateTimeRange.ERR_STRING);
         }
+    }
+
+    //метод вилидаций объекта
+    public ValidationException validate(boolean flag) {
+        ValidationException validationException = new ValidationException();
+        //проверка, что начало и конец диапазона не null
+        if(this.from == null | this.to == null){
+            validationException.put("date_time_range", "Начало и конец диапазона не должны быть пустыми");
+            return validationException;
+        }
+        //проверка, что начало диапазона меньше или равно конца диапазона
+        if(!isValid()) {
+            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
+        }
+        if (flag && this.from.toLocalDate().isBefore(LocalDate.now().minusDays(1))) {
+            validationException.put("dateRange.from", "Дата начала занятий должна быть не позднее, чем день назад.");
+        }
+        return validationException;
     }
 }

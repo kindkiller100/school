@@ -1,6 +1,7 @@
 package com.school.school.lessons;
 
 import com.school.school.exceptions.ValidationException;
+import com.school.school.lessons_groups.LessonsGroupRepository;
 import com.school.school.students.StudentRepository;
 import com.school.school.subjects.SubjectRepository;
 import com.school.school.teachers.TeacherRepository;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class LessonService {
@@ -24,10 +27,12 @@ public class LessonService {
     private TeacherRepository teacherRepository;
     @Autowired
     private SubjectRepository subjectRepository;
+    @Autowired
+    private LessonsGroupRepository lessonsGroupRepository;
 
     //получить все занятия
-    public Page<Lesson> list(Pageable pageable){
-        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+    public Page<Lesson> list(Pageable pageable) {
+        PageableValidator.sortValidOrThrow(Lesson.class, pageable);
         return repository.findAll(pageable);
     }
 
@@ -39,16 +44,8 @@ public class LessonService {
     //получить все занятия из диапазона дат
     public Page<Lesson> getAllInDateRange(DateTimeRange dateRange, Pageable pageable){
         ValidationException validationException = new ValidationException();
-
-        if(!PageableValidator.isSortValid(Lesson.class, pageable)) {
-            validationException.put("pageable", PageableValidator.currentError);
-        }
-
-        //проверка, что начало диапазона меньше или равно концу диапазона
-        if(!dateRange.isValid()) {
-            validationException.put("date_range", DateTimeRange.ERR_STRING);
-        }
-
+        validationException.put(PageableValidator.sortValid(Lesson.class, pageable));
+        validationException.put(dateRange.validate(false));
         validationException.throwExceptionIfIsNotEmpty();
 
         return repository.findLessonsByStartDateTimeBetween(dateRange.getFrom(), dateRange.getTo(), pageable);
@@ -56,13 +53,13 @@ public class LessonService {
 
     //получить все занятия по id преподавателя
     public Page<Lesson> getAllByTeacherId(long id, Pageable pageable) {
-        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+        PageableValidator.sortValidOrThrow(Lesson.class, pageable);
         return repository.findLessonsByTeacherId(id, pageable);
     }
 
     //получить все занятия по id студента
     public Page<Lesson> getAllByStudentId(long id, Pageable pageable) {
-        PageableValidator.checkIsSortValid(Lesson.class, pageable);
+        PageableValidator.sortValidOrThrow(Lesson.class, pageable);
         return repository.findLessonsByStudentId(id, pageable);
     }
 
@@ -75,9 +72,7 @@ public class LessonService {
             validationException.put("id", "Преподаватель с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        if (!dateTimeRange.isValid()) {
-            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
-        }
+        validationException.put(dateTimeRange.validate(false));
 
         validationException.throwExceptionIfIsNotEmpty();
 
@@ -94,9 +89,7 @@ public class LessonService {
             validationException.put("id", "Студент с id «" + id + "» не найден.");
         }
         // проверка диапазона дат
-        if (!dateTimeRange.isValid()) {
-            validationException.put("date_time_range", DateTimeRange.ERR_STRING);
-        }
+        validationException.put(dateTimeRange.validate(false));
 
         validationException.throwExceptionIfIsNotEmpty();
 
@@ -128,6 +121,17 @@ public class LessonService {
         repository.save(editLesson);
     }
 
+    //TODO: add transactional
+    public void clearGroupIdBeforeDateTime(long groupId, LocalDateTime dateTime) {
+        List<Lesson> lessons = repository.findLessonByGroupIdAndStartDateTimeBefore(groupId, dateTime);
+
+        lessons.forEach(lesson -> repository.save(lesson.clone().setGroup(null).build()));
+    }
+
+    public void deleteAllByGroupIdAndStartDateTimeAfter(long groupId, LocalDateTime startDateTime) {
+        repository.deleteAllByGroupIdAndStartDateTimeAfter(groupId, startDateTime);
+    }
+
     private void validate(Lesson lesson, boolean editFlag) {
         ValidationException validationException = new ValidationException();
 
@@ -150,8 +154,8 @@ public class LessonService {
             validationException.put("startdatetime", "Дата начала занятия должна быть не позднее, чем день назад.");
         }
         //проверка группы занятий
-        if (lesson.getGroupId() != null && lesson.getGroupId() < 1) {
-            validationException.put("groupId", "Группа занятий должна быть пуста (null) или должна быть больше нуля.");
+        if (lesson.getGroup() != null && !lessonsGroupRepository.existsById(lesson.getGroup().getId())) {
+            validationException.put("group", "Группа занятий с id «" + lesson.getGroup().getId() + "» не найден.");
         }
 
         validationException.throwExceptionIfIsNotEmpty();

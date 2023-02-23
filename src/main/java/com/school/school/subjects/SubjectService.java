@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class SubjectService {
     @Autowired
@@ -17,13 +19,13 @@ public class SubjectService {
 
     //возвращает список всех subject с deleted == false
     public Page<Subject> getAll(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Subject.class, pageable);
+        PageableValidator.sortValidOrThrow(Subject.class, pageable);
         return repository.findAllByDeletedIsFalse(pageable);
     }
 
     //возвращает список всех subject с deleted == true
     public Page<Subject> getAllDeleted(Pageable pageable) {
-        PageableValidator.checkIsSortValid(Subject.class, pageable);
+        PageableValidator.sortValidOrThrow(Subject.class, pageable);
         return repository.findAllByDeletedIsTrue(pageable);
     }
 
@@ -41,7 +43,7 @@ public class SubjectService {
             validationException.put("id", "Предмет с id «" + id + "» уже существует.");
         }
 
-        if (repository.existsByTitle(title)) {
+        if (repository.existsByTitleAndDeletedFalse(title)) {
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
@@ -56,7 +58,7 @@ public class SubjectService {
         String title = subject.getTitle();
         ValidationException validationException = new ValidationException();
 
-        if (repository.existsByTitleAndIdNot(title, id)) {
+        if (repository.existsByTitleAndIdNotAndDeletedFalse(title, id)) {
             validationException.put("title", "Предмет с заголовком «" + title + "» уже существует.");
         }
 
@@ -67,6 +69,7 @@ public class SubjectService {
                 .build();
 
         repository.save(subjectClone);
+        validationException.throwExceptionIfIsNotEmpty();
     }
 
     //устанавливает флаг deleted по id
@@ -88,11 +91,12 @@ public class SubjectService {
 
         repository.save(subjectClone);
     }
-//удаляет все subject с deleted == true,
-// на которые нет ссылок в связанной таблице lessons
-     public void wipe() {
-     repository.findAllByDeletedIsTrue(null).stream()
-        .filter(subject -> !lessonRepository.existsBySubjectId(subject.getId()))
-        .forEach(subject -> repository.deleteById(subject.getId()));
-}
+
+    //удаляет все subject с deleted == true,
+    // на которые нет ссылок в связанной таблице lessons
+    public void wipe() {
+        repository.findAllByDeletedIsTrue(null).stream()
+                .filter(subject -> !lessonRepository.existsBySubjectId(subject.getId()))
+                .forEach(subject -> repository.deleteById(subject.getId()));
+    }
 }
