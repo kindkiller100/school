@@ -8,9 +8,12 @@ import com.school.school.utils.PageableValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Service
@@ -56,6 +59,16 @@ public class StudentService {
         return repository.findAllByDateOfBirthRange(fromDate, uptoDate, pageable);
     }
 
+    public Set<Student> getAllById(Set<Long> studentIds) {
+        Set<Student> students = new HashSet<>(repository.findAllById(studentIds));
+
+        if (students.size() != studentIds.size()) {
+            throw new ValidationException("student ids", "Часть студентов по списку id не найдено.")
+                    .setStatus(HttpStatus.NOT_FOUND);
+        }
+
+        return students;
+    }
 
     public void create(Student student) {
         repository.save(student);

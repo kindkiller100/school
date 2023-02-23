@@ -5,6 +5,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 public class LessonDtoIn {
     @Min(value = 0, message = "Id занятия должно быть положительным.")
@@ -21,6 +22,7 @@ public class LessonDtoIn {
     @Size(max = 40, message = "Подробное описание занятия не должно быть больше 40 символов.")
     private String description;
     private Long groupId;
+    private Set<Long> studentIds;
 
     public LessonDtoIn() {
     }
@@ -79,5 +81,13 @@ public class LessonDtoIn {
 
     public void setGroupId(Long groupId) {
         this.groupId = groupId;
+    }
+
+    public Set<Long> getStudentIds() {
+        return studentIds;
+    }
+
+    public void setStudentIds(Set<Long> studentIds) {
+        this.studentIds = studentIds;
     }
 }
